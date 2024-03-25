@@ -4,6 +4,7 @@ import Layout from '../layout/Layout';
 import Home from '../pages/home/Home';
 import SignIn from '../pages/signin/SignIn';
 import SignUp from '../pages/signin/SignUp';
+import BookDetails from '../pages/bookdetails/BookDetails';
 const Router = () => {
     return (
         <div>
@@ -13,6 +14,7 @@ const Router = () => {
                         <Route path="/" element={<Home />} />
                         <Route path="/login" element={<SignIn />} />
                         <Route path="/register" element={<SignUp />} />
+                        <Route path="/details/:id" element={<BookDetails />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
