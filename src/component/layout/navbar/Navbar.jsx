@@ -4,11 +4,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoon, faBars, faTrophy } from '@fortawesome/free-solid-svg-icons'
 import { moonSharp, sunnyOutline } from 'ionicons/icons'
 import { IonIcon } from "@ionic/react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 export default function Navbar() {
   const [darkMode, setDarkMode] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const navigate = useNavigate();
   function changeMode() {
     setDarkMode(!darkMode);
   }
@@ -29,7 +28,7 @@ export default function Navbar() {
             <div className="flex items-center space-x-2 ml-20 cursor-pointer bg-black">
 
               <span className=" w-15 h-10">
-                <img src="./logo.png" className=" bg-white w-15 h-10" width={60} height={40} alt="" />
+                <img src="logo.png" className=" bg-white w-15 h-10" width={60} height={40} alt="" />
               </span>
 
             </div>

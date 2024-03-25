@@ -1,19 +1,13 @@
-import React from 'react'
-import Home from './component/pages/home/Home'
 import Router from './component/routers/Router'
-import Navbar from './component/layout/navbar/Navbar'
-import Footer from './component/layout/footer/Footer'
+import { BrowserRouter } from 'react-router-dom'
 function App() {
 
   return (
     <>
-      <React.Fragment>
-     
+        <BrowserRouter>
+          <Router />
+        </BrowserRouter>
 
-        <Router/>
-        
-      </React.Fragment>,
-      
     </>
   )
 }
