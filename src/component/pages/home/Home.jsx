@@ -60,27 +60,27 @@ const Home = () => {
         genre: 'Tâm lý - Tự viện',
         description: 'Một quyển sách kinh điển về tâm lý học.'
     }];
-    var rates = [{ id: 1, rate: 5, name: "nam1" }, { id: 2, rate: 4, name: "nam1" }, { id: 3, rate: 3, name: "nam1" }, { id: 4, rate: 2, name: "nam1" }, { id: 5, rate: 1, name: "nam1" }]
+    var rates = [{ id: 1, rate: 5, name: "nam1" }, { id: 2, rate: 4, name: "nam1" }, { id: 3, rate: 3, name: "nam1" }, { id: 4, rate: 2, name: "nam1" }, { id: 5, rate: 1, name: "nam1" },{ id: 6, rate: 4, name: "nam1" }]
 
-    return (< div className='bg-gray-100'>
+    return (< div className='bg-gray-100 border'>
         <Carousel interval={3000} navButtonsAlwaysVisible={true} >
             {bgs.map((bg) => {
                 return (
                     <Paper key={bg} >
-                        <div className={`mt-[5rem] w-full h-[40rem] bg-center items-center justify-center bg-gradient-to-b from-transparent to-black`} style={{ backgroundImage: `url("${bg}")`, backgroundRepeat: "no-repeat" }}>
+                        <div className={`mt-[5rem] w-full h-[40rem] bg-center items-center justify-center bg-gradient-to-b from-transparent cursor-pointer`} style={{ backgroundImage: `url("${bg}")`, backgroundRepeat: "no-repeat" }}>
                         </div>
                     </Paper>
                 )
             })
             }
         </Carousel>
-        <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96' icon={arrowUpCircleOutline}></IonIcon>
-        <IonIcon className='animate-bounce w-10 h-10 fixed right-4 top-96' icon={arrowDownCircleOutline}></IonIcon>
+        <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
+        <IonIcon className='animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
         {/* Nominated book */}
         {NominatedBook(data)}
         {/* New update book */}
         {NewBook(data, rates)}
-        {HotBook(data)}
+        {HotBook(data, rates)}
     </div>
     );
 };

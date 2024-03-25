@@ -1,34 +1,45 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMoon, faBars,faTrophy } from '@fortawesome/free-solid-svg-icons'
+import { faMoon, faBars, faTrophy } from '@fortawesome/free-solid-svg-icons'
 import { moonSharp, sunnyOutline } from 'ionicons/icons'
 import { IonIcon } from "@ionic/react";
-
+import { Link, useNavigate } from "react-router-dom";
 export default function Navbar() {
   const [darkMode, setDarkMode] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const navigate = useNavigate();
   function changeMode() {
     setDarkMode(!darkMode);
   }
   function showMenuMobile() {
     setShowMenu(!showMenu);
   }
+  // function Login() {
+  //   navigate("/login");
+  // }
+  // function signup() {
+  //   navigate("/register");
+  // }
   return (
     <div className="fixed top-0 z-50 bg-white shadow-md border w-full">
       <div className="mx-auto py-4 flex justify-between items-center ml-10 font-semibold">
         <div className="flex ml-10 space-x-10">
-          <div className="flex items-center space-x-2 ml-20">
-            <span className="ml-3">
-              <img src="./logo.png" className="w-10 h-10" alt="" />
-            </span>
-          </div>
-          <div className="flex items-center space-x-2">
-          <FontAwesomeIcon icon={faBars} />
+          <Link to="/">
+            <div className="flex items-center space-x-2 ml-20 cursor-pointer bg-black">
+
+              <span className=" w-15 h-10">
+                <img src="./logo.png" className=" bg-white w-15 h-10" width={60} height={40} alt="" />
+              </span>
+
+            </div>
+          </Link>
+          <div className="flex items-center space-x-2 cursor-pointer">
+            <FontAwesomeIcon icon={faBars} />
             <span className="">The loai</span>
           </div>
-          <div className="flex items-center space-x-2">
-          <FontAwesomeIcon icon={faTrophy} />
+          <div className="flex items-center space-x-2 cursor-pointer">
+            <FontAwesomeIcon icon={faTrophy} />
             <span className="">Bang xep hang</span>
           </div>
         </div>
@@ -46,12 +57,18 @@ export default function Navbar() {
         </div>
         <div className="md:flex hidden space-x-10 ">
           <div className="md:flex items-center gap-x-10 ">
-            <div className="md:space-x-4 space-x-2 border h-7 border-tblue rounded-full">
-              <span className="text-gray-600 p-3">Sign in</span>
-            </div>
-            <div className="md:space-x-4 space-x-2 border h-7 border-tblue rounded-full">
-              <span className="text-gray-600 p-3">Sign up</span>
-            </div>
+            <Link to={"/login"}>
+              <div className="md:space-x-4 space-x-2 border h-7 border-tblue rounded-full cursor-pointer">
+
+                <span className="text-gray-600 p-3"><button>Sign in</button></span>
+
+              </div>
+            </Link>
+            <Link to={"/register"}>
+              <div className="md:space-x-4 space-x-2 border h-7 border-tblue rounded-full cursor-pointer">
+                <span className="text-gray-600 p-3"><button>Sign up</button></span>
+              </div>
+            </Link>
           </div>
         </div>
         <div className="md:hiden w-10">
@@ -63,12 +80,16 @@ export default function Navbar() {
       {showMenu ? (
         <div className="md:flex justify-center md:hidden md:space-x-10 sm-w-full">
           <div className="md:flex items-center md:space-x-10 sm-w-full">
-            <div className="flex justify-center md:space-x-2 sm:w-full h-7 bg-tblue border border-white">
-              <span className="text-white">Sign in</span>
-            </div>
-            <div className="flex justify-center md:space-x-2 sm:w-full h-7 bg-tblue border border-white">
-              <span className="text-white">Sign up</span>
-            </div>
+            <Link to={"/login"}>
+              <div className="flex justify-center md:space-x-2 sm:w-full h-7 bg-tblue border border-white cursor-pointer">
+                <span className="text-white">Sign in</span>
+              </div>
+            </Link>
+            <Link to={"/register"}>
+              <div className="flex justify-center md:space-x-2 sm:w-full h-7 bg-tblue border border-white cursor-pointer">
+                <span className="text-white">Sign up</span>
+              </div>
+            </Link>
           </div>
         </div>
       ) : null}
