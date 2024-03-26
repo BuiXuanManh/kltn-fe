@@ -67,7 +67,7 @@ const Home = () => {
             {bgs.map((bg) => {
                 return (
                     <Paper key={bg} >
-                        <div className={`mt-[5rem] w-full h-[40rem] bg-center items-center justify-center bg-gradient-to-b from-transparent cursor-pointer`} style={{ backgroundImage: `url("${bg}")`, backgroundRepeat: "no-repeat" }}>
+                        <div className={`w-full h-[40rem] bg-center items-center justify-center bg-gradient-to-b from-transparent cursor-pointer`} style={{ backgroundImage: `url("${bg}")`, backgroundRepeat: "no-repeat" }}>
                         </div>
                     </Paper>
                 )

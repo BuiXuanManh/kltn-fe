@@ -6,7 +6,7 @@ import React from 'react';
 
 const SignIn = () => {
     return (
-        <div className="mt-[5rem] bg-gray-50 dark:bg-gray-800">
+        <div className="bg-gray-50 dark:bg-gray-800">
     <div className="flex min-h-[80vh] flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="text-center sm:mx-auto sm:w-full sm:max-w-md">
             <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">

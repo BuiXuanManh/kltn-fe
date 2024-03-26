@@ -10,10 +10,6 @@ const BookDetails = () => {
     const [content, setContent] = useState(0); // Giá trị nội dung sách
     const [understandability, setUnderstandability] = useState(0);
 
-    const handleInputChange = (event) => {
-        setProgress(parseInt(event.target.value));
-    };
-
     const handleMenuClick = (menuItem) => {
         setActiveMenu(menuItem);
     };
@@ -38,7 +34,7 @@ const BookDetails = () => {
     }
     return (
         <div>
-            <div className="mt-[5rem] w-full h-[40rem] border items-center justify-center border-white rounded-lg bg-white shadow-md" style={{ backgroundImage: "url(bg-2.jpg)" }}>
+            <div className="w-full h-[40rem] border items-center justify-center border-white rounded-lg bg-white shadow-md" style={{ backgroundImage: "url(bg-2.jpg)" }}>
                 <div className=' mt-[20%] mx-48  p-5 bg-white rounded-md' >
                     <div className='flex'>
                         <div className='w-52 h-72'>
@@ -163,6 +159,9 @@ const BookDetails = () => {
                             </div>
                             <div className='mt-4'>
                                 <textarea name="rate" placeholder='Nhập đánh giá của bạn' cols="70" rows="10"></textarea>
+                            </div>
+                            <div className='mt-4'>
+                               <button></button>
                             </div>
                         </div>
                     )}

@@ -21,7 +21,7 @@ export default function Navbar() {
   //   navigate("/register");
   // }
   return (
-    <div className="fixed top-0 z-50 bg-white shadow-md border w-full">
+    <div className="bg-white shadow-md border w-full">
       <div className="mx-auto py-4 flex justify-between items-center ml-10 font-semibold">
         <div className="flex ml-10 space-x-10">
           <Link to="/">
