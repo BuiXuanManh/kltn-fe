@@ -12,6 +12,7 @@ import NotFound from '../pages/notFound/NotFound';
 import ReadBook from '../pages/readbook/ReadBook';
 import Profile from '../pages/profile/Profile';
 
+
 const Router = () => {
     var data = [{
         id: 1,
@@ -59,19 +60,17 @@ const Router = () => {
     }];
     return (
         <div>
-            <Navbar />
-            <Routes>
 
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<SignIn />} />
-                    <Route path="/register" element={<SignUp />} />
-                    <Route path="/details/:id" element={<BookDetails />} ></Route>
-                    <Route path="/details/read/:id" element={<ReadBook />} ></Route>
-                    <Route path="/profile/:id" element={<Profile data={data} />} ></Route>
-                    <Route path="*" element={<NotFound />}></Route>
-                
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<SignIn />} />
+                <Route path="/register" element={<SignUp />} />
+                <Route path="/details/:id" element={<BookDetails />} ></Route>
+                <Route path="/details/read/:id" element={<ReadBook />} ></Route>
+                <Route path="/profile/:id" element={<Profile data={data} />} ></Route>
+                <Route path="*" element={<NotFound />}></Route>
             </Routes>
-            <Footer />
+
         </div>
     );
 };

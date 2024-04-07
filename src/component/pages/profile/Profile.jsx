@@ -1,41 +1,54 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Paper } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import Carousel from 'react-material-ui-carousel';
 import { faUser, faPenToSquare } from '@fortawesome/free-regular-svg-icons';
-import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
+import { faUserTie, faXmark } from '@fortawesome/free-solid-svg-icons';
+// import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 const Profile = ({ data }) => {
-
-
+    const [showSetting, setShowSetting] = useState(false);
+    const showSettingHandle = () => {
+        setShowSetting(!showSetting);
+    }
     return (
         <div>
             <div className="h-full bg-gray-200 p-8">
                 <div className="bg-white rounded-lg shadow-xl pb-8">
                     <div className="absolute right-12 mt-4 rounded">
-                        <button className="border border-gray-400 p-2 rounded text-gray-300 hover:text-gray-300 bg-gray-100 bg-opacity-10 hover:bg-opacity-20" title="Settings">
+                        <button onClick={() => showSettingHandle()} className="border border-gray-400 p-2 rounded text-gray-300 hover:text-gray-300 bg-gray-100 bg-opacity-10 hover:bg-opacity-20" title="Settings">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
                             </svg>
                         </button>
-                        <div className="bg-white absolute right-0 w-52 py-2 mt-1 border border-gray-200 shadow-2xl" style={{ display: "none;" }}>
+                        {showSetting && <div className="bg-white absolute right-0 w-52 py-2 mt-1 border border-gray-200 shadow-2xl" style={{ display: "none;" }}>
                             <div className="py-2 border-b">
-                                <p className="text-gray-700 text-xs px-6 uppercase mb-1">Cài đặt</p>
+                                <div className='flex justify-between'>
+                                    <div className="text-gray-700 text-xs px-6 uppercase mb-1">Cài đặt</div>
+                                    <div className='text-gray-700 text-xs px-6 uppercase mb-1 '>
+                                        <button onClick={() => showSettingHandle()} >
+                                            <FontAwesomeIcon icon={faXmark} />
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <button className="w-full flex items-center px-6 py-1.5 space-x-2 hover:bg-gray-200">
-                                    <KeyOutlinedIcon className='h-4 w-4 text-gray-400' />
-                                    <span className="text-sm text-gray-700">Đổi mật khẩu</span>
+                                    <FontAwesomeIcon icon={faUserTie} className='h-4 w-6 text-gray-400' />
+                                    <span className="text-sm text-gray-700">Đổi avatar</span>
                                 </button>
                                 <button className="w-full flex items-center py-1.5 px-6 space-x-2 hover:bg-gray-200">
                                     <FontAwesomeIcon className='h-4 w-6 text-gray-400' icon={faPenToSquare} />
                                     <span className="ml-4 text-sm text-gray-700">Đổi hình nền</span>
                                 </button>
                             </div>
-                        </div>
+                        </div>}
                     </div>
                     <div className="w-full h-[250px]">
                         <img src="https://vojislavd.com/ta-template-demo/assets/img/profile-background.jpg" className="w-full h-full rounded-tl-lg rounded-tr-lg" />
                     </div>
                     <div className="flex flex-col items-center -mt-20">
-                        <img src="avarta.jpg" className="w-40 border-4 border-white rounded-full" />
+                        <img src="avatar.jpg" className="w-40 border-4 border-white rounded-full" />
                         <div className="flex items-center space-x-2 mt-2">
                             <p className="text-2xl">Amanda Ross</p>
                             <span className="bg-blue-500 rounded-full p-1" title="Verified">
@@ -119,17 +132,17 @@ const Profile = ({ data }) => {
                             </ul>
                         </div>
                     </div>
-                    <div className="flex flex-col w-full 2xl:w-2/3">
+                    <div className="flex flex-col w-full shadow-xl">
                         <div className="flex-1 bg-white rounded-lg p-8">
-                            <h4 className="text-xl text-gray-900 font-bold">About</h4>
-                            < div className='bg-gray-100 w-full'>
-                                <Carousel interval={3000} navButtonsAlwaysVisible={true} >
+                            <h4 className="text-xl text-gray-900 font-bold">Đã đọc</h4>
+                            < div className='bg-gray-100 w-full rounded-md mt-5 '>
+                                <Carousel interval={3000}>
                                     {data.map((i) => {
                                         return (
                                             <Paper key={i.id} >
-                                                <div className={`w-full bg-center items-center justify-center bg-gray-100 cursor-pointer`} >
+                                                <div className=" border border-x-0 border-t-4 border-solid w-full bg-center items-center justify-center bg-gray-100 cursor-pointer p-2" >
                                                     <div className='flex mt-5'>
-                                                        <div className=' ml-20'>
+                                                        <div className='ml-20 mb-3'>
                                                             <img className='h-80 object-cover w-52' src={i.img} alt="" />
                                                         </div>
                                                         <div className='ml-10'>
@@ -141,7 +154,6 @@ const Profile = ({ data }) => {
                                                             <div className='mt-4'>
                                                                 {i.description}
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                 </div>

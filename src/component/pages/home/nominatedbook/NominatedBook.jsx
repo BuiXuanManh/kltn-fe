@@ -22,14 +22,22 @@ function NominatedBook(data) {
                         return (
                             <div key={item.id} className='flex text-start w-full mt-5 max-h-52 shadow-md'>
                                 <div className='w-24 h-32 ml-2 cursor-pointer'>
-                                    <img className='w-full h-full object-cover' src={item.img} alt='img book' />
+                                    <img className='w-full h-full object-cover' src={item.image} alt='img book' />
                                 </div>
                                 <div className='ml-2 w-full'>
                                     <h3 className="cursor-pointer">{item.title}</h3>
-                                    <span>{item.description}</span>
+                                    <span>{item.shortDescription}</span>
                                     <div className='flex items-center justify-between w-full'>
-                                        <div className=''>{item.author}</div>
-                                        <div className='p-1 border border-yellow-400 text-orange-600 cursor-pointer'>{item.genre}</div>
+                                        {item.authors?.map((author) => {
+                                            return (
+                                                <div key={author} className='p-1 border border-tblue text-orange-600 cursor-pointer'>{author}</div>
+                                            );
+                                        })}
+                                        {item.genres?.map((genre) => {
+                                            return (
+                                                <div key={genre} className='p-1 border border-tblue text-orange-600 cursor-pointer'>{genre}</div>
+                                            )
+                                        })}
                                     </div>
                                 </div>
                             </div>
@@ -41,11 +49,15 @@ function NominatedBook(data) {
                         return (
                             <div key={item.id} className='flex text-start w-full mt-5 max-h-30 pb-2 shadow-md '>
                                 <div className='w-8 h-12'>
-                                    <img width={40} height={60} className='w-full h-full cursor-pointer' src={item.img} alt='img book' />
+                                    <img width={40} height={60} className='w-full h-full cursor-pointer' src={item.image} alt='img book' />
                                 </div>
                                 <div className='ml-2 w-full'>
                                     <h3 className="cursor-pointer">{item.title}</h3>
-                                    <span>{item.genre}</span>
+                                    {item.genres?.map((genre) => {
+                                        return (
+                                            <div key={genre} >{genre}</div>
+                                        )
+                                    })}
                                 </div>
                             </div>
                         );

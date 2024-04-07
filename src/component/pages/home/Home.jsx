@@ -6,6 +6,10 @@ import HotBook from './hotbook/HotBook';
 
 import { IonIcon } from '@ionic/react';
 import { arrowDownCircleOutline, arrowUpCircleOutline } from 'ionicons/icons';
+import BookService from '../../service/BookService';
+import { useEffect, useState } from 'react';
+// import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 const Home = () => {
     var bgs = [
         "bg-1.jpg",
@@ -16,51 +20,67 @@ const Home = () => {
         "bg-6.jpg",
         "bg-7.jpg",
     ]
-    var data = [{
-        id: 1,
-        title: 'Harry Potter và Hòn Đá Phù Thủy',
-        img: 'book1.jpg',
-        author: 'J.K. Rowling',
-        genre: 'Fantasy',
-        description: 'Cuốn sách đầu tiên trong loạt truyện Harry Potter.'
-    }, {
-        id: 2,
-        title: 'Narnia: Lữ Khách Thép',
-        img: 'book2.jpg',
-        author: 'C.S. Lewis',
-        genre: 'Fantasy',
-        description: 'Cuốn thứ hai trong loạt truyện Narnia.'
-    }, {
-        id: 3,
-        title: 'Hobbit',
-        img: 'book3.jpg',
-        author: 'J.R.R. Tolkien',
-        genre: 'Fantasy',
-        description: 'Một cuộc phiêu lưu của một người Hobbit tên là Bilbo Baggins.'
-    }, {
-        id: 4,
-        title: 'Đi Tìm Lẽ Sống',
-        img: 'book4.jpg',
-        author: 'Viktor E. Frankl',
-        genre: 'Tâm lý - Tự viện',
-        description: 'Một quyển sách kinh điển về tâm lý học.'
-    }, {
-        id: 5,
-        title: 'Đi Tìm Lẽ Sống',
-        img: 'book4.jpg',
-        author: 'Viktor E. Frankl',
-        genre: 'Tâm lý - Tự viện',
-        description: 'Một quyển sách kinh điển về tâm lý học.'
-    },
-    {
-        id: 6,
-        title: 'Đi Tìm Lẽ Sống',
-        img: 'book4.jpg',
-        author: 'Viktor E. Frankl',
-        genre: 'Tâm lý - Tự viện',
-        description: 'Một quyển sách kinh điển về tâm lý học.'
-    }];
-    var rates = [{ id: 1, rate: 5, name: "nam1" }, { id: 2, rate: 4, name: "nam1" }, { id: 3, rate: 3, name: "nam1" }, { id: 4, rate: 2, name: "nam1" }, { id: 5, rate: 1, name: "nam1" },{ id: 6, rate: 4, name: "nam1" }]
+    const [data, setData] = useState([]);
+    const navigate = useNavigate();
+   
+    useEffect(() => {
+        const fetchData = async () => {
+            if (data.length <= 0) {
+                let bookService = new BookService();
+                const response = await bookService.getBooks();
+                setData(response.data);
+                navigate("/");
+            }
+        };
+
+        fetchData();
+    }, []);
+    
+    // var data = [{
+    //     id: 1,
+    //     title: 'Harry Potter và Hòn Đá Phù Thủy',
+    //     img: 'book1.jpg',
+    //     author: 'J.K. Rowling',
+    //     genre: 'Fantasy',
+    //     description: 'Cuốn sách đầu tiên trong loạt truyện Harry Potter.'
+    // }, {
+    //     id: 2,
+    //     title: 'Narnia: Lữ Khách Thép',
+    //     img: 'book2.jpg',
+    //     author: 'C.S. Lewis',
+    //     genre: 'Fantasy',
+    //     description: 'Cuốn thứ hai trong loạt truyện Narnia.'
+    // }, {
+    //     id: 3,
+    //     title: 'Hobbit',
+    //     img: 'book3.jpg',
+    //     author: 'J.R.R. Tolkien',
+    //     genre: 'Fantasy',
+    //     description: 'Một cuộc phiêu lưu của một người Hobbit tên là Bilbo Baggins.'
+    // }, {
+    //     id: 4,
+    //     title: 'Đi Tìm Lẽ Sống',
+    //     img: 'book4.jpg',
+    //     author: 'Viktor E. Frankl',
+    //     genre: 'Tâm lý - Tự viện',
+    //     description: 'Một quyển sách kinh điển về tâm lý học.'
+    // }, {
+    //     id: 5,
+    //     title: 'Đi Tìm Lẽ Sống',
+    //     img: 'book4.jpg',
+    //     author: 'Viktor E. Frankl',
+    //     genre: 'Tâm lý - Tự viện',
+    //     description: 'Một quyển sách kinh điển về tâm lý học.'
+    // },
+    // {
+    //     id: 6,
+    //     title: 'Đi Tìm Lẽ Sống',
+    //     img: 'book4.jpg',
+    //     author: 'Viktor E. Frankl',
+    //     genre: 'Tâm lý - Tự viện',
+    //     description: 'Một quyển sách kinh điển về tâm lý học.'
+    // }];
+    var rates = [{ id: 1, rate: 5, name: "nam1" }, { id: 2, rate: 4, name: "nam1" }, { id: 3, rate: 3, name: "nam1" }, { id: 4, rate: 2, name: "nam1" }, { id: 5, rate: 1, name: "nam1" }, { id: 6, rate: 4, name: "nam1" }, { id: 7, rate: 4, name: "nam1" }, { id: 8, rate: 3, name: "nam1" }, { id: 9, rate: 2, name: "nam1" }, { id: 10, rate: 1, name: "nam1" }, { id: 11, rate: 4, name: "nam1" }]
 
     return (< div className='bg-gray-100 border'>
         <Carousel interval={3000} navButtonsAlwaysVisible={true} >
@@ -74,13 +94,13 @@ const Home = () => {
             })
             }
         </Carousel>
-        <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
-        <IonIcon className='animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
+        <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
+        <IonIcon className='animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
         {/* Nominated book */}
         {NominatedBook(data)}
         {/* New update book */}
         {NewBook(data, rates)}
-        {HotBook(data, rates)}
+        {data.length > 0 && HotBook(data, rates)}
     </div>
     );
 };
