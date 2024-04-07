@@ -10,6 +10,7 @@ export default {
       colors: {
         tblack: '#081C36',
         tblue: "#0C4DA2",
+        tyellow:"#FCD34D",
         dark:"#181A1B"
       },        
     },

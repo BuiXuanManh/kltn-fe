@@ -7,22 +7,23 @@ import Cookies from 'js-cookie';
 import AccountService from '../../service/AccountService';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import useHandleBlur from '../../../hook/useHandleBlur';
 const SignIn = () => {
-    const [username, setUsername] = useState("");
+    const [mssv, setMssv] = useState("");
     const [password, setPassword] = useState("");
     const [isToken, setIsToken] = useState(false)
     const [isProfile, setIsProfile] = useState(false)
     // const [shouldAutoRefresh, setShouldAutoRefresh] = useState(true);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-
+    const { handleBlur, errors } = useHandleBlur();
     const service = new AccountService();
 
     const token = useQuery({
         queryKey: ["token"],
         queryFn: async () => {
-            if (username && password) {
-                const data = await service.login({ username, password });
+            if (mssv && password) {
+                const data = await service.login({ mssv, password });
                 console.log(data)
                 if (data) {
                     return data;
@@ -71,7 +72,7 @@ const SignIn = () => {
 
                 if (data) {
                     // console.log("p data", data);
-                    Cookies.set("profile",  JSON.stringify(data.data));
+                    Cookies.set("profile", JSON.stringify(data.data));
                     return data;
                 }
             }
@@ -117,7 +118,7 @@ const SignIn = () => {
         e.preventDefault();
         handleGetToken();
         queryClient.invalidateQueries(["token"]);
-        const data = queryClient.getQueryData(["token"]);
+        // const data = queryClient.getQueryData(["token"]);
         // profile.mutate();
         // console.log("token", token);
         // console.log("profile", profile);
@@ -139,18 +140,20 @@ const SignIn = () => {
                                 <label for="email" className="block text-sm font-medium text-gray-700 dark:text-white">Email address /
                                     MSSV</label>
                                 <div className="mt-1">
-                                    <input id="email" type="text" data-testid="username" required="" onChange={(e) => setUsername(e.target.value)}
+                                    <input onBlur={()=>handleBlur({ field: "mssv", mssv: mssv })} type="text" data-testid="mssv" required="" onChange={(e) => setMssv(e.target.value)}
                                         className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-300 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 sm:text-sm"
                                     />
+                                    {<p style={{ color: 'red' }}>{errors.mssv}</p>}
                                 </div>
                             </div>
                             <div>
                                 <label for="password" className="block text-sm font-medium text-gray-700 dark:text-white">Password</label>
                                 <div className="mt-1">
-                                    <input id="password" name="password" type="password" data-testid="password"
+                                    <input id="password" onBlur={()=>handleBlur({ field: "password", password: password })} name="password" type="password" data-testid="password"
                                         autocomplete="current-password" required="" onChange={(e) => setPassword(e.target.value)}
                                         className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-300 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 sm:text-sm"
                                     />
+                                    {<p style={{ color: 'red' }}>{errors.password}</p>}
                                 </div>
                             </div>
                             <div className="flex items-center justify-between">

@@ -46,7 +46,7 @@ const BookDetails = () => {
                             <div className='flex my-2'>
                                 {genres.map((genre) => {
                                     return (
-                                        <div key={genre} className='p-1 mx-2 border rounded-2xl border-tblue text-orange-600 cursor-pointer'>{genre}</div>
+                                        <div key={genre} className='p-1 px-3 mx-2 border rounded-2xl border-tyellow text-orange-600 cursor-pointer'>{genre}</div>
                                     );
                                 })}
 
@@ -98,8 +98,8 @@ const BookDetails = () => {
             <div className='mx-52'>
                 <div className="flex mt-8 gap-8 text-xl font-semibold">
                     <div className={activeMenu === 'giới thiệu' ? 'text-tblue border-b-4 border- py-2 border-tblue' : 'py-2'} onClick={() => handleMenuClick('giới thiệu')}>Giới thiệu</div>
-                    <div className={activeMenu === 'đánh giá' ? ' text-tblue border-b-4 py-2 border-tblue' : 'py-2'} onClick={() => handleMenuClick('đánh giá')}>Đánh giá <span className='border px-2 bg-gray-500 rounded-xl'>{rates.rate}</span></div>
-                    <div className={activeMenu === 'bình luận' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2'} onClick={() => handleMenuClick('bình luận')}>Bình luận <span className='border px-2 bg-gray-500 rounded-xl'>{rates.comments}</span></div>
+                    <div className={activeMenu === 'đánh giá' ? ' text-tblue border-b-4 py-2 border-tblue' : 'py-2'} onClick={() => handleMenuClick('đánh giá')}>Đánh giá <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{rates.rate}</span></div>
+                    <div className={activeMenu === 'bình luận' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2'} onClick={() => handleMenuClick('bình luận')}>Bình luận <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{rates.comments}</span></div>
                 </div>
                 <div className='mb-10'>
                     {activeMenu === 'giới thiệu' && (

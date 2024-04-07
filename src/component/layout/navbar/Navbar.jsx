@@ -8,13 +8,14 @@ import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Avatar, Skeleton } from "@mui/material";
 export default function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
  
   const [login, isLogin] = useState(false);
   const [token, setToken] = useState("");
   const [profile, setProfile] = useState();
-  const [username, setUsername] = useState();
+  const [mssv, setMssv] = useState();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const showMenuMobile = () => {
@@ -30,7 +31,7 @@ export default function Navbar() {
     Cookies.remove("profile");
     isLogin(false);
     setToken("");
-    setUsername("");
+    setMssv("");
     setProfile(null);
     setShowSetting(false);
     queryClient.removeQueries(["token"]);
@@ -43,15 +44,15 @@ export default function Navbar() {
       if (t && p) {
         setToken(t);
         setProfile(JSON.parse(p))
-        setUsername(JSON.parse(p).username);
-        console.log("username", JSON.parse(p).username);
+        setMssv(JSON.parse(p).mssv);
+        console.log("mssv", JSON.parse(p).mssv);
         isLogin(true);
       } else {
         isLogin(false);
       }
     }
     loginData();
-  }, [token, username, login, Cookies.get("token")]);
+  }, [token, mssv, login, Cookies.get("token")]);
   // const t = queryClient.getQueryData(["token"]);
   // const p = queryClient.getQueryData(["profile"]);
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -67,7 +68,7 @@ export default function Navbar() {
   };
 
   // Xác định lớp CSS cho div bao quanh input dựa trên trạng thái focus
-  const divBorderClassName = isInputFocused ? "blue-700" : "gray-400";
+  const divBorderClassName = isInputFocused ? "tblue" : "gray-400";
   return (
     <div className="bg-white shadow-md border w-full">
       <div className="mx-auto py-4 flex justify-between items-center ml-10 font-semibold">
@@ -91,7 +92,7 @@ export default function Navbar() {
 
 
         <div className="md:flex space-x-15">
-          <div className={`md:flex hidden md:items-center w-80 bg-white py-1 px-2 rounded-full border border-${divBorderClassName}`}>
+          <div className={`md:flex hidden md:items-center w-80 bg-white py-1 px-2 rounded-full border-2 border-${divBorderClassName}`}>
             <span>
               <svg xmlns="http://www.w3.org/2000/svg" className={`h-7 w-7 text-${divBorderClassName} cursor-pointer`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -124,23 +125,24 @@ export default function Navbar() {
                 <div className="relative">
                   <a onClick={() => showSettingHandle()}>
                     <div className="flex h-10 cursor-pointer justify-center items-center space-x-2">
-                      <img src="avatar.jpg" className="w-15 h-10 border-4 border-white rounded-full" />
-                      <span className="text-gray-600 ">{username}</span>
+                    <Avatar sx={{ width: 35, height: 35 }} src={profile?.image}/>
+                      {/* <img src="avatar.jpg" className="w-15 h-10 border-4 border-white rounded-full" /> */}
+                      <span className="text-gray-600 ">{mssv}</span>
                     </div>
                   </a>
                   {showSetting ? (
                     <>
                       <div className="z-50 absolute left-0 w-48 py-2 mt-2 mr-10 bg-white rounded-lg shadow-xl">
-                        <a href={"/profile/" + username} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <a href={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Profile
                         </a>
-                        <a href={"/profile/" + username} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <a href={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Đổi mật khẩu
                         </a>
-                        <a href={"/profile/" + username} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <a href={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Lịch sử đọc
                         </a>
-                        <a href={"/profile/" + username} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <a href={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Lưu trữ
                         </a>
                         <a onClick={(e) => handleLogout(e)} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">

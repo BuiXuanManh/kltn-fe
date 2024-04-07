@@ -1,3 +1,4 @@
+
 import { IonIcon } from '@ionic/react';
 import React from 'react';
 import {
@@ -19,57 +20,18 @@ const ReadBook = () => {
             {index !== content.split('.').length - 1 && '.'}<br /><br />
         </React.Fragment>
     ));
+    // const [scoll, setScoll] = React.useState(false);
+    // const handleScoll = () => {
+    //     setScoll(true);
+    // }
     return (
         <div className='mx-3 py-10 w-full h-full bg-gray-100'>
             <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
             <IonIcon className='animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
-            <div className=''>
-                <div className='fixed ml-4 mt-1 top-28 right-24 rounded-xl justify-between h-full '>
-                    <div className='bg-[#EAE4D3] rounded-xl w-20'>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center'>
-                            {/* <FontAwesomeIcon className='w-8 h-8' icon={faBars}/> */}
-                            <div className='mt-4 text-center'>
-                                <IonIcon className='w-7 h-7' icon={menuSharp} />
-                            </div>
+            <div className='w-full'>
+                {/* <div className=''> */}
 
-                        </div>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                            <div className='mt-4'>
-                                <IonIcon className='w-6 h-6' icon={settingsOutline} />
-                            </div>
-                        </div>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                            <div className='mt-4'>
-                                <IonIcon className='w-6 h-6' icon={arrowBack} />
-                            </div>
-                        </div>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                            <div className='mt-4'>
-                                <IonIcon className='w-7 h-7' icon={alertCircleOutline} />
-                            </div>
-                        </div>
-                    </div>
 
-                </div>
-                <div className='fixed ml-4 mt-1 bottom-10 right-24  justify-between'>
-                    <div className='bg-[#EAE4D3] w-20 rounded-xl'>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                            <div className='mt-4'>
-                                <IonIcon className='w-7 h-7' icon={heartOutline} />
-                            </div>
-                        </div>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                            <div className='mt-4'>
-                                <IonIcon className='w-7 h-7' icon={bookmarkOutline} />
-                            </div>
-                        </div>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                            <div className='mt-4'>
-                                <IonIcon className='w-7 h-7' icon={chatbubblesOutline} />
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div className='mx-48 border bg-[#EAE4D3] border-white rounded-xl items-center justify-center text-center'>
                     <div className='mt-5 flex mx-20 justify-between'>
                         <div className=''>
@@ -200,6 +162,52 @@ const ReadBook = () => {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div className='fixed ml-4 top-0 mt-28 right-24 rounded-xl justify-between'>
+                    <div className={`sticky bg-[#EAE4D3] rounded-xl w-20`}>
+                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center'>
+                            {/* <FontAwesomeIcon className='w-8 h-8' icon={faBars}/> */}
+                            <div className='mt-4 text-center'>
+                                <IonIcon className='w-7 h-7' icon={menuSharp} />
+                            </div>
+
+                        </div>
+                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
+                            <div className='mt-4'>
+                                <IonIcon className='w-6 h-6' icon={settingsOutline} />
+                            </div>
+                        </div>
+                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
+                            <div className='mt-4'>
+                                <IonIcon className='w-6 h-6' icon={arrowBack} />
+                            </div>
+                        </div>
+                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
+                            <div className='mt-4'>
+                                <IonIcon className='w-7 h-7' icon={alertCircleOutline} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className='sticky mt-14'>
+                        <div className='bg-[#EAE4D3] w-20 rounded-xl'>
+                            <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
+                                <div className='mt-4'>
+                                    <IonIcon className='w-7 h-7' icon={heartOutline} />
+                                </div>
+                            </div>
+                            <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
+                                <div className='mt-4'>
+                                    <IonIcon className='w-7 h-7' icon={bookmarkOutline} />
+                                </div>
+                            </div>
+                            <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
+                                <div className='mt-4'>
+                                    <IonIcon className='w-7 h-7' icon={chatbubblesOutline} />
+                                </div>
+                            </div>
+                        </div>
+                        {/* </div> */}
                     </div>
                 </div>
             </div>

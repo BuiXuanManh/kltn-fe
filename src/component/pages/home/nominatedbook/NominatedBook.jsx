@@ -30,12 +30,12 @@ function NominatedBook(data) {
                                     <div className='flex items-center justify-between w-full'>
                                         {item.authors?.map((author) => {
                                             return (
-                                                <div key={author} className='p-1 border border-tblue text-orange-600 cursor-pointer'>{author}</div>
+                                                <div key={author} className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{author}</div>
                                             );
                                         })}
                                         {item.genres?.map((genre) => {
                                             return (
-                                                <div key={genre} className='p-1 border border-tblue text-orange-600 cursor-pointer'>{genre}</div>
+                                                <div key={genre} className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{genre}</div>
                                             )
                                         })}
                                     </div>
