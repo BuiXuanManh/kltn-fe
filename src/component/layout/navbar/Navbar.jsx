@@ -9,9 +9,10 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Skeleton } from "@mui/material";
+import useLoginData from "../../../hook/useLoginData";
 export default function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
- 
+
   const [login, isLogin] = useState(false);
   const [token, setToken] = useState("");
   const [profile, setProfile] = useState();
@@ -37,24 +38,7 @@ export default function Navbar() {
     queryClient.removeQueries(["token"]);
     queryClient.removeQueries(["profile"]);
   }
-  useEffect(() => {
-    const loginData = () => {
-      const t = Cookies.get("token");
-      const p = Cookies.get("profile");
-      if (t && p) {
-        setToken(t);
-        setProfile(JSON.parse(p))
-        setMssv(JSON.parse(p).mssv);
-        console.log("mssv", JSON.parse(p).mssv);
-        isLogin(true);
-      } else {
-        isLogin(false);
-      }
-    }
-    loginData();
-  }, [token, mssv, login, Cookies.get("token")]);
-  // const t = queryClient.getQueryData(["token"]);
-  // const p = queryClient.getQueryData(["profile"]);
+  useLoginData({ token, mssv, login, setToken, setProfile, setMssv, isLogin });
   const [isInputFocused, setIsInputFocused] = useState(false);
 
   // Hàm xử lý khi input được focus
@@ -125,7 +109,7 @@ export default function Navbar() {
                 <div className="relative">
                   <a onClick={() => showSettingHandle()}>
                     <div className="flex h-10 cursor-pointer justify-center items-center space-x-2">
-                    <Avatar sx={{ width: 35, height: 35 }} src={profile?.image}/>
+                      <Avatar sx={{ width: 35, height: 35 }} src={profile?.image} />
                       {/* <img src="avatar.jpg" className="w-15 h-10 border-4 border-white rounded-full" /> */}
                       <span className="text-gray-600 ">{mssv}</span>
                     </div>
