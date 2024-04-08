@@ -6,12 +6,20 @@ import React, { useState } from 'react';
 import Carousel from 'react-material-ui-carousel';
 import { faUser, faPenToSquare } from '@fortawesome/free-regular-svg-icons';
 import { faUserTie, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { Avatar, Skeleton } from "@mui/material";
+import useLoginData from '../../../hook/useLoginData';
 // import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 const Profile = ({ data }) => {
     const [showSetting, setShowSetting] = useState(false);
     const showSettingHandle = () => {
         setShowSetting(!showSetting);
     }
+    const [token, setToken] = useState("");
+    const [profile, setProfile] = useState();
+    const [name, setName] = useState();
+    const [mssv, setMssv] = useState("");
+    console.log(profile)
+    useLoginData({ token, setToken, setProfile, setName, setMssv });
     return (
         <div>
             <div className="h-full bg-gray-200 p-8">
@@ -48,32 +56,33 @@ const Profile = ({ data }) => {
                         <img src="https://vojislavd.com/ta-template-demo/assets/img/profile-background.jpg" className="w-full h-full rounded-tl-lg rounded-tr-lg" />
                     </div>
                     <div className="flex flex-col items-center -mt-20">
-                        <img src="avatar.jpg" className="w-40 border-4 border-white rounded-full" />
+                        {/* <img src="avatar.jpg" className="w-40 border-4 border-white rounded-full" /> */}
+                        <Avatar src={profile?.image} sx={{ width: "10rem", height: "10rem" }} />
                         <div className="flex items-center space-x-2 mt-2">
-                            <p className="text-2xl">Amanda Ross</p>
+                            <p className="text-2xl">{profile?.name}</p>
                             <span className="bg-blue-500 rounded-full p-1" title="Verified">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="text-gray-100 h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </span>
                         </div>
-                        <p className="text-gray-700">Senior Software Engineer at Tailwind CSS</p>
-                        <p className="text-sm text-gray-500">New York, USA</p>
+                        <p className="mt-1 text-gray-700">Trường Đại Học Công Nghiệp TP.HCM</p>
+                        {/* <p className="text-sm text-gray-500">New York, USA</p> */}
                     </div>
                 </div>
 
                 <div className="my-4 flex flex-col 2xl:flex-row space-y-4 2xl:space-y-0 2xl:space-x-4">
                     <div className="w-full flex flex-col 2xl:w-1/3">
                         <div className="flex-1 bg-white rounded-lg shadow-xl p-8">
-                            <h4 className="text-xl text-gray-900 font-bold">Personal Info</h4>
+                            <h4 className="text-xl text-gray-900 font-bold">Thông tin cá nhân</h4>
                             <ul className="mt-2 text-gray-700">
                                 <li className="flex border-y py-2">
-                                    <span className="font-bold w-28">Full name:</span>
-                                    <span className="text-gray-700">Amanda S. Ross</span>
+                                    <span className="font-bold w-28">Họ tên:</span>
+                                    <span className="text-gray-700">{profile.name}</span>
                                 </li>
                                 <li className="flex border-b py-2">
                                     <span className="font-bold w-28">Birthday:</span>
-                                    <span className="text-gray-700">24 Jul, 1991</span>
+                                    <span className="text-gray-700">{profile.birthday}</span>
                                 </li>
                                 <li className="flex border-b py-2">
                                     <span className="font-bold w-28">Joined:</span>

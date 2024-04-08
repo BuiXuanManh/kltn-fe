@@ -6,18 +6,21 @@ import { moonSharp, sunnyOutline } from 'ionicons/icons'
 import { IonIcon } from "@ionic/react";
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Skeleton } from "@mui/material";
 import useLoginData from "../../../hook/useLoginData";
 export default function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
-
+  const location = useLocation();
   const [login, isLogin] = useState(false);
+  
   const [token, setToken] = useState("");
   const [profile, setProfile] = useState();
-  const [mssv, setMssv] = useState();
+  const [name, setName] = useState();
+  const [mssv,setMssv]=useState("");
   const navigate = useNavigate();
+
   const queryClient = useQueryClient();
   const showMenuMobile = () => {
     setShowMenu(!showMenu);
@@ -30,15 +33,17 @@ export default function Navbar() {
     e.preventDefault();
     Cookies.remove("token");
     Cookies.remove("profile");
+    Cookies.remove("refreshToken");
     isLogin(false);
     setToken("");
-    setMssv("");
+    setName("");
+    setMssv("")
     setProfile(null);
     setShowSetting(false);
     queryClient.removeQueries(["token"]);
     queryClient.removeQueries(["profile"]);
   }
-  useLoginData({ token, mssv, login, setToken, setProfile, setMssv, isLogin });
+  useLoginData({ token, setToken, setProfile, setName, setMssv});
   const [isInputFocused, setIsInputFocused] = useState(false);
 
   // Hàm xử lý khi input được focus
@@ -54,7 +59,7 @@ export default function Navbar() {
   // Xác định lớp CSS cho div bao quanh input dựa trên trạng thái focus
   const divBorderClassName = isInputFocused ? "tblue" : "gray-400";
   return (
-    <div className="bg-white shadow-md border w-full">
+    <div className={`${location === '/register' || location === '/login' ? 'hiden' : null}bg-white shadow-md border w-full`}>
       <div className="mx-auto py-4 flex justify-between items-center ml-10 font-semibold">
         <div className="flex ml-10 space-x-10">
           <Link to="/">
@@ -111,7 +116,7 @@ export default function Navbar() {
                     <div className="flex h-10 cursor-pointer justify-center items-center space-x-2">
                       <Avatar sx={{ width: 35, height: 35 }} src={profile?.image} />
                       {/* <img src="avatar.jpg" className="w-15 h-10 border-4 border-white rounded-full" /> */}
-                      <span className="text-gray-600 ">{mssv}</span>
+                      <span className="text-gray-600 ">{name}</span>
                     </div>
                   </a>
                   {showSetting ? (
@@ -148,7 +153,7 @@ export default function Navbar() {
         </div>
       </div>
       {showMenu ? (
-        <div className="md:flex justify-center md:hidden md:space-x-10 sm-w-full">
+        <div className="flex justify-center md:hidden md:space-x-10 sm-w-full">
           <div className="md:flex items-center md:space-x-10 sm-w-full">
             <Link to={"/login"}>
               <div className="flex justify-center md:space-x-2 sm:w-full h-7 bg-tblue border border-white cursor-pointer">

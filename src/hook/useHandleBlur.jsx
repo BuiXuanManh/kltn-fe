@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ErrorMessage from '../component/service/ErrorMessage';
 import RegexService from '../component/service/RegexService';
 var e = {
@@ -11,6 +11,7 @@ var e = {
     lastName: '*',
     birthday: '*',
     image: "*",
+    gender: "*"
 };
 const useHandleBlur = () => {
     const [errors, setErrors] = useState({
@@ -23,19 +24,17 @@ const useHandleBlur = () => {
         lastName: '*',
         birthday: '*',
         image: "*",
+        gender: "*"
     });
     let errorService = new ErrorMessage();
     let regexService = new RegexService();
-    var currentDate = new Date();
+    useEffect(() => {
 
-    // Trừ đi 18 năm
-    currentDate.setFullYear(currentDate.getFullYear() - 18);
-    var year = currentDate.getFullYear();
-    var month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
-    var day = ('0' + currentDate.getDate()).slice(-2);
-    var minimumBirthDate = year + '-' + month + '-' + day;
-    const handleBlur = ({ field, mssv, password, cppassword, phone }) => {
-        const newErrors = { ...errors };
+    },[errors])
+    const ngayHienTai = new Date();
+
+    const handleBlur = ({ field, mssv, password, cppassword, phone, email, firstName, lastName, birthday, image, gender }) => {
+        const newErrors = { ...e };
 
         if (field === 'mssv') {
             if (!mssv) {
@@ -92,16 +91,17 @@ const useHandleBlur = () => {
             if (!lastName) {
                 newErrors.lastName = errorService.error.lastNameRequired;
             } else if (!regexService.regex.name.test(lastName)) {
-                newErrors.firstName = errorService.error.lastName;
+                newErrors.lastName = errorService.error.lastName;
             } else {
                 newErrors.lastName = "*";
             }
         }
-
         if (field === 'birthday') {
+            const ngaySinh = new Date(birthday);
+            const age = ngayHienTai.getFullYear() - ngaySinh.getFullYear();
             if (!birthday) {
                 newErrors.birthday = errorService.error.birthdayRequired;
-            } else if (!birthday < minimumBirthDate) {
+            } else if (age < 18) {
                 newErrors.birthday = errorService.error.birthday;
             } else {
                 newErrors.birthday = "*";
@@ -124,6 +124,14 @@ const useHandleBlur = () => {
                 newErrors.cppassword = "*";
             }
         }
+        if (field === 'gender') {
+            if (!gender) {
+                newErrors.gender = errorService.error.genderRequired;
+            } else {
+                newErrors.gender = "*";
+            }
+        }
+        e = { ...newErrors };
         setErrors({ ...newErrors });
     };
 
