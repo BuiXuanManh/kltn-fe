@@ -17,9 +17,9 @@ const Profile = ({ data }) => {
     const [token, setToken] = useState("");
     const [profile, setProfile] = useState();
     const [name, setName] = useState();
-    const [mssv, setMssv] = useState("");
+    const [user, setUser] = useState("");
     console.log(profile)
-    useLoginData({ token, setToken, setProfile, setName, setMssv });
+    useLoginData({ token, setToken, setProfile, setName, setUser });
     return (
         <div>
             <div className="h-full bg-gray-200 p-8">
@@ -59,7 +59,7 @@ const Profile = ({ data }) => {
                         {/* <img src="avatar.jpg" className="w-40 border-4 border-white rounded-full" /> */}
                         <Avatar src={profile?.image} sx={{ width: "10rem", height: "10rem" }} />
                         <div className="flex items-center space-x-2 mt-2">
-                            <p className="text-2xl">{profile?.name}</p>
+                            <p className="text-2xl">{profile?.firstName} {profile?.lastName}</p>
                             <span className="bg-blue-500 rounded-full p-1" title="Verified">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="text-gray-100 h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M5 13l4 4L19 7"></path>
@@ -78,31 +78,23 @@ const Profile = ({ data }) => {
                             <ul className="mt-2 text-gray-700">
                                 <li className="flex border-y py-2">
                                     <span className="font-bold w-28">Họ tên:</span>
-                                    <span className="text-gray-700">{profile.name}</span>
+                                    <span className="text-gray-700">{user?.name}</span>
                                 </li>
                                 <li className="flex border-b py-2">
                                     <span className="font-bold w-28">Birthday:</span>
-                                    <span className="text-gray-700">{profile.birthday}</span>
+                                    <span className="text-gray-700">{profile?.birthday}</span>
                                 </li>
                                 <li className="flex border-b py-2">
-                                    <span className="font-bold w-28">Joined:</span>
-                                    <span className="text-gray-700">10 Jan 2022 (25 days ago)</span>
+                                    <span className="font-bold w-28">Ngày tạo:</span>
+                                    <span className="text-gray-700">{profile?.createdAt}</span>
                                 </li>
                                 <li className="flex border-b py-2">
-                                    <span className="font-bold w-28">Mobile:</span>
-                                    <span className="text-gray-700">(123) 123-1234</span>
+                                    <span className="font-bold w-28">Giới tính:</span>
+                                    <span className="text-gray-700">{profile?.gender?"Nam":"Nữ"}</span>
                                 </li>
                                 <li className="flex border-b py-2">
                                     <span className="font-bold w-28">Email:</span>
-                                    <span className="text-gray-700">amandaross@example.com</span>
-                                </li>
-                                <li className="flex border-b py-2">
-                                    <span className="font-bold w-28">Location:</span>
-                                    <span className="text-gray-700">New York, US</span>
-                                </li>
-                                <li className="flex border-b py-2">
-                                    <span className="font-bold w-28">Languages:</span>
-                                    <span className="text-gray-700">English, Spanish</span>
+                                    <span className="text-gray-700">{user?.email}</span>
                                 </li>
                                 <li className="flex items-center py-2 space-x-2 mt-4">
                                     <button className='bg-tblue text-white rounded-md px-6 h-10'>Edit</button>
@@ -112,13 +104,11 @@ const Profile = ({ data }) => {
                             </ul>
                         </div>
                         <div className="flex-1 bg-white rounded-lg shadow-xl mt-4 p-8">
-                            <h4 className="text-xl text-gray-900 font-bold">Personal Info</h4>
+                            <h4 className="text-xl text-gray-900 font-bold">
+                                Thông tin đọc sách
+                            </h4>
                             <ul className="mt-2 text-gray-700">
-                                <li className="flex border-b py-2">
-                                    <span className="font-bold w-28">Ngày tham gia:</span>
-                                    <span className="text-gray-700">10/10/2022 (2 năm trước)</span>
-                                </li>
-                                <li className="flex border-y py-2">
+                                <li className="flex border-y py-2 mt-4">
                                     <span className="font-bold w-28">Đã đọc:</span>
                                     <span className="text-gray-700">120 quyển sách</span>
                                 </li>

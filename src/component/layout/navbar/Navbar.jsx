@@ -18,7 +18,7 @@ export default function Navbar() {
   const [token, setToken] = useState("");
   const [profile, setProfile] = useState();
   const [name, setName] = useState();
-  const [mssv,setMssv]=useState("");
+  const [user, setUser] = useState();
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
@@ -37,13 +37,12 @@ export default function Navbar() {
     isLogin(false);
     setToken("");
     setName("");
-    setMssv("")
     setProfile(null);
     setShowSetting(false);
     queryClient.removeQueries(["token"]);
     queryClient.removeQueries(["profile"]);
   }
-  useLoginData({ token, setToken, setProfile, setName, setMssv});
+  useLoginData({ token, setToken, setProfile, setName, setUser});
   const [isInputFocused, setIsInputFocused] = useState(false);
 
   // Hàm xử lý khi input được focus
@@ -122,16 +121,16 @@ export default function Navbar() {
                   {showSetting ? (
                     <>
                       <div className="z-50 absolute left-0 w-48 py-2 mt-2 mr-10 bg-white rounded-lg shadow-xl">
-                        <a href={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <a href={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Profile
                         </a>
-                        <a href={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <a href={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Đổi mật khẩu
                         </a>
-                        <a href={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <a href={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Lịch sử đọc
                         </a>
-                        <a href={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <a href={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Lưu trữ
                         </a>
                         <a onClick={(e) => handleLogout(e)} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">

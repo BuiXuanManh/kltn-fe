@@ -59,11 +59,10 @@ const SignIn = () => {
                 const data = await service.getProfile(token.data.accessToken);
                 console.log("data profile", token.data.accessToken);
                 Cookies.set("token", token.data.accessToken);
-                Cookies.set("mssv", mssv);
-
                 if (data) {
                     // console.log("p data", data);
                     Cookies.set("profile", JSON.stringify(data.data));
+                    Cookies.set("user", JSON.stringify(data.data.user));
                     return data;
                 }
             }
