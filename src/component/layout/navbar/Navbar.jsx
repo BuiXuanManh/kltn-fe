@@ -14,7 +14,7 @@ export default function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
   const location = useLocation();
   const [login, isLogin] = useState(false);
-  
+
   const [token, setToken] = useState("");
   const [profile, setProfile] = useState();
   const [name, setName] = useState();
@@ -34,6 +34,7 @@ export default function Navbar() {
     Cookies.remove("token");
     Cookies.remove("profile");
     Cookies.remove("refreshToken");
+    Cookies.remove("phone");
     isLogin(false);
     setToken("");
     setName("");
@@ -42,7 +43,7 @@ export default function Navbar() {
     queryClient.removeQueries(["token"]);
     queryClient.removeQueries(["profile"]);
   }
-  useLoginData({ token, setToken, setProfile, setName, setUser});
+  useLoginData({ token, setToken, setProfile, setName, setUser });
   const [isInputFocused, setIsInputFocused] = useState(false);
 
   // Hàm xử lý khi input được focus
@@ -54,11 +55,16 @@ export default function Navbar() {
   const handleInputBlur = () => {
     setIsInputFocused(false);
   };
-
+  const [keyword, setKeyWord] = useState("");
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      navigate("/search/" + keyword);
+    }
+  }
   // Xác định lớp CSS cho div bao quanh input dựa trên trạng thái focus
   const divBorderClassName = isInputFocused ? "tblue" : "gray-400";
   return (
-    <div className={`${location === '/register' || location === '/login' ? 'hiden' : null}bg-white shadow-md border w-full`}>
+    <div className={`${location.pathname === '/register' || location.pathname === '/login' ? 'hiden' : null}bg-white shadow-md border w-full`}>
       <div className="mx-auto py-4 flex justify-between items-center ml-10 font-semibold">
         <div className="flex ml-10 space-x-10">
           <Link to="/">
@@ -77,8 +83,6 @@ export default function Navbar() {
             <span className="">Bang xep hang</span>
           </div>
         </div>
-
-
         <div className="md:flex space-x-15">
           <div className={`md:flex hidden md:items-center w-80 bg-white py-1 px-2 rounded-full border-2 border-${divBorderClassName}`}>
             <span>
@@ -87,11 +91,14 @@ export default function Navbar() {
               </svg>
             </span>
             <input
+              value={keyword}
+              onChange={(e) => setKeyWord(e.target.value)}
               className="h-7 bg-white focus:outline-none px-4 py-2 border-none rounded-full"
               type="text"
               placeholder="Tìm kiếm"
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
+              onKeyPress={handleKeyPress}
             />
           </div>
         </div>
@@ -114,7 +121,6 @@ export default function Navbar() {
                   <a onClick={() => showSettingHandle()}>
                     <div className="flex h-10 cursor-pointer justify-center items-center space-x-2">
                       <Avatar sx={{ width: 35, height: 35 }} src={profile?.image} />
-                      {/* <img src="avatar.jpg" className="w-15 h-10 border-4 border-white rounded-full" /> */}
                       <span className="text-gray-600 ">{name}</span>
                     </div>
                   </a>

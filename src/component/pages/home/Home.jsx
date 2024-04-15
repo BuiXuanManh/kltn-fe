@@ -10,7 +10,7 @@ import BookService from '../../service/BookService';
 import { useEffect, useState } from 'react';
 // import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-const Home = () => {
+const Home = ({ data }) => {
     var bgs = [
         "bg-1.jpg",
         "bg-2.jpg",
@@ -20,22 +20,7 @@ const Home = () => {
         "bg-6.jpg",
         "bg-7.jpg",
     ]
-    const [data, setData] = useState([]);
-    const navigate = useNavigate();
-   
-    useEffect(() => {
-        const fetchData = async () => {
-            if (data.length <= 0) {
-                let bookService = new BookService();
-                const response = await bookService.getBooks();
-                setData(response.data);
-                navigate("/");
-            }
-        };
 
-        fetchData();
-    }, []);
-    
     // var data = [{
     //     id: 1,
     //     title: 'Harry Potter và Hòn Đá Phù Thủy',
@@ -100,7 +85,7 @@ const Home = () => {
         {NominatedBook(data)}
         {/* New update book */}
         {NewBook(data, rates)}
-        {data.length > 0 && HotBook(data, rates)}
+        {data?.length > 0 && HotBook(data, rates)}
     </div>
     );
 };

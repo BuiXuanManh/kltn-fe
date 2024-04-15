@@ -19,5 +19,8 @@ module.exports = {
     ],
     'no-unused-vars': 'off',
     'react/no-unescape-entities': 'off',
+    'react-hooks/exhaustive-deps': 'off',
+    'jsx-ally/anchor-is-valid': 'off',
+    'react/prop-types': 'off',
   },
 }

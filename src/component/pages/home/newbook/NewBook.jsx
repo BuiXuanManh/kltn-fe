@@ -18,7 +18,7 @@ function NewBook(data, rates) {
             </div>
             <div className='grid grid-cols-3 mx-48 border border-white border-t-0 rounded-lg bg-white  shadow-md '>
                 <div className='col-span-2 gap-4 max-w-full justify-start pb-4 px-4 shadow-md'>
-                    {data.map((item) => {
+                    {data?.map((item) => {
                         return (
                             <div key={item.id} className='flex text-start w-full mt-5 max-h-52 shadow-md pb-4'>
                                 <div className='w-24 h-32 ml-2'>
@@ -46,7 +46,7 @@ function NewBook(data, rates) {
                     })}
                 </div>
                 <div className='px-4 grid grid-cols-1 justify-start text-start gap-4 max-w-full h-auto shadow-md pb-4'>
-                    {rates.map((item) => {
+                    {rates?.map((item) => {
                         return (
                             <div key={item.id} className='flex items-start max-h-12 text-start justify-between w-full mt-3 pb-2 shadow-md'>
                                 <div className='flex'>

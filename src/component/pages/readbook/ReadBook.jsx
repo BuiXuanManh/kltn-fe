@@ -1,13 +1,16 @@
 
 import { IonIcon } from '@ionic/react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     heartOutline, documentTextOutline, bookmarkOutline, arrowBack, arrowForward,
     alertCircleOutline, menuSharp, settingsOutline, chatbubblesOutline
 } from 'ionicons/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShareFromSquare, faBookmark, faStar, faThumbsUp, faReply, faFlag } from '@fortawesome/free-solid-svg-icons';
+import { faShareFromSquare, faBookmark, faStar, faThumbsUp, faReply, faFlag, faCheck, faFilePen } from '@fortawesome/free-solid-svg-icons';
 import { arrowDownCircleOutline, arrowUpCircleOutline } from 'ionicons/icons';
+import Setting from './setting/Setting';
+import ListPage from './listpage/ListPage';
+import { Avatar } from '@mui/material';
 const ReadBook = () => {
     const content = `Tất cả đã sẵn sàng cho cuộc phiêu lưu mới của Harray Potter và nhóm bạn trung thành. Họ đã thu thập thông tin, chuẩn bị trang bị và lên kế hoạch cẩn thận trước khi bắt đầu hành trình đi tìm kiếm Hoàn Đá Phủ Thủy - một vật phẩm quan trọng mà Voldemort đang cố gắng tìm kiếm để đạt được sức mạnh vô song.
         Harray, cùng với Ron và Hermione, đã bắt đầu hành trình qua các thị trấn và khu rừng hoang dã của thế giới phù thủy. Họ phải vượt qua nhiều thử thách, từ những con người và quái vật gian ác đến các phù thủy tà ác đang cố gắng ngăn cản họ tiến xa hơn.
@@ -20,18 +23,39 @@ const ReadBook = () => {
             {index !== content.split('.').length - 1 && '.'}<br /><br />
         </React.Fragment>
     ));
-    // const [scoll, setScoll] = React.useState(false);
-    // const handleScoll = () => {
-    //     setScoll(true);
-    // }
+    const [showSetting, setShowSetting] = useState(false);
+    const handleShowSetting = () => {
+        setShowSetting(!showSetting)
+        setShowListPage(false);
+        setShowEmotion(false);
+        setShowSave(false);
+    }
+    const [showListPage, setShowListPage] = useState(false);
+    const handleShowListPage = () => {
+        setShowListPage(!showListPage);
+        setShowSetting(false);
+        setShowSetting(false);
+        setShowSave(false);
+    }
+    const [showEmotion, setShowEmotion] = useState(false);
+    const handleShowEmotion = () => {
+        setShowEmotion(!showEmotion);
+        setShowListPage(false);
+        setShowSetting(false);
+        setShowSave(false);
+    }
+    const [showSave, setShowSave] = useState(false);
+    const handleShowSave = () => {
+        setShowSave(!showSave);
+        setShowSetting(false);
+        setShowListPage(false);
+        setShowEmotion(false);
+    }
     return (
-        <div className='mx-3 py-10 w-full h-full bg-gray-100'>
+        <div className='relative mx-3 py-10 w-full h-full bg-gray-100'>
             <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
             <IonIcon className='animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
             <div className='w-full'>
-                {/* <div className=''> */}
-
-
                 <div className='mx-48 border bg-[#EAE4D3] border-white rounded-xl items-center justify-center text-center'>
                     <div className='mt-5 flex mx-20 justify-between'>
                         <div className=''>
@@ -46,21 +70,29 @@ const ReadBook = () => {
                         <h1 className='text-3xl font-semibold uppercase'>HarryPotter và hòn đá phủ thủy</h1>
                     </div>
                     <div className='justify-center mt-5 gap-4 flex'>
-                        <span className='text-sm'>
-                            <IonIcon icon={documentTextOutline}></IonIcon>
-                            <span className='ml-1'> Trang 1</span>
-
+                        <span className='text-sm flex'>
+                            <div className='flex justify-center items-center'>
+                                <IonIcon icon={documentTextOutline}></IonIcon>
+                                <span className='ml-1'> Trang 1</span>
+                            </div>
                         </span>
-                        <span className='text-sm'>
-                            <IonIcon icon={heartOutline}></IonIcon>
-                            <span className='ml-1'>  30 yêu thích</span>
-
-
+                        <span className='text-sm flex'>
+                            <div className='flex justify-center items-center'>
+                                <FontAwesomeIcon icon={faFilePen} className='text-gray-600' />
+                                <span className='ml-1'>J.K. Rowling</span>
+                            </div>
                         </span>
-                        <span className='text-sm'>
-                            <IonIcon icon={bookmarkOutline}></IonIcon>
-                            <span className='ml-1'>  15 đánh dấu</span>
-
+                        <span className='text-sm flex'>
+                            <div className='flex justify-center items-center'>
+                                <IonIcon icon={heartOutline}></IonIcon>
+                            </div>
+                            <span className='ml-1'>  30 cảm xúc</span>
+                        </span>
+                        <span className='text-sm flex'>
+                            <div className='flex justify-center items-center'>
+                                <IonIcon icon={bookmarkOutline}></IonIcon>
+                                <span className='ml-1'>  15 đánh dấu</span>
+                            </div>
                         </span>
                     </div>
                     <div className='mt-10 mx-16 text-2xl  text-start justify-start items-star'>
@@ -87,6 +119,7 @@ const ReadBook = () => {
                             </div>
                         </div>
                     </div>
+
                 </div>
                 <div className='mt-4 mx-48 border bg-[#EAE4D3] border-white h-25 rounded-md'>
                     <div className='mx-16 flex gap-10  py-10'>
@@ -116,17 +149,17 @@ const ReadBook = () => {
                                 </select>
                             </div>
                             <div className='flex w-full my-10 border-b-1 border border-gray-200 border-x-0 border-t-0 pb-4'>
-                                <div className='w-20'>
-                                    <img src="avatar.jpg" alt="" className='w-20 h-16 rounded-full' />
+                                <div>
+                                    <Avatar src="" sx={{ width: 60, height: 60 }} />
                                 </div>
                                 <div className='ml-4 w-full'>
-                                    <textarea name="comment" placeholder='Nhập bình luận của bạn ...' className='w-full h-16 rounded-xl'></textarea>
+                                    <textarea name="comment" placeholder='Nhập bình luận của bạn ...' className='w-full p-4 h-16 rounded-xl'></textarea>
                                 </div>
                             </div>
                             <div className='grid border-b-1 border border-gray-200 border-x-0 border-t-0'>
                                 <div className='flex w-full'>
-                                    <div className='w-20'>
-                                        <img src="avatar.jpg" alt="" className='w-20 h-16 rounded-full' />
+                                    <div>
+                                        <Avatar src="" sx={{ width: 60, height: 60 }} />
                                     </div>
                                     <div className='ml-4 w-full'>
                                         <div className='w-full rounded-xl pb-4 pr-5'>
@@ -148,13 +181,13 @@ const ReadBook = () => {
                                                     <div>
                                                         <FontAwesomeIcon className='text-gray-400' icon={faReply} />
                                                     </div>
-                                                    <div>Tra loi</div>
+                                                    <div>Trả lời</div>
                                                 </div>
                                                 <div className='flex gap-2'>
                                                     <div>
                                                         <FontAwesomeIcon className='text-gray-400' icon={faFlag} />
                                                     </div>
-                                                    <div>Bao xau</div>
+                                                    <div>Báo xấu</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -164,50 +197,52 @@ const ReadBook = () => {
                         </div>
                     </div>
                 </div>
-                <div className='fixed ml-4 top-0 mt-28 right-24 rounded-xl justify-between'>
-                    <div className={`sticky bg-[#EAE4D3] rounded-xl w-20`}>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center'>
-                            {/* <FontAwesomeIcon className='w-8 h-8' icon={faBars}/> */}
-                            <div className='mt-4 text-center'>
-                                <IonIcon className='w-7 h-7' icon={menuSharp} />
-                            </div>
-
+                {showSetting && <Setting handleShowSetting={handleShowSetting} />}
+                {showListPage && <ListPage handleShowListPage={handleShowListPage} />}
+                <div className='fixed ml-4 top-4 mt-24 right-24 rounded-xl'>
+                    <div className={`rounded-xl w-20`}>
+                        <div onClick={() => handleShowListPage()} className={`flex border-white border ${showListPage ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid  border-b-1 justify-center text-center h-14 items-center cursor-pointer`}>
+                            <IonIcon className='w-7 h-7' icon={menuSharp} />
                         </div>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                            <div className='mt-4'>
-                                <IonIcon className='w-6 h-6' icon={settingsOutline} />
-                            </div>
+                        <div onClick={() => handleShowSetting()} className={`border border-white ${showSetting ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid  border-b-1 flex items-center justify-center text-center h-14 cursor-pointer`}>
+                            <IonIcon className='w-6 h-6' icon={settingsOutline} />
                         </div>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                            <div className='mt-4'>
-                                <IonIcon className='w-6 h-6' icon={arrowBack} />
-                            </div>
-                        </div>
-                        <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                            <div className='mt-4'>
-                                <IonIcon className='w-7 h-7' icon={alertCircleOutline} />
-                            </div>
+                        <div className='borde border-white border-solid bg-[#EAE4D3] border-b-1 justify-center items-center text-center h-14 flex cursor-pointer'>
+                            <IonIcon className='w-6 h-6' icon={arrowBack} />
                         </div>
                     </div>
-                    <div className='sticky mt-14'>
+                </div>
+                <div className='fixed bottom-10 right-24 rounded-xl flex-row justify-center items-center gap-5 '>
+                    {showEmotion && <div className='rounded-3xl bg-white py-2'>
+                        <div className='flex justify-center items-center'>
+                            <img src="love.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
+                        </div>
+                        <div className='flex justify-center items-center'>
+                            <img src="like.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
+                        </div>
+                        <div className='flex justify-center items-center'>
+                            <img src="fun.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
+                        </div>
+                        <div className='flex justify-center items-center'>
+                            <img src="sad.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
+                        </div>
+                        <div className='flex justify-center items-center'>
+                            <img src="angry.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
+                        </div>
+                    </div>
+                    }
+                    <div className='mt-2'>
                         <div className='bg-[#EAE4D3] w-20 rounded-xl'>
-                            <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                                <div className='mt-4'>
-                                    <IonIcon className='w-7 h-7' icon={heartOutline} />
-                                </div>
+                            <div onClick={() => handleShowEmotion()} className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
+                                <IonIcon className='w-7 h-7' icon={heartOutline} />
                             </div>
-                            <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                                <div className='mt-4'>
-                                    <IonIcon className='w-7 h-7' icon={bookmarkOutline} />
-                                </div>
+                            <div onClick={() => handleShowSave()} className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
+                                {showSave ? <FontAwesomeIcon className='w-7 h-7' icon={faCheck} /> : <IonIcon className='w-7 h-7' icon={bookmarkOutline} />}
                             </div>
-                            <div className='border border-white border-solid  border-b-1 justify-center text-center h-14'>
-                                <div className='mt-4'>
-                                    <IonIcon className='w-7 h-7' icon={chatbubblesOutline} />
-                                </div>
+                            <div className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
+                                <IonIcon className='w-7 h-7' icon={chatbubblesOutline} />
                             </div>
                         </div>
-                        {/* </div> */}
                     </div>
                 </div>
             </div>

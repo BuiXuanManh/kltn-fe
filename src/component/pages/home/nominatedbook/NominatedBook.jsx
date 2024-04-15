@@ -18,7 +18,7 @@ function NominatedBook(data) {
             </div>
             <div className='grid grid-cols-3 mx-48 border border-white border-t-0 rounded-lg bg-white shadow-md'>
                 <div className='px-4 pb-4 grid grid-cols-2 col-span-2 gap-4 max-w-full justify-start'>
-                    {data.map((item) => {
+                    {data?.map((item) => {
                         return (
                             <div key={item.id} className='flex text-start w-full mt-5 max-h-52 shadow-md'>
                                 <div className='w-24 h-32 ml-2 cursor-pointer'>
@@ -45,7 +45,7 @@ function NominatedBook(data) {
                     })}
                 </div>
                 <div className='px-4 pb-4 grid grid-cols-1 gap-4 max-w-full items-start shadow-md'>
-                    {data.map((item) => {
+                    {data?.map((item) => {
                         return (
                             <div key={item.id} className='flex text-start w-full mt-5 max-h-30 pb-2 shadow-md '>
                                 <div className='w-8 h-12'>

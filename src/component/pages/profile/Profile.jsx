@@ -90,7 +90,7 @@ const Profile = ({ data }) => {
                                 </li>
                                 <li className="flex border-b py-2">
                                     <span className="font-bold w-28">Giới tính:</span>
-                                    <span className="text-gray-700">{profile?.gender?"Nam":"Nữ"}</span>
+                                    <span className="text-gray-700">{profile?.gender ? "Nam" : "Nữ"}</span>
                                 </li>
                                 <li className="flex border-b py-2">
                                     <span className="font-bold w-28">Email:</span>

@@ -6,7 +6,6 @@ const useLoginData = ({ token, setToken, setProfile, setName, setUser }) => {
         const loginData = () => {
             const t = Cookies.get("token");
             const p = Cookies.get("profile");
-            console.log(p)
             const u = Cookies.get("user");
             if (t && p && u) {
                 setToken(t);

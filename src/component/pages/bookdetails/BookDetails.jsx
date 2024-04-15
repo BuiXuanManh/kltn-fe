@@ -101,7 +101,7 @@ const BookDetails = () => {
                     <div className={activeMenu === 'đánh giá' ? ' text-tblue border-b-4 py-2 border-tblue' : 'py-2'} onClick={() => handleMenuClick('đánh giá')}>Đánh giá <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{rates.rate}</span></div>
                     <div className={activeMenu === 'bình luận' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2'} onClick={() => handleMenuClick('bình luận')}>Bình luận <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{rates.comments}</span></div>
                 </div>
-                <div className='mb-10'>
+                <div className='mb-10 min-h-96'>
                     {activeMenu === 'giới thiệu' && (
                         <div>
                             {data.description}

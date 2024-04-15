@@ -4,6 +4,7 @@ import { sendSharp } from 'ionicons/icons';
 import { useState } from 'react';
 import { faReply, faThumbsUp, faFlag, faStar, faStarHalfAlt, faGlasses } from '@fortawesome/free-solid-svg-icons';
 import { faClock, faStar as star } from '@fortawesome/free-regular-svg-icons';
+import { Avatar } from '@mui/material';
 
 const Reviews = () => {
     const [usefulness, setUsefulness] = useState(0); // Giá trị tiện ích
@@ -78,7 +79,58 @@ const Reviews = () => {
                             <option value="Oldest">Cũ nhất</option>
                         </select>
                     </div>
+                    <div className='w-full border-b-1 border border-gray-200 border-x-0 border-t-0 mt-5'>
+                        <div className='flex gap-4 w-full'>
+                            <div>
+                                <Avatar src="" sx={{ width: 60, height: 60 }} />
+                            </div>
+                            <div className='w-full'>
+                                <div className='rounded-xl pb-4 pr-5 w-full'>
+                                    <div className='font-semibold'>Nguyen Van A</div>
+                                    <div className='text-sm flex text-gray-500 gap-10 mt-2'>
+                                        <div className='text-yellow-500'>
+                                            <FontAwesomeIcon icon={faStar} />
+                                            <FontAwesomeIcon icon={faStar} />
+                                            <FontAwesomeIcon icon={faStarHalfAlt} />
+                                            <FontAwesomeIcon icon={star} />
+                                            <FontAwesomeIcon icon={star} />
+                                            <span className='text-black ml-2'>3.2</span>
+                                        </div>
+                                        <div>
+                                            <FontAwesomeIcon icon={faGlasses} />
+                                            <span className='ml-2'>Đã đọc: 1 Trang</span>
+                                        </div>
+                                        <div>
+                                            <FontAwesomeIcon icon={faClock} />
+                                            <span className='ml-2'>14 gio truoc</span>
+                                        </div>
+                                    </div>
+                                    <div className='mt-2'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, dolorum.</div>
+                                    <div className='w-full flex mt-10 justify-end items-end gap-6 text-gray-600'>
+                                        <div className='flex gap-2'>
+                                            <div>
+                                                <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
+                                            </div>
+                                            <div>0</div>
+                                        </div>
 
+                                        <div className='flex gap-2'>
+                                            <div>
+                                                <FontAwesomeIcon className='text-gray-400' icon={faReply} />
+                                            </div>
+                                            <div>Tra loi</div>
+                                        </div>
+                                        <div className='flex gap-2'>
+                                            <div>
+                                                <FontAwesomeIcon className='text-gray-400' icon={faFlag} />
+                                            </div>
+                                            <div>Bao xau</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div className='grid grid-cols-1 rounded-md bg-gray-200 ml-3 px-3 py-1 mt-5'>
                     <div>
@@ -129,58 +181,6 @@ const Reviews = () => {
                                     <FontAwesomeIcon icon={star} />
                                     <FontAwesomeIcon icon={star} />
                                     <span className='text-black ml-2 text-xl'>3.2</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className='w-full border-b-1 border border-gray-200 border-x-0 border-t-0 mt-5'>
-                <div className='flex gap-4 w-full'>
-                    <div className='w-20'>
-                        <img src="avatar.jpg" alt="" className='w-20 h-16 rounded-full' />
-                    </div>
-                    <div className='w-full'>
-                        <div className='rounded-xl pb-4 pr-5 w-full'>
-                            <div className='font-semibold'>Nguyen Van A</div>
-                            <div className='text-sm flex text-gray-500 gap-10 mt-2'>
-                                <div className='text-yellow-500'>
-                                    <FontAwesomeIcon icon={faStar} />
-                                    <FontAwesomeIcon icon={faStar} />
-                                    <FontAwesomeIcon icon={faStarHalfAlt} />
-                                    <FontAwesomeIcon icon={star} />
-                                    <FontAwesomeIcon icon={star} />
-                                    <span className='text-black ml-2'>3.2</span>
-                                </div>
-                                <div>
-                                    <FontAwesomeIcon icon={faGlasses} />
-                                    <span className='ml-2'>Đã đọc: 1 Trang</span>
-                                </div>
-                                <div>
-                                    <FontAwesomeIcon icon={faClock} />
-                                    <span className='ml-2'>14 gio truoc</span>
-                                </div>
-                            </div>
-                            <div className='mt-2'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, dolorum.</div>
-                            <div className='w-full flex mt-10 justify-end items-end gap-6 text-gray-600'>
-                                <div className='flex gap-2'>
-                                    <div>
-                                        <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
-                                    </div>
-                                    <div>0</div>
-                                </div>
-
-                                <div className='flex gap-2'>
-                                    <div>
-                                        <FontAwesomeIcon className='text-gray-400' icon={faReply} />
-                                    </div>
-                                    <div>Tra loi</div>
-                                </div>
-                                <div className='flex gap-2'>
-                                    <div>
-                                        <FontAwesomeIcon className='text-gray-400' icon={faFlag} />
-                                    </div>
-                                    <div>Bao xau</div>
                                 </div>
                             </div>
                         </div>

@@ -14,7 +14,7 @@ const SignUp = () => {
     const [lastName, setLastName] = useState("");
     const [birthday, setBirthday] = useState("");
     const [gender, setGender] = useState();
-    const navigate= useNavigate();
+    const navigate = useNavigate();
     const validForm = () => {
         handleBlur({ field: "password", password: password });
         handleBlur({ field: "mssv", mssv: mssv });
