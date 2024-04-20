@@ -13,6 +13,9 @@ import ReadBook from '../pages/readbook/ReadBook';
 import Profile from '../pages/profile/Profile';
 import SearchDetail from '../pages/search/SearchDetail';
 import BookService from '../service/BookService';
+import App from '../../App';
+import AppProvider from '../../context/AppContext';
+import { useQuery } from '@tanstack/react-query';
 
 
 const Router = () => {
@@ -60,35 +63,33 @@ const Router = () => {
     //     genre: 'Tâm lý - Tự viện',
     //     description: 'Một quyển sách kinh điển về tâm lý học.'
     // }];
-    const [data, setData] = useState([]);
     const navigate = useNavigate();
+    const [data, setData] = useState([]);
+    let bookService = new BookService();
     useEffect(() => {
-        const fetchData = async () => {
-            if (data.length <= 0) {
-                let bookService = new BookService();
-                const response = await bookService.getBooks(1, 12);
-                setData(response.data);
-                navigate("/");
+        const fetchBooks = async () => {
+            try {
+                const res = await bookService.getBooks(1, 12);
+                console.log(res.data);
+                setData(res.data);
+            } catch (err) {
+                console.log(err);
             }
         };
-        fetchData();
-    }, [data]);
+        fetchBooks();
+    }, []);
     return (
-        <div>
-
-            <Routes>
-                <Route path="/" element={<Home data={data?.pageBook?.content} />} />
-                <Route path="/login" element={<SignIn />} />
-                <Route path="/register" element={<SignUp />} />
-                <Route path="/details/:id" element={<BookDetails />} ></Route>
-                <Route path="/details/read/:id" element={<ReadBook />} ></Route>
-                <Route path="/profile/:id" element={<Profile data={data?.pageBook?.content} />} ></Route>
-                <Route path="/search/:keyword" element={<SearchDetail data={data} />} ></Route>
-                <Route path="/search/*" element={<SearchDetail data={data} />} />
-                <Route path="*" element={<NotFound />}></Route>
-            </Routes>
-
-        </div>
+        <Routes>
+            <Route path="/" element={<Home data={data?.pageBook?.content} />} />
+            <Route path="/login" element={<SignIn />} />
+            <Route path="/register" element={<SignUp />} />
+            <Route path="/details/:id" element={<BookDetails />} ></Route>
+            <Route path="/details/read/:id" element={<ReadBook />} ></Route>
+            <Route path="/profile/:id" element={<Profile data={data?.pageBook?.content} />} ></Route>
+            <Route path="/search/:keyword" element={<SearchDetail data={data} />} ></Route>
+            <Route path="/search/*" element={<SearchDetail data={data} />} />
+            <Route path="*" element={<NotFound />}></Route>
+        </Routes>
     );
 };
 

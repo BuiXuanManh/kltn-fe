@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoon, faBars, faTrophy } from '@fortawesome/free-solid-svg-icons'
 import { moonSharp, sunnyOutline } from 'ionicons/icons'
@@ -9,16 +9,12 @@ import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Skeleton } from "@mui/material";
-import useLoginData from "../../../hook/useLoginData";
+import { AppContext } from "../../../context/AppContext";
 export default function Navbar() {
+  const { token, setToken, mssv, setMssvContext, user, setUser, profile, setProfile } = useContext(AppContext);
   const [showMenu, setShowMenu] = useState(false);
   const location = useLocation();
-  const [login, isLogin] = useState(false);
-
-  const [token, setToken] = useState("");
-  const [profile, setProfile] = useState();
   const [name, setName] = useState();
-  const [user, setUser] = useState();
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
@@ -31,11 +27,6 @@ export default function Navbar() {
   }
   const handleLogout = (e) => {
     e.preventDefault();
-    Cookies.remove("token");
-    Cookies.remove("profile");
-    Cookies.remove("refreshToken");
-    Cookies.remove("phone");
-    isLogin(false);
     setToken("");
     setName("");
     setProfile(null);
@@ -43,7 +34,6 @@ export default function Navbar() {
     queryClient.removeQueries(["token"]);
     queryClient.removeQueries(["profile"]);
   }
-  useLoginData({ token, setToken, setProfile, setName, setUser });
   const [isInputFocused, setIsInputFocused] = useState(false);
 
   // Hàm xử lý khi input được focus
@@ -104,7 +94,7 @@ export default function Navbar() {
         </div>
         <div className="md:flex hidden space-x-10 ">
           <div className="md:flex items-center gap-x-10 ">
-            {(!token) && (!login) ? (<>
+            {(token === "") || !token || profile?.firstName === "" || !profile?.lastName ? (<>
               <Link to={"/login"}>
                 <div className="md:space-x-4 space-x-2 border h-7 border-tblue rounded-full cursor-pointer">
 
@@ -121,15 +111,15 @@ export default function Navbar() {
                   <a onClick={() => showSettingHandle()}>
                     <div className="flex h-10 cursor-pointer justify-center items-center space-x-2">
                       <Avatar sx={{ width: 35, height: 35 }} src={profile?.image} />
-                      <span className="text-gray-600 ">{name}</span>
+                      <span className="text-gray-600 ">{profile?.firstName} {profile?.lastName}</span>
                     </div>
                   </a>
                   {showSetting ? (
                     <>
                       <div className="z-50 absolute left-0 w-48 py-2 mt-2 mr-10 bg-white rounded-lg shadow-xl">
-                        <a href={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <Link onClick={() => showSettingHandle()} to={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Profile
-                        </a>
+                        </Link>
                         <a href={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Đổi mật khẩu
                         </a>

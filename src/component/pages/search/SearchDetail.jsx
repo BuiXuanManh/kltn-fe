@@ -134,7 +134,7 @@ const SearchDetail = ({ data }) => {
                         </div>
                     </div>
                     <div className='p-4 w-full'>
-                        <div className='px-4 pb-4 grid grid-cols-2 col-span-2 gap-4 max-w-full justify-start'>
+                        <div className=' pb-4 grid grid-cols-2 col-span-2 gap-4 max-w-full justify-start'>
                             {searchData?.pageBook?.content?.map((item) => {
                                 return (
                                     <div key={item.id} className='flex text-start w-full mt-5 max-h-52 p-3 shadow-md'>

@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import AccountService from '../../service/AccountService';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import useHandleBlur from '../../../hook/useHandleBlur';
 import swal from 'sweetalert';
+import { AppContext } from '../../../context/AppContext';
+
 const SignIn = () => {
     const [mssv, setMssv] = useState("");
     const [password, setPassword] = useState("");
@@ -14,14 +16,16 @@ const SignIn = () => {
     const queryClient = useQueryClient();
     const { handleBlur, errors } = useHandleBlur();
     const service = new AccountService();
-
-    const token = useQuery({
+    const { token, setToken, setMssvContext, user, setUser, profile, setProfile } = useContext(AppContext);
+    const t = useQuery({
         queryKey: ["token"],
         queryFn: async () => {
             if (mssv && password) {
                 const data = await service.login({ mssv, password });
                 console.log(data)
                 if (data) {
+                    setToken(data.data.accessToken);
+                    setMssvContext(mssv);
                     return data;
                 }
             }
@@ -47,21 +51,25 @@ const SignIn = () => {
         gcTime: 600000,
     });
 
-    const profile = useQuery({
+    const p = useQuery({
         queryKey: ["profile"],
         queryFn: async () => {
-            const token = queryClient.getQueryData(["token"]);
-            console.log("data token", token);
-            if (token) {
+
+            const t = queryClient.getQueryData(["token"]);
+            console.log("data token", t);
+            if (t) {
                 // console.log("data token", token.data.accessToken);
                 const service = new AccountService();
-                console.log("token", token.data.accessToken);
-                const data = await service.getProfile(token.data.accessToken);
-                console.log("data profile", token.data.accessToken);
-                Cookies.set("token", token.data.accessToken);
+                console.log("token", t.data.accessToken);
+                // setToken(t.data.accessToken);
+                const data = await service.getProfile(t.data.accessToken);
+                console.log("data profile", t.data.accessToken);
+                // Cookies.set("token", t.data.accessToken);
                 if (data) {
                     // console.log("p data", data);
-                    Cookies.set("profile", JSON.stringify(data.data));
+                    // Cookies.set("profile", JSON.stringify(data.data));
+                    setProfile(data.data);
+                    setUser(data.data.user);
                     Cookies.set("user", JSON.stringify(data.data.user));
                     return data;
                 }
@@ -89,15 +97,15 @@ const SignIn = () => {
         // , refetchInterval: 1000
     });
     useEffect(() => {
-        if (token?.data) {
-            console.log("token", token.data);
+        if (t?.data) {
+            console.log("token", t.data);
             handleGetProfile();
-            console.log("profile", profile.data);
-            if (profile?.data) {
+            console.log("profile", p.data);
+            if (p?.data) {
                 navigate("/");
             }
         }
-    }, [token.data, profile.data])
+    }, [t.data, p.data])
     const handleGetToken = () => {
         setIsToken(true);
     }

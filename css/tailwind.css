@@ -2,8 +2,8 @@
 @tailwind components;
 @Tailwind utilities;
 
-@layer utilities {
+/* @layer utilities {
     .paused {
         animation-play-state: paused;
     }
-}
+} */

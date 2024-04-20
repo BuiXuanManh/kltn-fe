@@ -2,24 +2,21 @@
 /* eslint-disable no-unused-vars */
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Paper } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Carousel from 'react-material-ui-carousel';
 import { faUser, faPenToSquare } from '@fortawesome/free-regular-svg-icons';
 import { faUserTie, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Avatar, Skeleton } from "@mui/material";
-import useLoginData from '../../../hook/useLoginData';
+import { AppContext } from '../../../context/AppContext';
 // import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 const Profile = ({ data }) => {
     const [showSetting, setShowSetting] = useState(false);
     const showSettingHandle = () => {
         setShowSetting(!showSetting);
     }
-    const [token, setToken] = useState("");
-    const [profile, setProfile] = useState();
-    const [name, setName] = useState();
-    const [user, setUser] = useState("");
-    console.log(profile)
-    useLoginData({ token, setToken, setProfile, setName, setUser });
+    const { token, user, profile } = useContext(AppContext);
+    console.log(token)
+    console.log(profile);
     return (
         <div>
             <div className="h-full bg-gray-200 p-8">
@@ -136,22 +133,28 @@ const Profile = ({ data }) => {
                             <h4 className="text-xl text-gray-900 font-bold">Đã đọc</h4>
                             < div className='bg-gray-100 w-full rounded-md mt-5 '>
                                 <Carousel interval={3000}>
-                                    {data.map((i) => {
+                                    {data?.map((i) => {
                                         return (
                                             <Paper key={i.id} >
                                                 <div className=" border border-x-0 border-t-4 border-solid w-full bg-center items-center justify-center bg-gray-100 cursor-pointer p-2" >
                                                     <div className='flex mt-5'>
                                                         <div className='ml-20 mb-3'>
-                                                            <img className='h-80 object-cover w-52' src={i.img} alt="" />
+                                                            <img className='h-80 object-cover w-52' src={i.image} alt="" />
                                                         </div>
                                                         <div className='ml-10'>
                                                             <h2 className='text-xl font-semibold'>{i.title}</h2>
-                                                            <div className='mt-4'>
+                                                            <div className='mt-4 flex items-center'>
                                                                 <FontAwesomeIcon icon={faUser} />
-                                                                <span className='ml-2'>{i.author}</span>
+                                                                <div>
+                                                                    {i.authors?.map((author, index) => {
+                                                                        return (
+                                                                            <span key={index} className='ml-3'>{author}</span>
+                                                                        );
+                                                                    })}
+                                                                </div>
                                                             </div>
                                                             <div className='mt-4'>
-                                                                {i.description}
+                                                                {i.shortDescription}
                                                             </div>
                                                         </div>
                                                     </div>
