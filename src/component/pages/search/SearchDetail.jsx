@@ -1,12 +1,13 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { comment } from 'postcss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faFilePen, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useMutation } from '@tanstack/react-query';
 import BookService from '../../service/BookService';
-
+import IconGlobal from '../../../icon/IconGlobal';
 const SearchDetail = ({ data }) => {
+    let icon = new IconGlobal()
     const { keyword } = useParams();
     const [genres, setGenres] = useState(["lịch sử", "quân sự", "bài học cuộc sống", "tiểu thuyết", "giáo trình"]);
     const [filter, setFilter] = useState({
@@ -70,7 +71,7 @@ const SearchDetail = ({ data }) => {
     // }
     // useEffect(() => {},[pagee])
     return (
-        <div className='mx-48 border mt-10 bg-gray-50 rounded-xl items-center justify-center text-center'>
+        <div className='mx-44 border mt-10 bg-gray-50 rounded-xl items-center justify-center text-center'>
             <div className='grid grid-cols-11 w-full'>
                 <div className='col-span-3 justify-start items-start text-left'>
                     <div className='p-4 w-full'>
@@ -137,19 +138,26 @@ const SearchDetail = ({ data }) => {
                         <div className=' pb-4 grid grid-cols-2 col-span-2 gap-4 max-w-full justify-start'>
                             {searchData?.pageBook?.content?.map((item) => {
                                 return (
-                                    <div key={item.id} className='flex text-start w-full mt-5 max-h-52 p-3 shadow-md'>
+                                    <div key={item.id} className='flex text-start w-full mt-3 max-h-52 p-3 shadow-md'>
                                         <div className='w-24 h-28 ml-2 cursor-pointer'>
-                                            <img className='w-full h-full object-cover' src={item.image} alt='img book' />
+                                            <Link to={`/details/${item?.id}`}>
+                                                <img width="5rem" height="6rem" className='w-full h-full object-cover' src={item.image} alt='img book' />
+                                            </Link>
                                         </div>
                                         <div className='ml-2 w-full'>
-                                            <h3 className="cursor-pointer">{item.title}</h3>
-                                            <span>{item.shortDescription}</span>
-                                            <div className='flex items-center justify-between w-full'>
+                                            <Link to={"/details/" + item.id}>
+                                                <h3 className="cursor-pointer font-semibold hover:text-blue-500">{item.title}</h3>
+                                            </Link>
+                                            <div className="mt-2 flex-wrap w-60 flex items-center gap-1">
+                                                <span className="line-clamp-3 ml-1">{item?.shortDescription}</span>
+                                            </div>
+                                            <div className='flex items-center justify-between w-full mt-3'>
+                                                
                                                 {item.authors?.map((author) => {
                                                     return (
-                                                        <div key={author} className='p-1 flex justify-center items-center'>
-                                                            <FontAwesomeIcon icon={faFilePen} className='text-gray-600' />
-                                                            <p className='ml-1'>{author}</p>
+                                                        <div key={author} className='p-1 flex min-w-14 justify-center items-center'>
+                                                            <img src={icon?.icon?.author} className='w-5 h-5' alt="" />
+                                                            <p className='ml-1 w-32 truncate'>{author}</p>
                                                         </div>
                                                     );
                                                 })}

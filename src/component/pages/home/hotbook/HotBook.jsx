@@ -17,7 +17,7 @@ function HotBook(data, rates) {
             <div className='mt-10 px-4 border border-white border-b-0  rounded-lg bg-white'>
                 <div className=' w-full flex justify-between'>
                     <h3 className='p-3 items-start text-center'>Sách hot</h3>
-                    <a href='/books' className='p-3 items-start text-center text-orange-500 text-sm font-serif cursor-pointer'>Xem tất cả</a>
+                    <a href='/books' className='p-3 items-start text-center text-orange-500 text-sm cursor-pointer font-medium'>Xem tất cả</a>
                 </div>
             </div>
             <div className='px-4 pb-4 border-white border-t-0 rounded-lg border bg-white'>
@@ -40,9 +40,9 @@ function HotBook(data, rates) {
                                                 return null;
                                             })}
                                         </div>
-                                        <div className='cursor-pointer bg-tblue w-full text-center absolute bottom-0 font-bold text-white'>
+                                        {/* <div className='flex opacity-70 cursor-pointer h-14 justify-center items-center text-red-800 bg-gray-50 w-full text-center absolute bottom-0 font-bold'>
                                             {item.title}
-                                        </div>
+                                        </div> */}
                                     </Link>
                                 </div>
                             </div>

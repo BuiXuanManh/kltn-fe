@@ -120,15 +120,12 @@ export default function Navbar() {
                         <Link onClick={() => showSettingHandle()} to={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Profile
                         </Link>
-                        <a href={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
-                          Đổi mật khẩu
-                        </a>
-                        <a href={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
-                          Lịch sử đọc
-                        </a>
-                        <a href={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
-                          Lưu trữ
-                        </a>
+                        <Link onClick={() => showSettingHandle()} to={"/changPass/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                          Dôi mât khâu
+                        </Link>
+                        <Link onClick={() => showSettingHandle()} to={"/history/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                          Lích sử đọc
+                        </Link>
                         <a onClick={(e) => handleLogout(e)} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Logout
                         </a>

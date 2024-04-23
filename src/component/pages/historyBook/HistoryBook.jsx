@@ -1,16 +1,23 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import HistoryRead from './history/HistoryRead';
 import Bookmark from './flag/Bookmark';
 import FollowBook from './follow/FollowBook';
+import { AppContext } from '../../../context/AppContext';
 
 const HistoryBook = ({ data }) => {
-    const { id } = useParams();
+    const { mssv } = useParams();
+    const [showSetting, setShowSetting] = useState(false);
+    const showSettingHandle = () => {
+        setShowSetting(!showSetting);
+    }
+    const { token, user, profile } = useContext(AppContext);
     const [activeMenu, setActiveMenu] = useState('reading');
 
     const handleMenuClick = (menuItem) => {
         setActiveMenu(menuItem);
     };
+    console.log(data);
     return (
         <div className='mx-96 mt-8 border border-white border-b-0 rounded-lg bg-white shadow-md'>
             <div className="flex mt-8 ml-8 gap-8 text-xl font-semibold">
