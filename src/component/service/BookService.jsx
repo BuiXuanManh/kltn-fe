@@ -8,4 +8,7 @@ export default class BookService {
     getBookById(id) {
         return api.get(`/api/books/${id}`);
     }
+    getPageByBookIdAndPageNo(bookId, pageNo) {
+        return api.get(`/api/books/pages/${bookId}/${pageNo}`);
+    }
 }

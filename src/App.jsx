@@ -8,13 +8,14 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import AppProvider from './context/AppContext'
 
 const MINUTE = 1000 * 60;
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      gcTime: 10 * MINUTE,
-    },
-  },
-});
+const queryClient = new QueryClient();
+// {
+//   defaultOptions: {
+//     queries: {
+//       gcTime: 10 * MINUTE,
+//     },
+//   },
+// }
 function App() {
   return (
     <>

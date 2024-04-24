@@ -3,7 +3,7 @@ import { IonIcon } from '@ionic/react';
 import React, { useEffect, useState } from 'react';
 import {
     heartOutline, documentTextOutline, bookmarkOutline, arrowBack, arrowForward,
-    alertCircleOutline, menuSharp, settingsOutline, chatbubblesOutline
+    alertCircleOutline, menuSharp, settingsOutline, chatbubblesOutline,
 } from 'ionicons/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShareFromSquare, faBookmark, faStar, faThumbsUp, faReply, faFlag, faCheck, faFilePen } from '@fortawesome/free-solid-svg-icons';
@@ -11,18 +11,11 @@ import { arrowDownCircleOutline, arrowUpCircleOutline } from 'ionicons/icons';
 import Setting from './setting/Setting';
 import ListPage from './listpage/ListPage';
 import { Avatar } from '@mui/material';
+import IconGlobal from '../../../icon/IconGlobal';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import BookService from '../../service/BookService';
 const ReadBook = () => {
-    const content = `Tất cả đã sẵn sàng cho cuộc phiêu lưu mới của Harray Potter và nhóm bạn trung thành. Họ đã thu thập thông tin, chuẩn bị trang bị và lên kế hoạch cẩn thận trước khi bắt đầu hành trình đi tìm kiếm Hoàn Đá Phủ Thủy - một vật phẩm quan trọng mà Voldemort đang cố gắng tìm kiếm để đạt được sức mạnh vô song.
-        Harray, cùng với Ron và Hermione, đã bắt đầu hành trình qua các thị trấn và khu rừng hoang dã của thế giới phù thủy. Họ phải vượt qua nhiều thử thách, từ những con người và quái vật gian ác đến các phù thủy tà ác đang cố gắng ngăn cản họ tiến xa hơn.
-        Trong suốt cuộc hành trình, tình bạn giữa Harray, Ron và Hermione ngày càng chắc chắn hơn, và sức mạnh của tình bạn này là nguồn động viên lớn nhất giúp họ vượt qua mọi khó khăn. Mỗi trở ngại, mỗi thử thách đều là cơ hội để họ học hỏi, trưởng thành và trở nên mạnh mẽ hơn.
-        Cuối cùng, sau nhiều ngày dài và đầy gian nan, Harray và nhóm của cậu đã đạt được mục tiêu của mình. Họ đã tìm ra Hoàn Đá Phủ Thủy và chiến thắng những kẻ thù để bảo vệ nó. Trận chiến cuối cùng giữa Harray và Voldemort là một cuộc đấu ác liệt, nhưng sức mạnh của tình bạn và lòng dũng cảm cuối cùng đã chiến thắng ác độc. 
-        Với việc tiêu diệt Hoàn Đá Phủ Thủy, Harray Potter không chỉ cứu vớt thế giới phù thủy khỏi sự thống trị của Voldemort, mà còn chứng minh rằng sức mạnh của tình bạn và lòng tin vào điều tốt là những thứ mạnh mẽ nhất trong mọi cuộc chiến.`
-    const processedContent = content.split('.').map((sentence, index) => (
-        <React.Fragment key={index}>
-            {sentence.trim()}
-            {index !== content.split('.').length - 1 && '.'}<br /><br />
-        </React.Fragment>
-    ));
     const [showSetting, setShowSetting] = useState(false);
     const handleShowSetting = () => {
         setShowSetting(!showSetting)
@@ -51,6 +44,54 @@ const ReadBook = () => {
         setShowListPage(false);
         setShowEmotion(false);
     }
+    let icon = new IconGlobal();
+    let service = new BookService();
+    const { id, pageNo } = useParams();
+    const [pageNoo, setPageNo] = useState(pageNo);
+    const [page, setPage] = useState({});
+    const getPage = useQuery({
+        queryKey: ['page', id, pageNoo],
+        queryFn: () => service.getPageByBookIdAndPageNo(id, pageNoo).then((res) => {
+            if (res?.data) {
+                // console.log(res?.data);
+                setPage(res.data);
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err.message);
+        }),
+    });
+
+    // console.log(getPage)
+    useEffect(() => {
+        if (pageNo) {
+            setPageNo(pageNo);
+        }
+    }, [pageNo, id])
+    const processedContent = page?.content?.split('.').map((sentence, index) => (
+        <React.Fragment key={index}>
+            {sentence.trim()}
+            {index !== page?.content?.split('.').length - 1 && '.'}<br /><br />
+        </React.Fragment>
+    ));
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const handlePrePage = (e) => {
+        e.preventDefault();
+        if (pageNoo > 1) {
+            const no = Number(pageNoo) - 1;
+            // queryClient.removeQueries(['page', id, pageNo]);
+            navigate(`/details/read/${id}/${Number(no)}`);
+        }
+
+    }
+    const handleNextPage = (e) => {
+        e.preventDefault();
+        if (pageNoo < page?.book?.pageCount) {
+            const no = Number(pageNoo) + 1;
+            navigate(`/details/read/${id}/${Number(no)}`);
+        }
+    }
     return (
         <div className='relative mx-3 py-10 w-full h-full bg-gray-100'>
             <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
@@ -59,27 +100,32 @@ const ReadBook = () => {
                 <div className='mx-48 border bg-[#EAE4D3] border-white rounded-xl items-center justify-center text-center'>
                     <div className='mt-5 flex mx-20 justify-between'>
                         <div className=''>
-                            <button className='rounded-3xl px-8 h-10 bg-[#F0ECDF] justify-center items-center'><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
+                            <button disabled={Number(pageNoo) === 1} onClick={(e) => handlePrePage(e)} className={`rounded-3xl px-8 h-10  ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center1`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
                         </div>
                         <div className=''>
-                            <button className='rounded-3xl px-8 h-10 bg-[#F0ECDF] justify-center items-center'><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
+                            <button disabled={Number(pageNoo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`rounded-3xl px-8 h-10 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
                         </div>
 
                     </div>
                     <div className='mt-5 '>
-                        <h1 className='text-3xl font-semibold uppercase'>HarryPotter và hòn đá phủ thủy</h1>
+                        <h1 className='text-3xl font-semibold uppercase'>{page?.book?.title}</h1>
                     </div>
                     <div className='justify-center mt-5 gap-4 flex'>
                         <span className='text-sm flex'>
                             <div className='flex justify-center items-center'>
                                 <IonIcon icon={documentTextOutline}></IonIcon>
-                                <span className='ml-1'> Trang 1</span>
+                                <span className='ml-1'> Trang {pageNo}</span>
                             </div>
                         </span>
                         <span className='text-sm flex'>
                             <div className='flex justify-center items-center'>
-                                <FontAwesomeIcon icon={faFilePen} className='text-gray-600' />
-                                <span className='ml-1'>J.K. Rowling</span>
+                                <img src={icon?.icon?.author} className='w-5 h-5' alt="" />
+                                {page?.book?.authors?.map((i, index) =>
+                                    <div className='flex ml-2' key={index}>
+                                        <p className=''>{i?.name}</p>
+                                        {(index !== page?.book?.authors?.length - 1) ? <span className="mr-2">, </span>
+                                            : <span> </span>}
+                                    </div>)}
                             </div>
                         </span>
                         <span className='text-sm flex'>
@@ -96,6 +142,11 @@ const ReadBook = () => {
                         </span>
                     </div>
                     <div className='mt-10 mx-16 text-2xl  text-start justify-start items-star'>
+                        {page?.name && <span className='mt-1 text-3xl'>Trang {pageNo}: {page?.name}</span>
+
+                        }
+                        <br />
+                        <br />
                         <span className='' style={{ lineHeight: "1" }} >
                             {processedContent}
                         </span>
@@ -124,8 +175,7 @@ const ReadBook = () => {
                 <div className='mt-4 mx-48 border bg-[#EAE4D3] border-white h-25 rounded-md'>
                     <div className='mx-16 flex gap-10  py-10'>
                         <div className='w-[45%] h-full'>
-                            <button className='w-full px-8 h-10 bg-[#F0ECDF] justify-center items-center'><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
-
+                            <button disabled={Number(pageNoo) === 1} onClick={(e) => handlePrePage(e)} className={`w-full px-8 h-10 ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
                         </div>
                         <div className='justify-center text-center h-full items-center w-[10%]'>
                             <button className='px-8 h-10 bg-[#F0ECDF] justify-center items-center'>
@@ -133,7 +183,7 @@ const ReadBook = () => {
                             </button>
                         </div>
                         <div className='w-[45%] h-full justify-end flex'>
-                            <button className='ml-auto w-full px-8 h-10 bg-[#F0ECDF]'><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
+                            <button disabled={Number(pageNoo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`ml-auto w-full px-8 h-10 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"}`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
                         </div>
                     </div>
                 </div>

@@ -15,7 +15,7 @@ const FollowBook = ({ data }) => {
                                 <div className='flex items-center mt-2'>
                                     <FontAwesomeIcon icon={faFilePen} className='text-gray-600' />
                                     <div className='ml-2 flex'>
-                                        {i.authors?.map((i, index) => <span key={index}>{i}
+                                        {i.authors?.map((i, index) => <span key={index}>{i?.name}
                                             {(index !== i?.authors?.length - 1) ? <span>, </span>
                                                 : <span> </span>}
                                         </span>)}

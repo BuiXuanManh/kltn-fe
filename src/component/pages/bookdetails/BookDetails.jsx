@@ -39,7 +39,7 @@ const BookDetails = () => {
     }
     const navigate = useNavigate();
     const handleReadBook = () => {
-        navigate(`/details/read/1`);
+        navigate(`/details/read/${id}/1`);
     }
     let service = new BookService();
     const { data, isLoading } = useQuery({
@@ -65,9 +65,9 @@ const BookDetails = () => {
                     <div className='mx-10'>
                         <h3 className='font-semibold text-2xl'>{book?.title}</h3>
                         <div className='flex my-2'>
-                            {book?.genres?.map((genre) => {
+                            {book?.genres?.map((genre, index) => {
                                 return (
-                                    <div key={genre} className='p-1 px-3 mx-2 border rounded-2xl border-tyellow text-orange-600 cursor-pointer'>{genre}</div>
+                                    <div key={index} className='p-1 px-3 mx-2 border rounded-2xl border-tyellow text-orange-600 cursor-pointer'>{genre?.name}</div>
                                 );
                             })}
 
@@ -109,9 +109,10 @@ const BookDetails = () => {
                         <div className='flex items-center mt-3'>
                             <img src={icon?.icon?.author} className='w-5 h-5' alt="" />
                             {book?.authors?.map((i, index) =>
-                                <div className='flex' key={index}>
-                                    <p className='ml-2'>{i}</p>
-                                    {book?.authors.length - 1 == index ? null : <p>,</p>}
+                                <div className='flex ml-2' key={index}>
+                                    <p className=''>{i?.name}</p>
+                                    {(index !== book?.authors?.length - 1) ? <span className="mr-2">, </span>
+                                        : <span> </span>}
                                 </div>)}
                         </div>
                         <div className='mt-10'>

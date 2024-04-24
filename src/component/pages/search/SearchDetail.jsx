@@ -152,16 +152,16 @@ const SearchDetail = ({ data }) => {
                                                 <span className="line-clamp-3 ml-1">{item?.shortDescription}</span>
                                             </div>
                                             <div className='flex items-center justify-between w-full mt-3'>
-                                                
-                                                {item.authors?.map((author) => {
+
+                                                {item.authors?.map((author, index) => {
                                                     return (
-                                                        <div key={author} className='p-1 flex min-w-14 justify-center items-center'>
+                                                        <div key={index} className='p-1 flex min-w-14 justify-center items-center'>
                                                             <img src={icon?.icon?.author} className='w-5 h-5' alt="" />
-                                                            <p className='ml-1 w-32 truncate'>{author}</p>
+                                                            <p className='ml-1 w-32 truncate'>{author?.name}</p>
                                                         </div>
                                                     );
                                                 })}
-                                                <div className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{item.genres[0]}</div>
+                                                <div className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{item.genres[0]?.name}</div>
                                             </div>
                                         </div>
                                     </div>

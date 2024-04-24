@@ -85,7 +85,7 @@ const Router = () => {
             <Route path="/login" element={<SignIn />} />
             <Route path="/register" element={<SignUp />} />
             <Route path="/details/:id" element={<BookDetails />} ></Route>
-            <Route path="/details/read/:id" element={<ReadBook />} ></Route>
+            <Route path="/details/read/:id/:pageNo" element={<ReadBook />} ></Route>
             <Route path="/profile/:mssv" element={<Profile data={data?.pageBook?.content} />} ></Route>
             <Route path="/search/:keyword" element={<SearchDetail data={data} />} ></Route>
             <Route path="/search/*" element={<SearchDetail data={data} />} />

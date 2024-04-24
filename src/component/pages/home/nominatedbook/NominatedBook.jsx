@@ -40,14 +40,14 @@ function NominatedBook(data) {
 
                                         <div className="flex max-w-28 items-center">
                                             <img src={icon?.icon?.author} className='w-5 h-5 mt-1' alt="" />
-                                            
+
                                             <div className='flex truncate justify-center items-center'>
-                                                <p className='ml-1 max-w-24 truncate'>{item?.authors[0]}</p>
+                                                <p className='ml-1 max-w-24 truncate'>{item?.authors[0]?.name}</p>
 
                                             </div>
                                         </div>
 
-                                        <div className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{item.genres[0]}</div>
+                                        <div className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{item.genres[0]?.name}</div>
                                     </div>
                                 </div>
                             </div>
@@ -68,7 +68,7 @@ function NominatedBook(data) {
                                             <div key={genre} >{genre}</div>
                                         )
                                     })} */}
-                                    <div>{item?.genres[0]}</div>
+                                    <div>{item?.genres[0]?.name}</div>
                                 </div>
                             </div>
                         );

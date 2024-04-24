@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import IconGlobal from "../../../../icon/IconGlobal";
 
 function NewBook(data, rates) {
@@ -24,10 +25,14 @@ function NewBook(data, rates) {
                         return (
                             <div key={item.id} className='flex text-start w-full mt-5 max-h-52 border-b p-2 border-gray-200'>
                                 <div className='w-24 h-32 ml-2'>
-                                    <img className='w-full h-full object-cover cursor-pointer' src={item.image} alt='img book' />
+                                    <Link to={`/details/${item?.id}`}>
+                                        <img width="5rem" height="6rem" className='w-full h-full object-cover' src={item.image} alt='img book' />
+                                    </Link>
                                 </div>
                                 <div className='ml-3 w-full'>
-                                    <h3 className="cursor-pointer font-semibold hover:text-blue-500">{item.title}</h3>
+                                    <Link to={`/details/${item?.id}`}>
+                                        <h3 className="cursor-pointer font-semibold hover:text-blue-500">{item.title}</h3>
+                                    </Link>
                                     <div className="mt-2 flex-wrap flex items-center gap-1">
                                         <span className="line-clamp-3 ml-1">{item?.shortDescription}</span>
                                     </div>
@@ -37,8 +42,8 @@ function NewBook(data, rates) {
                                             {item.authors?.map((author, index) => {
                                                 return (
                                                     <div key={index} className='flex truncate justify-center items-center'>
-                                                        <p className='ml-1 w-48 truncate'>{author}</p>
-                                                        {(index !== item?.authors?.length - 1) ? <span>, </span>
+                                                        <p className=' w-48 truncate'>{author?.name}</p>
+                                                        {(index !== item?.authors?.length - 1) ? <span className="mr-2">, </span>
                                                             : <span> </span>}
                                                     </div>
                                                 );
@@ -46,9 +51,9 @@ function NewBook(data, rates) {
                                         </div>
 
                                         <div className="flex flex-wrap-reverse flex-row-reverse gap-2">
-                                            {item.genres?.map((genre) => {
+                                            {item.genres?.map((genre, index) => {
                                                 return (
-                                                    <div key={genre} className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{genre}</div>
+                                                    <div key={index} className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{genre?.name}</div>
                                                 )
                                             })}
 

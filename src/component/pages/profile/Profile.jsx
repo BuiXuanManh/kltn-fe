@@ -148,7 +148,7 @@ const Profile = ({ data }) => {
                                                                 <div>
                                                                     {i.authors?.map((author, index) => {
                                                                         return (
-                                                                            <span key={index} className='ml-3'>{author}</span>
+                                                                            <span key={index} className='ml-3'>{author?.name}</span>
                                                                         );
                                                                     })}
                                                                 </div>
