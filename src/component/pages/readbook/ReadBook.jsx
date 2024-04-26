@@ -1,9 +1,9 @@
 
 import { IonIcon } from '@ionic/react';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     heartOutline, documentTextOutline, bookmarkOutline, arrowBack, arrowForward,
-    alertCircleOutline, menuSharp, settingsOutline, chatbubblesOutline,
+    alertCircleOutline, menuSharp, settingsOutline, chatbubblesOutline
 } from 'ionicons/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShareFromSquare, faBookmark, faStar, faThumbsUp, faReply, faFlag, faCheck, faFilePen } from '@fortawesome/free-solid-svg-icons';
@@ -13,9 +13,13 @@ import ListPage from './listpage/ListPage';
 import { Avatar } from '@mui/material';
 import IconGlobal from '../../../icon/IconGlobal';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import BookService from '../../service/BookService';
+import { AppContext } from '../../../context/AppContext';
+import AccountService from '../../service/AccountService';
+import AudioService from '../../service/AudioService';
 const ReadBook = () => {
+    const { token, setToken, profile, setProfile } = useContext(AppContext);
     const [showSetting, setShowSetting] = useState(false);
     const handleShowSetting = () => {
         setShowSetting(!showSetting)
@@ -82,6 +86,7 @@ const ReadBook = () => {
             const no = Number(pageNoo) - 1;
             // queryClient.removeQueries(['page', id, pageNo]);
             navigate(`/details/read/${id}/${Number(no)}`);
+
         }
 
     }
@@ -92,6 +97,67 @@ const ReadBook = () => {
             navigate(`/details/read/${id}/${Number(no)}`);
         }
     }
+    console.log(id)
+    let userService = new AccountService();
+    const updateBookInteraction = useQuery({
+        queryKey: ["interaction", profile?.id, page?.book?.id],
+        queryFn: () => userService.updateBookInteraction(token, page?.book?.id, pageNoo).then((res) => {
+            if (res?.data) {
+                console.log(res.data);
+                setProfile(res.data);
+                return res.data;
+            }
+        }).catch((error) => {
+            console.error(error);
+        }),
+        enabled: profile?.id !== undefined && page?.book?.id !== undefined && id != undefined
+    });
+    let audioService = new AudioService();
+    const pageLoad = {
+        "audioConfig": {
+            "audioEncoding": "MP3",
+            "effectsProfileId": [
+                "small-bluetooth-speaker-class-device"
+            ],
+            "pitch": 0,
+            "speakingRate": 1
+        },
+        "input": {
+            "text": page?.content
+        },
+        "voice": {
+            "languageCode": "vi-VN",
+            "name": "vi-VN-Neural2-A"
+        }
+    }
+    const [audio, setAudio] = useState(null);
+    const audioMuta = useMutation({
+        mutationKey: ['audio', page?.id],
+        mutationFn: (pageLoad) => audioService.getAudio(pageLoad).then((res) => {
+            if (res?.data) {
+                console.log(res.data);
+                setAudio(`data:audio/mp3;base64,${res.data.audioContent}`);
+                return res.data;
+            }
+        }).catch((error) => {
+            console.error(error);
+        }),
+    })
+
+    const handleVoice = () => [
+        audioMuta.mutate(pageLoad),
+        setShowAudio(true)
+    ]
+
+    const [showAudio, setShowAudio] = useState(false);
+
+
+    useEffect(() => {
+        updateBookInteraction.refetch();
+        // audioMuta.refetch(); 
+    }, [pageNoo, audio]);
+    const [isHover, setIsHover] = useState(null);
+    const handleMouseLeave = () => setIsHover(null);
     return (
         <div className='relative mx-3 py-10 w-full h-full bg-gray-100'>
             <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
@@ -247,18 +313,58 @@ const ReadBook = () => {
                         </div>
                     </div>
                 </div>
-                {showSetting && <Setting handleShowSetting={handleShowSetting} />}
+                {showSetting && <Setting handleShowSetting={handleShowSetting} handleVoice={handleVoice} showAudio={showAudio} audio={audio} />}
                 {showListPage && <ListPage handleShowListPage={handleShowListPage} />}
                 <div className='fixed ml-4 top-4 mt-24 right-24 rounded-xl'>
                     <div className={`rounded-xl w-20`}>
-                        <div onClick={() => handleShowListPage()} className={`flex border-white border ${showListPage ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid  border-b-1 justify-center text-center h-14 items-center cursor-pointer`}>
+                        <div
+                            onMouseEnter={() => setIsHover("pages")}
+                            onMouseLeave={handleMouseLeave}
+                            className={`flex relative border-white border ${showListPage ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid border-b-1 justify-center text-center h-14 items-center cursor-pointer`}
+                            onClick={() => handleShowListPage()}
+                        >
                             <IonIcon className='w-7 h-7' icon={menuSharp} />
+                            {isHover === "pages" && (
+                                <div
+                                    className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                    role="tooltip" >
+                                    <span
+                                        className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                    Danh sách trang
+                                </div>
+                            )}
                         </div>
-                        <div onClick={() => handleShowSetting()} className={`border border-white ${showSetting ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid  border-b-1 flex items-center justify-center text-center h-14 cursor-pointer`}>
+
+                        <div
+                            onMouseEnter={() => setIsHover("setting")}
+                            onMouseLeave={handleMouseLeave}
+                            onClick={() => handleShowSetting()}
+                            className={`border relative border-white ${showSetting ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid  border-b-1 flex items-center justify-center text-center h-14 cursor-pointer`}>
                             <IonIcon className='w-6 h-6' icon={settingsOutline} />
+                            {isHover === "setting" && (
+                                <div
+                                    className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                    role="tooltip"  >
+                                    <span
+                                        className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                    Cài đặt
+                                </div>
+                            )}
                         </div>
-                        <div className='borde border-white border-solid bg-[#EAE4D3] border-b-1 justify-center items-center text-center h-14 flex cursor-pointer'>
+                        <div
+                            onMouseEnter={() => setIsHover("back")}
+                            onMouseLeave={handleMouseLeave}
+                            className='border relative border-white border-solid bg-[#EAE4D3] border-b-1 justify-center items-center text-center h-14 flex cursor-pointer'>
                             <IonIcon className='w-6 h-6' icon={arrowBack} />
+                            {isHover === "back" && (
+                                <div
+                                    className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                    role="tooltip"  >
+                                    <span
+                                        className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                    Trở về trang thông tin sách
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -283,14 +389,52 @@ const ReadBook = () => {
                     }
                     <div className='mt-2'>
                         <div className='bg-[#EAE4D3] w-20 rounded-xl'>
-                            <div onClick={() => handleShowEmotion()} className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
+                            <div
+                                onMouseEnter={() => setIsHover("emotion")}
+                                onMouseLeave={handleMouseLeave}
+                                onClick={() => handleShowEmotion()}
+                                className='border relative border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
                                 <IonIcon className='w-7 h-7' icon={heartOutline} />
+                                {isHover === "emotion" && (
+                                    <div
+                                        className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                        role="tooltip"  >
+                                        <span
+                                            className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                        Cảm xúc
+                                    </div>
+                                )}
                             </div>
-                            <div onClick={() => handleShowSave()} className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
+                            <div
+                                onMouseEnter={() => setIsHover("save")}
+                                onMouseLeave={handleMouseLeave}
+                                onClick={() => handleShowSave()}
+                                className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
                                 {showSave ? <FontAwesomeIcon className='w-7 h-7' icon={faCheck} /> : <IonIcon className='w-7 h-7' icon={bookmarkOutline} />}
+                                {isHover === "save" && (
+                                    <div
+                                        className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                        role="tooltip"  >
+                                        <span
+                                            className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                        Lưu trữ
+                                    </div>
+                                )}
                             </div>
-                            <div className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
+                            <div
+                                onMouseEnter={() => setIsHover("comment")}
+                                onMouseLeave={handleMouseLeave}
+                                className='border relative border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
                                 <IonIcon className='w-7 h-7' icon={chatbubblesOutline} />
+                                {isHover === "comment" && (
+                                    <div
+                                        className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                        role="tooltip"  >
+                                        <span
+                                            className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                        Xem bình luận
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

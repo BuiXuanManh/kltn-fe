@@ -6,6 +6,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import useHandleBlur from '../../../hook/useHandleBlur';
 import swal from 'sweetalert';
 import { AppContext } from '../../../context/AppContext';
+import { IonIcon } from '@ionic/react';
+import { eyeOutline } from 'ionicons/icons';
 
 const SignIn = () => {
     const [mssv, setMssv] = useState("");
@@ -131,12 +133,16 @@ const SignIn = () => {
         handleBlur({ field: "mssv", mssv: mssv });
         return errors.mssv === "*" && errors.password === "*";
     }
+    const [security, setSecurity] = useState(true);
+    const handleSecurity = () => {
+        setSecurity(!security);
+    }
     return (
         <div className="bg-gray-50 dark:bg-gray-800">
             <div className="flex min-h-[80vh] flex-col justify-center py-12 sm:px-6 lg:px-8">
                 <div className="text-center sm:mx-auto sm:w-full sm:max-w-md">
-                    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
-                        Sign in
+                    <h1 className="text-3xl font-extrabold text-indigo-600 dark:text-white">
+                        Đăng nhập
                     </h1>
                 </div>
                 <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -153,12 +159,15 @@ const SignIn = () => {
                                 </div>
                             </div>
                             <div>
-                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-white">Password</label>
-                                <div className="mt-1">
-                                    <input id="password" onBlur={() => handleBlur({ field: "password", password: password })} name="password" type="password"
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-white">Mật khẩu</label>
+                                <div className="mt-1 relative">
+                                    <input id="password" onBlur={() => handleBlur({ field: "password", password: password })} type={security ? 'password' : 'text'}
                                         required="" onChange={(e) => setPassword(e.target.value)}
-                                        className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-300 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 sm:text-sm"
+                                        className="block relative w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-300 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 sm:text-sm"
                                     />
+                                    <div onClick={() => handleSecurity()} className='absolute right-4 -mt-7 text-blue-200 hover:text-blue-500 cursor-pointer'>
+                                        <IonIcon icon={eyeOutline} className='w-5 h-5' />
+                                    </div>
                                     {<p style={{ color: 'red' }}>{errors.password}</p>}
                                 </div>
                             </div>
@@ -174,6 +183,11 @@ const SignIn = () => {
                                     </a>
                                 </div>
                             </div> */}
+                            <div className="text-sm">
+                                <a className="font-medium text-indigo-400 hover:text-blue-300" href="">
+                                    Quên mật khẩu?
+                                </a>
+                            </div>
                             <div>
                                 <button onClick={(e) => login(e)}
                                     className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-700 dark:border-transparent dark:hover:bg-indigo-600 dark:focus:ring-indigo-400 dark:focus:ring-offset-2 disabled:cursor-wait disabled:opacity-50">
@@ -186,7 +200,7 @@ const SignIn = () => {
                                                 clipRule="evenodd"></path>
                                         </svg>
                                     </span>
-                                    Sign In
+                                    Đăng nhập
                                 </button>
                             </div>
                         </form>

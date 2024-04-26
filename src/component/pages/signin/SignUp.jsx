@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import useHandleBlur from '../../../hook/useHandleBlur';
 import swal from 'sweetalert';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import AccountService from '../../service/AccountService';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from '../../../context/AppContext';
 const SignUp = () => {
     const { handleBlur, errors } = useHandleBlur();
     const [mssv, setMssv] = useState("");
@@ -26,6 +27,7 @@ const SignUp = () => {
         handleBlur({ field: "gender", gender: gender });
         return errors.mssv === "*" && errors.password === "*" && errors.cppassword === "*" && errors.firstName === "*" && errors.lastName === "*" && errors.birthday === "*" && errors.email === "*" && errors.gender === "*";
     }
+    const { setToken, setMssvContext, setProfile } = useContext(AppContext);
     useEffect(() => {
 
     }, [errors])
@@ -40,17 +42,14 @@ const SignUp = () => {
                     console.log(res.data.profile);
                     console.log(res.data.token);
                     console.log(res.data.refreshToken);
-                    Cookies.set('token', res.data.token);
-                    Cookies.set('refreshToken', res.data.refreshToken);
-                    Cookies.set('profile', JSON.stringify(res.data.profile));
-                    Cookies.set('mssv', mssv);
-                    queryClient.setQueryData(['token'], res.data.token);
-                    queryClient.setQueryData(['profile'], res.data.profile);
-                    swal({
-                        title: "Success",
-                        text: res.data.message,
-                        icon: "success"
-                    });
+                    setToken(res.data.token);
+                    setMssvContext(res.data.profile.mssv);
+                    setProfile(res.data.profile);
+                    // swal({
+                    //     title: "Success",
+                    //     text: res.data.message,
+                    //     icon: "success"
+                    // });
                     navigate("/");
                 }
             }
@@ -93,12 +92,16 @@ const SignUp = () => {
             });
         }
     }
+    const [security, setSecurity] = useState(true);
+    const handleSecurity = () => {
+        setSecurity(!security);
+    }
     return (
         <div className="bg-gray-50 dark:bg-gray-800">
             <div className="flex min-h-[80vh] flex-col justify-center py-12 sm:px-6 lg:px-8">
                 <div className="text-center sm:mx-auto sm:w-full sm:max-w-md">
                     <h1 className="text-3xl font-extrabold  text-indigo-600 dark:text-white">
-                        Sign Up
+                        Đăng ký
                     </h1>
                 </div>
                 <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -186,7 +189,7 @@ const SignUp = () => {
                             <div>
                                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-white">Password</label>
                                 <div className="mt-1">
-                                    <input placeholder='Nhập mật khẩu' value={password} onChange={(e) => setPassword(e.target.value)} onBlur={() => handleBlur({ field: "password", password: password })} name="password" type="password"
+                                    <input placeholder='Nhập mật khẩu' value={password} onChange={(e) => setPassword(e.target.value)} onBlur={() => handleBlur({ field: "password", password: password })} type={security ? 'password' : 'text'}
                                         className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-300 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 sm:text-sm"
                                     />
                                     {<p style={{ color: 'red' }}>{errors.password}</p>}
@@ -195,11 +198,16 @@ const SignUp = () => {
                             <div>
                                 <label htmlFor="cp-password" className="block text-sm font-medium text-gray-700 dark:text-white">Confirm Password</label>
                                 <div className="mt-1">
-                                    <input placeholder='Nhập xác nhận mật khẩu' value={cppassword} onChange={(e) => setCPPassword(e.target.value)} onBlur={() => handleBlur({ field: "cppassword", cppassword: cppassword, password: password })} name="cp-password" type="password"
+                                    <input placeholder='Nhập xác nhận mật khẩu' value={cppassword} onChange={(e) => setCPPassword(e.target.value)} onBlur={() => handleBlur({ field: "cppassword", cppassword: cppassword, password: password })} type={security ? 'password' : 'text'}
                                         className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-300 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 sm:text-sm"
                                     />
                                     {<p style={{ color: 'red' }}>{errors.cppassword}</p>}
                                 </div>
+                            </div>
+                            <div className='mt-3'>
+                                <a className='text-blue-700 hover:text-blue-300 text-sm cursor-pointer' onClick={() => handleSecurity()} >
+                                    {security ? 'Hiện mật khẩu' : 'Ẩn mật khẩu'}
+                                </a>
                             </div>
                             <div>
                                 <button onClick={(e) => handleSubmit(e)}
@@ -213,7 +221,7 @@ const SignUp = () => {
                                                 clipRule="evenodd"></path>
                                         </svg>
                                     </span>
-                                    Sign Up
+                                    Đăng ký
                                 </button>
                             </div>
                         </form>

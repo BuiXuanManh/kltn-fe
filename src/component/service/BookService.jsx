@@ -11,4 +11,7 @@ export default class BookService {
     getPageByBookIdAndPageNo(bookId, pageNo) {
         return api.get(`/api/books/pages/${bookId}/${pageNo}`);
     }
+    getBookByGenres(genres, page, size) {
+        return api.post(`/api/books/genres?page=${page}&size=${size}`, genres);
+    }
 }

@@ -1,35 +1,36 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { comment } from 'postcss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faFilePen, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { useMutation } from '@tanstack/react-query';
+import { faChevronDown, faChevronLeft, faChevronRight, faFilePen, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import BookService from '../../service/BookService';
 import IconGlobal from '../../../icon/IconGlobal';
+import GenreService from '../../service/GenreService';
+import Select from "react-select"
+import { width } from '@fortawesome/free-regular-svg-icons/faAddressBook';
+import { Container } from '@mui/material';
 const SearchDetail = ({ data }) => {
     let icon = new IconGlobal()
-    const { keyword } = useParams();
-    const [genres, setGenres] = useState(["lịch sử", "quân sự", "bài học cuộc sống", "tiểu thuyết", "giáo trình"]);
-    const [filter, setFilter] = useState({
-        neww: "newUpdate",
-        read: "",
-        nomination: "",
-        save: false,
-        love: false,
-        rate: "",
-        comment: false
-    });
-    const [pagee, setPage] = useState(1);
+    const { keyword, page } = useParams();
+    const [genres, setGenres] = useState([]);
+    const [filterGenres, isFilterGenres] = useState(false);
+    const [filter, setFilter] = useState("new");
+    const [pagee, setPage] = useState(page);
     const [searchData, setSearchData] = useState(data);
-    const handlePage = (page) => {
-        mutation.mutate(page);
+    const navigate = useNavigate();
+    const handlePage = (p) => {
+        console.log(p)
+        filterGenres ? findByGenres.mutate(p) :
+            mutation.mutate(p);
+        setPage(p);
+        navigate(`/${p}/search/${keyword ? keyword : ""}`);
     }
     let service = new BookService();
     const mutation = useMutation({
         mutationKey: ["page", pagee],
         mutationFn: (page) => {
             setPage(page);
-            return service.getBooks(page, 2).then((res) => {
+            return service.getBooks(page, 3).then((res) => {
                 if (res.status === 200) {
                     console.log(res.data);
                     setSearchData(res.data);
@@ -40,64 +41,157 @@ const SearchDetail = ({ data }) => {
             });
         }
     })
-    const handleChangePage = (page) => {
-        setPage(page);
-    }
-    const handleChange = (e, field) => {
-        setFilter(prevFilter => ({
-            ...prevFilter,
-            [field]: e.target.value,
-            read: field === "read" ? e.target.value : "",
-            neww: field === "neww" ? e.target.value : "",
-            nomination: field === "nomination" ? e.target.value : "",
-            save: field === "save" ? true : false,
-            love: field === "love" ? true : false,
-            rate: field === "rate" ? e.target.value : "",
-            comment: field === "comment" ? true : false
-        }));
+    const handleChange = (field) => {
+        setFilter(
+            field === "read" ? "read" :
+                "new" === field ? "new" :
+                    "nomination" === field ? "nomination" :
+                        "save" === field ? "save" :
+                            "love" === field ? "love" :
+                                "rate" === field ? "rate" :
+                                    "comment" === field ? "comment" : "read"
+        );
     };
     const [selectedGenres, setSelectedGenres] = useState([]);
     const handleSelected = (genre) => {
         setSelectedGenres(prevSelectedGenres => [...prevSelectedGenres, genre]);
-        setGenres(prevGenres => prevGenres.filter(item => item !== genre));
+        setGenres(prevGenres => prevGenres.filter(item => item?.id !== genre?.id));
     }
     const handleRemove = (genre) => {
         setGenres(prevGenres => [...prevGenres, genre]);
-        setSelectedGenres(prevSelectedGenres => prevSelectedGenres.filter(item => item !== genre));
+        setSelectedGenres(prevSelectedGenres => prevSelectedGenres.filter(item => item?.id !== genre?.id));
     }
 
-    // const handleFind = () => {
+    let genreService = new GenreService();
+    const genresQuery = useQuery({
+        queryKey: ["genres"],
+        queryFn: () => genreService.getGenres().then((res) => {
+            if (res.data) {
+                setGenres(res.data);
+                return res.data;
+            }
+        }).catch((err) => [
+            console.error(err)
+        ]), enabled: genres.length === 0
+    })
+    const findByGenres = useMutation({
+        mutationKey: ["findBookGenres"],
+        mutationFn: (page) => service.getBookByGenres(selectedGenres, page, 2).then((res) => {
+            if (res.data) {
+                console.log(res.data)
+                setSearchData(res.data);
+                isFilterGenres(true);
+            }
+        }).catch((err) => {
+            console.error(err);
+        })
+    });
+    useEffect(() => {
 
-    // }
-    // useEffect(() => {},[pagee])
+    }, [searchData, filterGenres])
+    const handleSearch = () => {
+        findByGenres.mutate(1);
+        setPage(1);
+        navigate(`/1/search/${keyword ? keyword : ""}`);
+    }
+
+    const optionsNew = [
+        { value: "newUpdate", label: "Mới cập nhật" },
+        { value: "newCreate", label: "Mới đăng" },
+    ]
+    const optionsRead = [
+        { value: "readDay", label: "Lượt đọc ngày" },
+        { value: "readWeek", label: "Lượt đọc tuần" },
+        { value: "readMonth", label: "Lượt đọc tháng" },
+        { value: "readAll", label: "Lượt đọc tổng" },
+    ]
+    const optionsNomination = [
+        { value: "nominationDay", label: "Đề cử ngày" },
+        { value: "nominationWeek", label: "Đề cử tuần" },
+        { value: "nominationMonth", label: "Đề cử tháng" },
+        { value: "nominationAll", label: "Đề cử tổng" },
+    ]
+    const optionsRate = [
+        { value: "rateCount", label: "Lượt đánh giá" },
+        { value: "ratePoint", label: "Điểm đánh giá" },
+    ]
+    const [read, setRead] = useState();
+    const [neww, setNeww] = useState(optionsNew[0]);
+    const [rate, setRate] = useState();
+    const [nomination, setNomination] = useState();
+    const customStyles = {
+        control: (baseStyles, state) => ({
+            display: "flex",
+            justify: "center",
+            padding: 0,
+            // width: "9rem",
+            margin: 0,
+        }),
+        menu: (baseStyles, state) => ({
+            ...baseStyles,
+            backgroundColor: "white",
+            width: "9rem",
+            padding: 0,
+            margin: 0,
+        }),
+        valueContainer: (baseStyles, state) => ({
+            display: "flex",
+            padding: 0,
+            margin: 0,
+        }),
+        options: (baseStyles, state) => ({
+            backgroundColor: state.isFocused ? "#e2e2e2" : "white",
+            padding: 0,
+            margin: 0,
+        }),
+        dropdownIndicator: base => ({
+            padding: 0,
+            marginRight: "1rem",
+        }),
+        indicatorsContainer: base => ({
+            // display: "flex",
+            // items: "center",
+        })
+    }
+    const customTheme = (theme) => ({
+        ...theme,
+        borderRadius: 0,
+        colors: {
+            text: '#EF6C00',
+            primary25: '#81D4FA',
+            primary: 'blue',
+        },
+    })
+
     return (
+
         <div className='mx-44 border mt-10 bg-gray-50 rounded-xl items-center justify-center text-center'>
             <div className='grid grid-cols-11 w-full'>
                 <div className='col-span-3 justify-start items-start text-left'>
                     <div className='p-4 w-full'>
                         <div className='flex justify-between border border-b-2 border-x-0 border-t-0 pb-2'>
-                            <h3 className=''>Đã chọn</h3>
+                            <h3 className='font-semibold'>Đã chọn</h3>
                             <h3>
-                                <button className='p-1 px-2 bg-blue-600 rounded-md text-white'>Tìm kiếm</button>
+                                <button onClick={() => handleSearch()} className='p-1 px-2 bg-blue-600 rounded-md text-white'>Tìm kiếm</button>
                             </h3>
                         </div>
                         <div className='pl-2 flex-wrap flex gap-4 mt-4 p-1 w-full'>
                             {selectedGenres.map((genre, index) => (
                                 <div key={index}>
-                                    <div className='p-1 rounded-md border border-black'>
-                                        {genre}
-                                        <FontAwesomeIcon className='cursor-pointer ml-2' onClick={() => handleRemove(genre)} icon={faXmark} />
+                                    <div onClick={() => handleRemove(genre)} className='p-1 px-2 rounded-md border border-blue-500 hover:text-blue-600 hover:border-blue-600 cursor-pointer'>
+                                        {genre?.name}
+                                        <FontAwesomeIcon className='cursor-pointer ml-2' icon={faXmark} />
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        <div className='mt-3 pl-2'>
+                        <div className='mt-3 pl-2 font-semibold text-yellow-700'>
                             Thể loại
                         </div>
                         <div className='flex-wrap flex gap-4 mt-4 p-1 w-full'>
-                            {genres.map((genre, index) => (
+                            {genres?.map((genre, index) => (
                                 <div key={index}>
-                                    <div onClick={() => handleSelected(genre)} className='p-1 rounded-md border border-black cursor-pointer hover:text-yellow-500 hover:border-yellow-500'>{genre}</div>
+                                    <div onClick={() => handleSelected(genre)} className='p-1 px-2 rounded-md border border-yellow-700 cursor-pointer hover:text-yellow-700 hover:border-yellow-700'>{genre?.name}</div>
                                 </div>
                             ))}
                         </div>
@@ -105,33 +199,70 @@ const SearchDetail = ({ data }) => {
                 </div>
                 <div className='col-span-8'>
                     <div className='p-4 w-full'>
-                        <div className='flex pb-2 gap-6'>
-                            <select name="new" onChange={(e) => handleChange(e, "neww")} className={`${filter.neww !== "" ? "text-yellow-600" : "text-black"} focus:outline-none cursor-pointer bg-gray-50`}>
-                                <option value="newUpdate">Mới cập nhập</option>
-                                <option value="newCreate">Mới đăng</option>
-                            </select>
-                            <select onChange={(e) => handleChange(e, "read")} name="read" className={`${filter.read !== "" ? "text-yellow-600" : "text-black"} focus:outline-none cursor-pointer bg-gray-50`}>
-                                <option disabled hidden>Lượt đọc</option>
-                                <option value="readDay">Lượt đọc ngày</option>
-                                <option value="readWeek">Lượt đọc tuần</option>
-                                <option value="readMonth">Lượt đọc tháng</option>
-                                <option value="readAll">Lượt đọc tổng</option>
-                            </select>
-                            <select onChange={(e) => handleChange(e, "rate")} name="rate" className={`${filter.rate !== "" ? "text-yellow-600" : "text-black"} focus:outline-none cursor-pointer bg-gray-50`}>
-                                <option disabled hidden>Đánh giá</option>
-                                <option value="rateCount">Lượt đánh giá</option>
-                                <option value="ratePoint">Điểm đánh giá</option>
-                            </select>
-                            <button onClick={() => setFilter(prevFilter => ({ ...prevFilter, save: true, love: false, nomination: "", read: "", neww: "", rate: "", comment: false }))} className={`${filter.save ? "text-yellow-600" : "text-black"} hover:text-blue-400`}>lưu trữ</button>
-                            <button onClick={() => setFilter(prevFilter => ({ ...prevFilter, love: true, save: false, nomination: "", read: "", neww: "", rate: "", comment: false }))} className={`${filter.love ? "text-yellow-600" : "text-black"} hover:text-blue-400`}>Yêu thích</button>
-                            <select onChange={(e) => handleChange(e, "nomination")} name="nomination" className={`${filter.nomination !== "" ? "text-yellow-600" : "text-black"} focus:outline-none cursor-pointer bg-gray-50`}>
-                                <option disabled hidden>Đề cử</option>
-                                <option value="nominationDay">Đề cử ngày</option>
-                                <option value="nominationWeek">Đề cử tuần</option>
-                                <option value="nominationMonth">Đề cử tháng</option>
-                                <option value="nominationAll">Đề cử tổng</option>
-                            </select>
-                            <button onClick={() => setFilter(prevFilter => ({ ...prevFilter, save: false, love: false, nomination: "", read: "", neww: "", rate: "", comment: true }))} className={`${filter.comment ? "text-yellow-600" : "text-black"} hover:text-blue-400`}>Bình luận</button>
+                        <div className='flex w-full'>
+                            <Select
+                                components={{
+                                    IndicatorSeparator: () => null
+                                }}
+                                onChange={val => {
+                                    setNeww(val);
+                                    handleChange("new");
+                                }}
+                                className={`flex flex-grow items-center justify-center ${filter == "new" ? "text-yellow-700" : "text-black"}  cursor-pointer bg-gray-50`}
+                                theme={customTheme}
+                                styles={customStyles}
+                                isSearchable={false}
+                                options={optionsNew}
+                                defaultValue={optionsNew[0]}
+                            />
+                            <Select
+                                components={{
+                                    IndicatorSeparator: () => null
+                                }}
+                                onChange={val => {
+                                    setRead(val);
+                                    handleChange("read");
+                                }}
+                                className={`flex flex-grow items-center justify-center ${filter === "read" ? "text-yellow-700" : "text-black"}  cursor-pointer bg-gray-50`}
+                                theme={customTheme}
+                                styles={customStyles}
+                                isSearchable={false}
+                                options={optionsRead}
+                                placeholder="Lượt đọc"
+                            />
+                            <Select
+                                components={{
+                                    IndicatorSeparator: () => null
+                                }}
+                                onChange={val => {
+                                    setRate(val);
+                                    handleChange("rate");
+                                }}
+                                className={`flex flex-grow items-center justify-center ${filter === "rate" ? "text-yellow-700" : "text-black"}  cursor-pointer bg-gray-50`}
+                                theme={customTheme}
+                                styles={customStyles}
+                                isSearchable={false}
+                                options={optionsRate}
+                                placeholder="Đánh giá"
+                            />
+                            <Select
+                                components={{
+                                    IndicatorSeparator: () => null
+                                }}
+                                onChange={val => {
+                                    setNomination(val);
+                                    handleChange("nomination");
+                                }}
+                                className={`ml-3 flex flex-grow items-center justify-center ${filter === "nomination" ? "text-yellow-700" : "text-black"}  cursor-pointer bg-gray-50`}
+                                theme={customTheme}
+                                styles={customStyles}
+                                isSearchable={false}
+                                options={optionsNomination}
+                                placeholder="Đề cử"
+                            />
+                            <button onClick={() => handleChange("save")} className={`flex-grow ${filter === "save" ? "text-yellow-600" : "text-black"} hover:text-blue-400`}>lưu trữ</button>
+                            <button onClick={() => handleChange("love")} className={`flex-grow ml-4 ${filter === "love" ? "text-yellow-600" : "text-black"} hover:text-blue-400`}>Yêu thích</button>
+                            <button onClick={() => handleChange("comment")} className={`flex-grow ${filter === "comment" ? "text-yellow-600" : "text-black"} hover:text-blue-400`}>Bình luận</button>
                         </div>
                     </div>
                     <div className='p-4 w-full'>
@@ -141,7 +272,7 @@ const SearchDetail = ({ data }) => {
                                     <div key={item.id} className='flex text-start w-full mt-3 max-h-52 p-3 shadow-md'>
                                         <div className='w-24 h-28 ml-2 cursor-pointer'>
                                             <Link to={`/details/${item?.id}`}>
-                                                <img width="5rem" height="6rem" className='w-full h-full object-cover' src={item.image} alt='img book' />
+                                                <img width="5rem" height="6rem" className='min-w-24 min-h-28 object-cover' src={item.image} alt='img book' />
                                             </Link>
                                         </div>
                                         <div className='ml-2 w-full'>
@@ -152,15 +283,14 @@ const SearchDetail = ({ data }) => {
                                                 <span className="line-clamp-3 ml-1">{item?.shortDescription}</span>
                                             </div>
                                             <div className='flex items-center justify-between w-full mt-3'>
+                                                <div className="flex max-w-28 items-center">
+                                                    <img src={icon?.icon?.author} className='w-5 h-5 mt-1' alt="" />
 
-                                                {item.authors?.map((author, index) => {
-                                                    return (
-                                                        <div key={index} className='p-1 flex min-w-14 justify-center items-center'>
-                                                            <img src={icon?.icon?.author} className='w-5 h-5' alt="" />
-                                                            <p className='ml-1 w-32 truncate'>{author?.name}</p>
-                                                        </div>
-                                                    );
-                                                })}
+                                                    <div className='flex truncate justify-center items-center'>
+                                                        <p className='ml-1 max-w-24 truncate'>{item?.authors[0]?.name}</p>
+
+                                                    </div>
+                                                </div>
                                                 <div className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{item.genres[0]?.name}</div>
                                             </div>
                                         </div>
@@ -177,7 +307,7 @@ const SearchDetail = ({ data }) => {
                             <div className='gap-2 flex '>
                                 {searchData?.pageNumbers?.map((page) => {
                                     return (
-                                        <div key={page} onClick={() => handlePage(page)} className='cursor-pointer p-2 px-4 hover:bg-yellow-500 rounded-md'>{page}</div>
+                                        <div key={page} onClick={() => handlePage(page)} className={`${pagee === page ? "bg-yellow-500 " : " "} cursor-pointer p-2 px-4 hover:bg-yellow-500 rounded-md`}>{page}</div>
                                     );
                                 })}
                             </div>

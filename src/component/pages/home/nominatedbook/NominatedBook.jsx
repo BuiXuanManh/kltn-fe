@@ -1,8 +1,14 @@
 import { Link } from "react-router-dom";
 import IconGlobal from "../../../../icon/IconGlobal";
+import { useContext } from "react";
+import { AppContext } from "../../../../context/AppContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function NominatedBook(data) {
-    let icon = new IconGlobal()
+    let icon = new IconGlobal();
+    const { token, setToken, profile } = useContext(AppContext);
+    // console.log(profile)
     return (
         <div>
             <div className='grid grid-cols-3 mt-10 mx-48 border border-white border-b-0 rounded-lg bg-white shadow-md'>
@@ -52,17 +58,23 @@ function NominatedBook(data) {
                                 </div>
                             </div>
                         );
-                    })}
+                    })
+
+                    }
                 </div>
                 <div className='grid grid-cols-1 gap-4 max-w-full items-start'>
-                    {data?.map((item) => {
+                    {token === "" || profile?.firstName === "" ? data?.map((item) => {
                         return (
                             <div key={item.id} className='flex text-start w-full mt-5 max-h-30 p-4 border border-gray-200'>
                                 <div className='w-10 h-12'>
-                                    <img className='w-full h-full cursor-pointer object-cover' src={item.image} width="2.5rem" height="3rem" alt='img book' />
+                                    <Link to={`/details/${item?.id}`}>
+                                        <img className='w-full h-full cursor-pointer object-cover' src={item.image} width="2.5rem" height="3rem" alt='img book' />
+                                    </Link>
                                 </div>
                                 <div className='ml-3'>
-                                    <h3 className="cursor-pointer hover:text-blue-500">{item.title}</h3>
+                                    <Link to={`/details/${item?.id}`}>
+                                        <h3 className="cursor-pointer hover:text-blue-500">{item.title}</h3>
+                                    </Link>
                                     {/* {item.genres?.map((genre) => {
                                         return (
                                             <div key={genre} >{genre}</div>
@@ -72,7 +84,45 @@ function NominatedBook(data) {
                                 </div>
                             </div>
                         );
-                    })}
+                    }) : <div>
+                        {
+                            profile?.interactions?.map((item) => {
+                                return (
+                                    <div key={item.id} className='flex text-start w-full mt-5 max-h-30 p-4 border border-gray-200'>
+                                        <div className='w-10 h-12'>
+
+                                            <img className='w-full h-full cursor-pointer object-cover' src={item?.book?.image} width="2.5rem" height="3rem" alt='img book' />
+                                        </div>
+                                        <div className="flex justify-center w-full">
+                                            <div className='ml-3 w-48'>
+                                                <Link to={`/details/${item?.book?.id}`}>
+                                                    <h3 className="cursor-pointer font-semibold hover:text-blue-500 truncate">{item?.book?.title}</h3>
+                                                </Link>
+                                                {/* {item.genres?.map((genre) => {
+                                        return (
+                                            <div key={genre} >{genre}</div>
+                                        )
+                                    })} */}
+
+                                                <div className="mt-1 flex text-gray-500 text-sm">
+                                                    <div>Đã đọc:</div>
+                                                    <div className="ml-2">{item?.readCount}</div>
+                                                    <div>/ {item?.book?.pageCount}</div>
+                                                    <div className='flex items-center ml-2 hover:text-red-500'>
+                                                        <FontAwesomeIcon className='' icon={faTrash} />
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <Link to={`/details/read/${item?.book?.id}/${item?.readCount}`}>
+                                                <div className='p-1 items-start text-start text-orange-500 text-sm cursor-pointer font-medium'>Đọc tiếp</div>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        }
+                    </div>}
                 </div>
             </div>
 

@@ -2,9 +2,9 @@ import { faArrowsUpDown, faCheck, faCirclePlay, faFont, faMinus, faPalette, faPl
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
-const Setting = ({ handleShowSetting }) => {
+const Setting = ({ handleShowSetting, handleVoice, showAudio, audio }) => {
     return (
-        <div className='fixed h-3/5 w-1/3 z-50 ml-4 top-1 mt-40 right-48 flex whitespace-normal break-words rounded-lg py-1.5 px-3 font-sans text-sm font-normal bg-white focus:outline-none'>
+        <div className='fixed h-[70%] w-1/3 z-50 ml-4 top-1 mt-40 right-48 flex whitespace-normal break-words rounded-lg py-1.5 px-3 font-sans text-sm font-normal bg-white focus:outline-none'>
             <div className='ml-4 w-full h-full'>
                 <div onClick={() => handleShowSetting()} className='justify-end items-end flex text-gray-400 text-xl cursor-pointer'>
                     <FontAwesomeIcon icon={faXmark} />
@@ -105,12 +105,19 @@ const Setting = ({ handleShowSetting }) => {
                             Nghe sách
                         </div>
                     </div>
-                    <div className='grid-cols-1 col-span-6 gap-5 flex justify-between'>
-                        <button className=' rounded-full border flex justify-center items-center'>
+                    <div className='grid-cols-1 col-span-6 gap-5 '>
+                        <button onClick={() => handleVoice()} className=' rounded-full border flex justify-center items-center'>
                             <FontAwesomeIcon icon={faCirclePlay} className='w-14 h-14' />
                         </button>
+
                     </div>
+
+
                 </div>
+                <div className='mt-2 justify-end items-center flex'>
+                    {showAudio && <audio controls src={audio} />}
+                </div>
+
             </div>
         </div>
     );

@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import React from 'react'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import AppProvider from './context/AppContext'
-
+import { ThemeProvider } from "@material-tailwind/react";
 const MINUTE = 1000 * 60;
 const queryClient = new QueryClient();
 // {
@@ -22,10 +22,12 @@ function App() {
       <BrowserRouter>
         <AppProvider>
           <QueryClientProvider client={queryClient}>
-            <Navbar />
-            <Router />
-            <ReactQueryDevtools initialIsOpen={false} />
-            <Footer />
+            <ThemeProvider>
+              <Navbar />
+              <Router />
+              <ReactQueryDevtools initialIsOpen={false} />
+              <Footer />
+            </ThemeProvider>
           </QueryClientProvider>
         </AppProvider>
       </BrowserRouter>

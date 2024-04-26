@@ -48,7 +48,7 @@ export default function Navbar() {
   const [keyword, setKeyWord] = useState("");
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      navigate("/search/" + keyword);
+      navigate("1/search/" + keyword);
     }
   }
   // Xác định lớp CSS cho div bao quanh input dựa trên trạng thái focus
