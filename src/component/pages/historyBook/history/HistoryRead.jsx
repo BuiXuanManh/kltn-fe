@@ -5,16 +5,15 @@ import IconGlobal from '../../../../icon/IconGlobal';
 import { AppContext } from '../../../../context/AppContext';
 import { Link } from 'react-router-dom';
 
-const HistoryRead = ({ data }) => {
+const HistoryRead = () => {
     let icon = new IconGlobal();
-    const { token, setToken, profile } = useContext(AppContext);
-    console.log(profile)
+    const { token, interactions } = useContext(AppContext);
+    // console.log(profile)
     return (
         <div className='p-10'>
-            {profile?.interactions?.map((item, index) => <>
+            {interactions?.map((item, index) => <>
                 <Link key={index} to={`/details/read/${item?.book?.id}/${item?.readCount}`}>
                     <div key={index} className='flex gap-5 py-3 hover:bg-gray-100 w-full cursor-pointer'>
-
                         <div className='flex justify-between w-full'>
                             <div className='flex gap-5'>
                                 <img src={item?.book?.image} className='min-w-24 w-24 h-32' alt="" />

@@ -8,10 +8,13 @@ export default class BookService {
     getBookById(id) {
         return api.get(`/api/books/${id}`);
     }
-    getPageByBookIdAndPageNo(bookId, pageNo) {
-        return api.get(`/api/books/pages/${bookId}/${pageNo}`);
-    }
     getBookByGenres(genres, page, size) {
         return api.post(`/api/books/genres?page=${page}&size=${size}`, genres);
+    }
+    updateBookInteraction(token, bookId, pageId, page) {
+        return api.post(`/api/books/interactions/read/${bookId}/${pageId}/${page}`, {}, AuthService(token));
+    }
+    getInteractions(token) {
+        return api.get(`/api/books/interactions`, AuthService(token));
     }
 }

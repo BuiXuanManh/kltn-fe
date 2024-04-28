@@ -1,8 +1,10 @@
 import { faFilePen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
+import IconGlobal from '../../../../icon/IconGlobal';
 
 const Bookmark = ({ data }) => {
+    let icon = new IconGlobal();
     return (
         <div className='p-10'>
             {data?.pageBook?.content?.map((i, index) =>
@@ -13,10 +15,10 @@ const Bookmark = ({ data }) => {
                             <div className='ml-2'>
                                 <div className='font-semibold text-lg'>{i.title}</div>
                                 <div className='flex items-center mt-2'>
-                                    <FontAwesomeIcon icon={faFilePen} className='text-gray-600' />
+                                    <img src={icon?.icon?.author} className='w-5 h-5 mt-1' alt="" />
                                     <div className='ml-2 flex'>
-                                        {i.authors?.map((i, index) => <span key={index}>{i?.name}
-                                            {(index !== i?.authors?.length - 1) ? <span>, </span>
+                                        {i?.authors?.map((item, index) => <span key={index}>{item?.name}
+                                            {(index !== i?.authors?.length - 1) ? <span className='mr-2'>, </span>
                                                 : <span> </span>}
                                         </span>)}
                                     </div>

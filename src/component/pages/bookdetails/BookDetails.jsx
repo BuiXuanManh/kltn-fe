@@ -82,7 +82,7 @@ const BookDetails = () => {
                                 <div className='mx-5 '>
                                     <span className='font-extrabold '>{rates.reader} </span>
                                     <br />
-                                    <span className=''>Người đọc</span>
+                                    <span className=''>Lượt đọc</span>
                                 </div>
                                 <div className='mx-5 '>
                                     <span className='font-extrabold'>{rates.saved} </span>

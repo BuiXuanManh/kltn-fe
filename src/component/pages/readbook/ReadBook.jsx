@@ -18,44 +18,24 @@ import BookService from '../../service/BookService';
 import { AppContext } from '../../../context/AppContext';
 import AccountService from '../../service/AccountService';
 import AudioService from '../../service/AudioService';
+import PageService from '../../service/PageService';
+import CommentService from '../../service/CommentService';
 const ReadBook = () => {
-    const { token, setToken, profile, setProfile } = useContext(AppContext);
-    const [showSetting, setShowSetting] = useState(false);
-    const handleShowSetting = () => {
-        setShowSetting(!showSetting)
-        setShowListPage(false);
-        setShowEmotion(false);
-        setShowSave(false);
-    }
-    const [showListPage, setShowListPage] = useState(false);
-    const handleShowListPage = () => {
-        setShowListPage(!showListPage);
-        setShowSetting(false);
-        setShowSetting(false);
-        setShowSave(false);
-    }
-    const [showEmotion, setShowEmotion] = useState(false);
-    const handleShowEmotion = () => {
-        setShowEmotion(!showEmotion);
-        setShowListPage(false);
-        setShowSetting(false);
-        setShowSave(false);
-    }
-    const [showSave, setShowSave] = useState(false);
-    const handleShowSave = () => {
-        setShowSave(!showSave);
-        setShowSetting(false);
-        setShowListPage(false);
-        setShowEmotion(false);
+    const { token, profile, interactions, setInteractions } = useContext(AppContext);
+    const [show, setShow] = useState("");
+    const handleShow = (filter) => {
+        filter === show ? setShow("") : filter === "setting" ? setShow("setting") : filter === "listpage" ? setShow("listpage") : filter === "emotion" ? setShow("emotion") : setShow("save");
     }
     let icon = new IconGlobal();
     let service = new BookService();
+    let pageService = new PageService();
     const { id, pageNo } = useParams();
     const [pageNoo, setPageNo] = useState(pageNo);
     const [page, setPage] = useState({});
+    const [isPage, setIsPage] = useState(false);
     const getPage = useQuery({
         queryKey: ['page', id, pageNoo],
-        queryFn: () => service.getPageByBookIdAndPageNo(id, pageNoo).then((res) => {
+        queryFn: () => pageService.getPageByBookIdAndPageNo(id, pageNoo).then((res) => {
             if (res?.data) {
                 // console.log(res?.data);
                 setPage(res.data);
@@ -64,9 +44,8 @@ const ReadBook = () => {
         }).catch((err) => {
             console.error(err.message);
         }),
+        enabled: id !== undefined && pageNoo !== undefined
     });
-
-    // console.log(getPage)
     useEffect(() => {
         if (pageNo) {
             setPageNo(pageNo);
@@ -84,11 +63,8 @@ const ReadBook = () => {
         e.preventDefault();
         if (pageNoo > 1) {
             const no = Number(pageNoo) - 1;
-            // queryClient.removeQueries(['page', id, pageNo]);
             navigate(`/details/read/${id}/${Number(no)}`);
-
         }
-
     }
     const handleNextPage = (e) => {
         e.preventDefault();
@@ -97,20 +73,18 @@ const ReadBook = () => {
             navigate(`/details/read/${id}/${Number(no)}`);
         }
     }
-    console.log(id)
-    let userService = new AccountService();
     const updateBookInteraction = useQuery({
         queryKey: ["interaction", profile?.id, page?.book?.id],
-        queryFn: () => userService.updateBookInteraction(token, page?.book?.id, pageNoo).then((res) => {
+        queryFn: () => service.updateBookInteraction(token, page?.book?.id, page?.id, pageNoo).then((res) => {
             if (res?.data) {
-                console.log(res.data);
-                setProfile(res.data);
+                setIsPage(true);
+                setInteractions(res.data);
                 return res.data;
             }
         }).catch((error) => {
             console.error(error);
         }),
-        enabled: profile?.id !== undefined && page?.book?.id !== undefined && id != undefined
+        enabled: token !== undefined && token != "" && profile?.id !== undefined && page?.book?.id !== undefined && id != undefined && !isPage,
     });
     let audioService = new AudioService();
     const pageLoad = {
@@ -143,23 +117,79 @@ const ReadBook = () => {
             console.error(error);
         }),
     })
-
     const handleVoice = () => [
         audioMuta.mutate(pageLoad),
         setShowAudio(true)
     ]
-
     const [showAudio, setShowAudio] = useState(false);
-
-
+    const [interactionPage, setInteractionPage] = useState();
     useEffect(() => {
         updateBookInteraction.refetch();
-        // audioMuta.refetch(); 
     }, [pageNoo, audio]);
     const [isHover, setIsHover] = useState(null);
     const handleMouseLeave = () => setIsHover(null);
+    const handleClose = () => setShow("");
+    const handleBack = () => navigate(`/details/${id}`);
+    const getInteraction = useQuery({
+        queryKey: ["interactionPage", profile?.id, page?.id],
+        queryFn: () => pageService.getInteractionPage(token, page?.id).then((res) => {
+            if (res?.data) {
+                console.log(res.data);
+                setIsPage(true);
+                setInteractionPage(res.data);
+                return res.data;
+            }
+        }).catch((error) => {
+            console.error(error);
+        }).enabled = page?.id !== "" && profile?.id !== undefined && !isPage
+    })
+    const [comments, setComments] = useState([]);
+    let commentService = new CommentService();
+    const getComment = useQuery({
+        queryKey: ["comments", page?.id],
+        queryFn: () => commentService.getCommentByPageId(page?.id).then((res) => {
+            if (res?.data) {
+                console.log(res.data);
+                setComments(res.data);
+                return res.data;
+            }
+        }).catch((error) => {
+            console.error(error);
+        }).enabled = page?.id !== undefined && !isPage && comments.length === 0
+    })
+    console.log(comments);
+    const addEmo = useMutation({
+        mutationFn: (type) => pageService.addEmotion(token, page?.id, type).then((res) => {
+            if (res.data) {
+                console.log(res.data);
+                setInteractionPage(res.data);
+                handleClose();
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        })
+    })
+    const mark = useMutation({
+        mutationFn: (type) => pageService.mark(token, page?.id, type).then((res) => {
+            if (res.data) {
+                console.log(res.data);
+                setInteractionPage(res.data);
+                handleClose();
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        })
+    })
+    const handleEmotion = (type) => {
+        addEmo.mutate(type);
+    }
+    const handleMark = (type) => {
+        mark.mutate(type);
+    }
     return (
-        <div className='relative mx-3 py-10 w-full h-full bg-gray-100'>
+        <div className='relative py-10 w-full h-full bg-gray-100'>
             <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
             <IonIcon className='animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
             <div className='w-full'>
@@ -171,7 +201,6 @@ const ReadBook = () => {
                         <div className=''>
                             <button disabled={Number(pageNoo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`rounded-3xl px-8 h-10 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
                         </div>
-
                     </div>
                     <div className='mt-5 '>
                         <h1 className='text-3xl font-semibold uppercase'>{page?.book?.title}</h1>
@@ -208,11 +237,8 @@ const ReadBook = () => {
                         </span>
                     </div>
                     <div className='mt-10 mx-16 text-2xl  text-start justify-start items-star'>
-                        {page?.name && <span className='mt-1 text-3xl'>Trang {pageNo}: {page?.name}</span>
-
-                        }
-                        <br />
-                        <br />
+                        {page?.name && <span className='mt-1 text-3xl font-semibold'>Trang {pageNo}: {page?.name}</span>}
+                        <br /><br />
                         <span className='' style={{ lineHeight: "1" }} >
                             {processedContent}
                         </span>
@@ -224,19 +250,18 @@ const ReadBook = () => {
                                 <br />
                                 <span>Đánh giá</span>
                             </div>
-                            <div className='w-20 h-30'>
+                            {/* <div className='w-20 h-30'>
                                 <FontAwesomeIcon icon={faShareFromSquare} />
                                 <br />
                                 <span>Đề cử</span>
-                            </div>
-                            <div className='w-20 h-30'>
-                                <FontAwesomeIcon icon={faBookmark} />
+                            </div> */}
+                            <div className='w-20 h-30 cursor-pointer' onClick={() => handleMark(!interactionPage?.mark)}>
+                                <FontAwesomeIcon className={`${interactionPage?.mark ? "text-red-600" : ""}`} icon={faBookmark} />
                                 <br />
                                 <span>Đánh dấu</span>
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div className='mt-4 mx-48 border bg-[#EAE4D3] border-white h-25 rounded-md'>
                     <div className='mx-16 flex gap-10  py-10'>
@@ -272,56 +297,58 @@ const ReadBook = () => {
                                     <textarea name="comment" placeholder='Nhập bình luận của bạn ...' className='w-full p-4 h-16 rounded-xl'></textarea>
                                 </div>
                             </div>
-                            <div className='grid border-b-1 border border-gray-200 border-x-0 border-t-0'>
+                            {comments?.length > 0 && <div className='grid border-b-1 border border-gray-200 border-x-0 border-t-0'>
                                 <div className='flex w-full'>
                                     <div>
                                         <Avatar src="" sx={{ width: 60, height: 60 }} />
                                     </div>
                                     <div className='ml-4 w-full'>
-                                        <div className='w-full rounded-xl pb-4 pr-5'>
-                                            <div className='font-semibold'>Nguyen Van A</div>
-                                            <div className='text-sm flex text-gray-500 gap-10'>
-                                                <div >14 gio truoc</div>
-                                                <div>Trang 1 </div>
+                                        {comments?.map((i, index) => (
+                                            <div key={index} className='w-full rounded-xl pb-4 pr-5'>
+                                                <div className='font-semibold'>{i?.profile?.firstName} {i?.profile?.lastName}</div>
+                                                <div className='text-sm flex text-gray-500 gap-10'>
+                                                    <div >{i?.createAt ? new Date(i?.createAt).toLocaleString() + "" : <></>}</div>
+                                                    <div>Trang {pageNo} </div>
+                                                </div>
+                                                <div className='mt-2'>{i?.content}</div>
+                                                <div className='flex mt-10 justify-end gap-6 text-gray-600'>
+                                                    <div className='flex gap-2'>
+                                                        <div>
+                                                            <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
+                                                        </div>
+                                                        <div>0</div>
+                                                    </div>
+                                                    <div className='flex gap-2'>
+                                                        <div>
+                                                            <FontAwesomeIcon className='text-gray-400' icon={faReply} />
+                                                        </div>
+                                                        <div>Trả lời</div>
+                                                    </div>
+                                                    <div className='flex gap-2'>
+                                                        <div>
+                                                            <FontAwesomeIcon className='text-gray-400' icon={faFlag} />
+                                                        </div>
+                                                        <div>Báo xấu</div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className='mt-2'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, dolorum.</div>
-                                            <div className='flex mt-10 justify-end gap-6 text-gray-600'>
-                                                <div className='flex gap-2'>
-                                                    <div>
-                                                        <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
-                                                    </div>
-                                                    <div>0</div>
-                                                </div>
-
-                                                <div className='flex gap-2'>
-                                                    <div>
-                                                        <FontAwesomeIcon className='text-gray-400' icon={faReply} />
-                                                    </div>
-                                                    <div>Trả lời</div>
-                                                </div>
-                                                <div className='flex gap-2'>
-                                                    <div>
-                                                        <FontAwesomeIcon className='text-gray-400' icon={faFlag} />
-                                                    </div>
-                                                    <div>Báo xấu</div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        )
+                                        )}
                                     </div>
                                 </div>
-                            </div>
+                            </div>}
                         </div>
                     </div>
                 </div>
-                {showSetting && <Setting handleShowSetting={handleShowSetting} handleVoice={handleVoice} showAudio={showAudio} audio={audio} />}
-                {showListPage && <ListPage handleShowListPage={handleShowListPage} />}
-                <div className='fixed ml-4 top-4 mt-24 right-24 rounded-xl'>
+                {show === "setting" && <Setting handleClose={handleClose} handleVoice={handleVoice} showAudio={showAudio} audio={audio} />}
+                {show === "listpage" && <ListPage handleClose={handleClose} />}
+                <div className='fixed ml-4 top-4 mt-24 right-[6.5rem] rounded-xl'>
                     <div className={`rounded-xl w-20`}>
                         <div
                             onMouseEnter={() => setIsHover("pages")}
                             onMouseLeave={handleMouseLeave}
-                            className={`flex relative border-white border ${showListPage ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid border-b-1 justify-center text-center h-14 items-center cursor-pointer`}
-                            onClick={() => handleShowListPage()}
+                            className={`flex relative border-white border ${show === "listpage" ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid border-b-1 justify-center text-center h-14 items-center cursor-pointer`}
+                            onClick={() => handleShow("listpage")}
                         >
                             <IonIcon className='w-7 h-7' icon={menuSharp} />
                             {isHover === "pages" && (
@@ -334,12 +361,11 @@ const ReadBook = () => {
                                 </div>
                             )}
                         </div>
-
                         <div
                             onMouseEnter={() => setIsHover("setting")}
                             onMouseLeave={handleMouseLeave}
-                            onClick={() => handleShowSetting()}
-                            className={`border relative border-white ${showSetting ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid  border-b-1 flex items-center justify-center text-center h-14 cursor-pointer`}>
+                            onClick={() => handleShow("setting")}
+                            className={`border relative border-white ${show === "setting" ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid  border-b-1 flex items-center justify-center text-center h-14 cursor-pointer`}>
                             <IonIcon className='w-6 h-6' icon={settingsOutline} />
                             {isHover === "setting" && (
                                 <div
@@ -354,6 +380,7 @@ const ReadBook = () => {
                         <div
                             onMouseEnter={() => setIsHover("back")}
                             onMouseLeave={handleMouseLeave}
+                            onClick={() => handleBack()}
                             className='border relative border-white border-solid bg-[#EAE4D3] border-b-1 justify-center items-center text-center h-14 flex cursor-pointer'>
                             <IonIcon className='w-6 h-6' icon={arrowBack} />
                             {isHover === "back" && (
@@ -368,21 +395,21 @@ const ReadBook = () => {
                         </div>
                     </div>
                 </div>
-                <div className='fixed bottom-10 right-24 rounded-xl flex-row justify-center items-center gap-5 '>
-                    {showEmotion && <div className='rounded-3xl bg-white py-2'>
-                        <div className='flex justify-center items-center'>
+                <div className='fixed bottom-10 right-[6.5rem] rounded-xl flex-row justify-center items-center gap-5 '>
+                    {show === "emotion" && <div className='rounded-3xl bg-white py-2'>
+                        <div onClick={() => handleEmotion("LOVE")} className='flex justify-center items-center'>
                             <img src="love.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
                         </div>
-                        <div className='flex justify-center items-center'>
+                        <div onClick={() => handleEmotion("LIKE")} className='flex justify-center items-center'>
                             <img src="like.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
                         </div>
-                        <div className='flex justify-center items-center'>
+                        <div onClick={() => handleEmotion("FUN")} className='flex justify-center items-center'>
                             <img src="fun.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
                         </div>
-                        <div className='flex justify-center items-center'>
+                        <div onClick={() => handleEmotion("SAD")} className='flex justify-center items-center'>
                             <img src="sad.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
                         </div>
-                        <div className='flex justify-center items-center'>
+                        <div onClick={() => handleEmotion("ANGRY")} className='flex justify-center items-center'>
                             <img src="angry.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
                         </div>
                     </div>
@@ -392,9 +419,18 @@ const ReadBook = () => {
                             <div
                                 onMouseEnter={() => setIsHover("emotion")}
                                 onMouseLeave={handleMouseLeave}
-                                onClick={() => handleShowEmotion()}
+                                onClick={() => handleShow("emotion")}
                                 className='border relative border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
-                                <IonIcon className='w-7 h-7' icon={heartOutline} />
+                                {
+                                    interactionPage?.type ? <div>
+                                        <img src={interactionPage?.type === "LIKE" ? "like.png" :
+                                            interactionPage?.type === "LOVE" ? "love.png" :
+                                                interactionPage?.type === "FUN" ? "fun.png" :
+                                                    interactionPage?.type === "SAD" ? "sad.png" :
+                                                        "angry.png"
+                                        } alt="" className='w-7 h-7 cursor-pointer' />
+                                    </div> :
+                                        <IonIcon className='w-7 h-7' icon={heartOutline} />}
                                 {isHover === "emotion" && (
                                     <div
                                         className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
@@ -408,9 +444,9 @@ const ReadBook = () => {
                             <div
                                 onMouseEnter={() => setIsHover("save")}
                                 onMouseLeave={handleMouseLeave}
-                                onClick={() => handleShowSave()}
+                                onClick={() => handleShow("save")}
                                 className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
-                                {showSave ? <FontAwesomeIcon className='w-7 h-7' icon={faCheck} /> : <IonIcon className='w-7 h-7' icon={bookmarkOutline} />}
+                                {show === "save" ? <FontAwesomeIcon className='w-7 h-7' icon={faCheck} /> : <IonIcon className='w-7 h-7' icon={bookmarkOutline} />}
                                 {isHover === "save" && (
                                     <div
                                         className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"

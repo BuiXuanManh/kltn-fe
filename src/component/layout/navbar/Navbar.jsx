@@ -11,7 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Skeleton } from "@mui/material";
 import { AppContext } from "../../../context/AppContext";
 export default function Navbar() {
-  const { token, setToken, mssv, setMssvContext, user, setUser, profile, setProfile } = useContext(AppContext);
+  const { token, setToken, mssv, profile, setProfile } = useContext(AppContext);
   const [showMenu, setShowMenu] = useState(false);
   const location = useLocation();
   const [name, setName] = useState();
@@ -117,13 +117,13 @@ export default function Navbar() {
                   {showSetting ? (
                     <>
                       <div className="z-50 absolute left-0 w-48 py-2 mt-2 mr-10 bg-white rounded-lg shadow-xl">
-                        <Link onClick={() => showSettingHandle()} to={"/profile/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <Link onClick={() => showSettingHandle()} to={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Profile
                         </Link>
-                        <Link onClick={() => showSettingHandle()} to={"/changPass/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <Link onClick={() => showSettingHandle()} to={"/changPass/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Dôi mât khâu
                         </Link>
-                        <Link onClick={() => showSettingHandle()} to={"/history/" + user?.mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                        <Link onClick={() => showSettingHandle()} to={"/history/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                           Lích sử đọc
                         </Link>
                         <a onClick={(e) => handleLogout(e)} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">

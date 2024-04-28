@@ -260,9 +260,9 @@ const SearchDetail = ({ data }) => {
                                 options={optionsNomination}
                                 placeholder="Đề cử"
                             />
-                            <button onClick={() => handleChange("save")} className={`flex-grow ${filter === "save" ? "text-yellow-600" : "text-black"} hover:text-blue-400`}>lưu trữ</button>
-                            <button onClick={() => handleChange("love")} className={`flex-grow ml-4 ${filter === "love" ? "text-yellow-600" : "text-black"} hover:text-blue-400`}>Yêu thích</button>
-                            <button onClick={() => handleChange("comment")} className={`flex-grow ${filter === "comment" ? "text-yellow-600" : "text-black"} hover:text-blue-400`}>Bình luận</button>
+                            <button onClick={() => handleChange("save")} className={`flex-grow ${filter === "save" ? "text-yellow-700" : "text-black"} hover:text-blue-400`}>lưu trữ</button>
+                            <button onClick={() => handleChange("love")} className={`flex-grow ml-4 ${filter === "love" ? "text-yellow-700" : "text-black"} hover:text-blue-400`}>Yêu thích</button>
+                            <button onClick={() => handleChange("comment")} className={`flex-grow ml-4 ${filter === "comment" ? "text-yellow-700" : "text-black"} hover:text-blue-400`}>Bình luận</button>
                         </div>
                     </div>
                     <div className='p-4 w-full'>

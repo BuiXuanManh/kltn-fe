@@ -1,13 +1,31 @@
 import { Link } from "react-router-dom";
 import IconGlobal from "../../../../icon/IconGlobal";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AppContext } from "../../../../context/AppContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useQuery } from "@tanstack/react-query";
+import AccountService from "../../../service/AccountService";
+import BookService from "../../../service/BookService";
 
 function NominatedBook(data) {
     let icon = new IconGlobal();
-    const { token, setToken, profile } = useContext(AppContext);
+    const { token, setToken, profile, interactions, setInteractions } = useContext(AppContext);
+    const [inter, isInter] = useState(false);
+    let service =new BookService();
+    const getInteraciton = useQuery({
+        queryKey: ['getInteractions', profile?.id],
+        queryFn: () => service.getInteractions(token).then((res) => {
+            if (res.data) {
+                console.log("inter", res.data);
+                setInteractions(res.data);
+                isInter(true);
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        }), enabled: profile?.id !== undefined && interactions.length === 0 && !inter
+    })
     // console.log(profile)
     return (
         <div>
@@ -86,7 +104,7 @@ function NominatedBook(data) {
                         );
                     }) : <div>
                         {
-                            profile?.interactions?.map((item) => {
+                            interactions?.map((item) => {
                                 return (
                                     <div key={item.id} className='flex text-start w-full mt-5 max-h-30 p-4 border border-gray-200'>
                                         <div className='w-10 h-12'>

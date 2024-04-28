@@ -27,7 +27,6 @@ const Router = () => {
         const fetchBooks = async () => {
             try {
                 const res = await bookService.getBooks(1, 12);
-                console.log(res.data);
                 setData(res.data);
             } catch (err) {
                 console.log(err);

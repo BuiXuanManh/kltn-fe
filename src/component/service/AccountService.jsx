@@ -11,7 +11,5 @@ export default class AccountService {
     getProfile(token) {
         return api.get("/users/profile", AuthService(token));
     }
-    updateBookInteraction(token, bookId, page) {
-        return api.post(`users/interaction/read/${bookId}/${page}`, {}, AuthService(token));
-    }
+
 }
