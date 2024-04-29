@@ -19,6 +19,7 @@
     "@mui/material": "^5.15.13",
     "@tanstack/react-query": "^5.28.9",
     "@tanstack/react-query-devtools": "^5.28.10",
+    "antd": "^5.16.5",
     "axios": "^1.6.8",
     "ionicons": "^7.2.2",
     "js-cookie": "^3.0.5",
@@ -29,6 +30,7 @@
     "react-owl-carousel": "^2.3.3",
     "react-router-dom": "^6.22.3",
     "react-select": "^5.8.0",
+    "react-toastify": "^10.0.5",
     "sweetalert": "^2.1.2"
   },
   "devDependencies": {

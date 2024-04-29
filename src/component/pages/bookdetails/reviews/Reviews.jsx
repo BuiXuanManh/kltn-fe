@@ -184,6 +184,19 @@ const Reviews = () => {
                                 </div>
                             </div>
                         </div>
+                        <div className='mt-5'>
+                            <div className='flex justify-between'>
+                                <div>Nội dung tổng hợp</div>
+                                <div className='text-yellow-500 text-lg'>
+                                    <FontAwesomeIcon icon={faStar} />
+                                    <FontAwesomeIcon icon={faStar} />
+                                    <FontAwesomeIcon icon={faStarHalfAlt} />
+                                    <FontAwesomeIcon icon={star} />
+                                    <FontAwesomeIcon icon={star} />
+                                    <span className='text-black ml-2 text-xl'>3.2</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

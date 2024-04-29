@@ -11,8 +11,9 @@ import { faFilePen } from '@fortawesome/free-solid-svg-icons';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import BookService from '../../service/BookService';
 import IconGlobal from '../../../icon/IconGlobal';
+import PageService from '../../service/PageService';
 const BookDetails = () => {
-    const [activeMenu, setActiveMenu] = useState('giới thiệu');
+    const [activeMenu, setActiveMenu] = useState('introduction');
 
     const handleMenuClick = (menuItem) => {
         setActiveMenu(menuItem);
@@ -52,6 +53,22 @@ const BookDetails = () => {
         enabled: !!book,
     });
     let icon = new IconGlobal();
+    let pageService = new PageService();
+    const [pages, setPages] = useState([]);
+    const [pageCount, setPageCount] = useState(0);
+    const getPages = useQuery({
+        queryKey: ['pages', id],
+        queryFn: () => pageService.getPagesByBookId(id).then((res) => {
+            if (res.data) {
+                setPages(res.data);
+                setPageCount(res.data.length);
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err.message);
+        }),
+        enabled: !!pages,
+    })
     return (
         <div className='w-full'>
             <div className="w-full relative h-[40rem] z-0 border items-center justify-center border-white rounded-lg bg-white shadow-md" >
@@ -123,23 +140,42 @@ const BookDetails = () => {
                     </div>
                 </div>
                 <div className="flex mt-8 gap-8 text-xl font-semibold">
-                    <div className={activeMenu === 'giới thiệu' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('giới thiệu')}>Giới thiệu</div>
-                    <div className={activeMenu === 'đánh giá' ? ' text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('đánh giá')}>Đánh giá <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{rates.rate}</span></div>
-                    <div className={activeMenu === 'bình luận' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('bình luận')}>Bình luận <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{rates.comments}</span></div>
+                    <div className={activeMenu === 'introduction' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('introduction')}>Giới thiệu</div>
+                    <div className={activeMenu === 'listPage' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('listPage')}>Danh sách trang <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{pageCount}</span></div>
+                    <div className={activeMenu === 'review' ? ' text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('review')}>Đánh giá <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{rates.rate}</span></div>
+                    <div className={activeMenu === 'comment' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('comment')}>Bình luận <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{rates.comments}</span></div>
                 </div>
                 <div className='mb-10 min-h-96'>
-                    {activeMenu === 'giới thiệu' && (
+                    {activeMenu === 'introduction' && (
                         <div className='mt-5' style={{ whiteSpace: 'pre-line' }}>
                             {book?.longDescription}
                         </div>
                     )}
 
-                    {activeMenu === 'đánh giá' && (
+                    {activeMenu === 'review' && (
                         <Reviews />
                     )}
 
-                    {activeMenu === 'bình luận' && (
+                    {activeMenu === 'comment' && (
                         <Comment />
+                    )}
+                    {activeMenu === 'listPage' && (
+                        <div className=''>
+                            <div className='mt-3'>
+                                {pages?.map((page, index) => {
+                                    return (
+                                        <div key={index} className='border flex mt-2 hover:text-blue-700 hover:bg-gray-100 p-5 rounded-lg border-gray-300 cursor-pointer'>
+                                            <div className=''>
+                                                <div className='flex'>
+                                                    <h3>Trang {page.pageNo}</h3>
+                                                    <p>{page.name}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     )}
                 </div>
 

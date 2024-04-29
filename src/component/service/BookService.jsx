@@ -17,4 +17,10 @@ export default class BookService {
     getInteractions(token) {
         return api.get(`/api/books/interactions`, AuthService(token));
     }
+    findRateBookByProfileIdAndBookId(token, bookId) {
+        return api.get(`/api/books/rateBook/${bookId}`, AuthService(token));
+    }
+    addRateBook(token, bookId, rate) {
+        return api.post(`/api/books/rateBook/${bookId}`, rate, AuthService(token));
+    }
 }

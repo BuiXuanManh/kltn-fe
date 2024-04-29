@@ -4,7 +4,25 @@ import { faClock } from '@fortawesome/free-regular-svg-icons';
 import { IonIcon } from '@ionic/react';
 import { sendSharp } from 'ionicons/icons';
 import { Avatar } from '@mui/material';
+import { useState } from 'react';
+import CommentService from '../../../service/CommentService';
+import { useQuery } from '@tanstack/react-query';
 const Comment = () => {
+    const [comments, setComments] = useState([]);
+    let commentService = new CommentService();
+    // const getComment = useQuery({
+    //     queryKey: ["comments", page?.id],
+    //     queryFn: () => commentService.getCommentByPageId(page?.id).then((res) => {
+    //         if (res?.data) {
+    //             console.log(res.data);
+    //             setComments(res.data);
+    //             return res.data;
+    //         }
+    //     }).catch((error) => {
+    //         console.error(error);
+    //     }).enabled = page?.id !== undefined && !isPage && comments.length === 0
+    // })
+    // console.log(comments);
     return (
         <div className='mx-16 grid gap-10 py-10'>
             <div className='grid'>
@@ -18,7 +36,7 @@ const Comment = () => {
                 </div>
                 <div className='flex w-full my-10 border-b-1 border border-gray-200 border-x-0 border-t-0 pb-4'>
                     <div>
-                    <Avatar src="" sx={{ width: 60, height: 60 }} />
+                        <Avatar src="" sx={{ width: 60, height: 60 }} />
                     </div>
                     <div className='relative ml-4 w-full'>
                         <textarea name="comment" placeholder='Nhập bình luận của bạn ...' className='w-full h-16 rounded-xl bg-gray-200 focus:outline-none focus:ring focus:ring-indigo-500 px-4 py-2'></textarea>
@@ -27,50 +45,45 @@ const Comment = () => {
                         </button>
                     </div>
                 </div>
-                <div className='grid w-full border-b-1 border border-gray-200 border-x-0 border-t-0'>
-                    <div className='flex gap-4 w-full'>
+                {comments?.length > 0 && <div className='grid border-b-1 border border-gray-200 border-x-0 border-t-0'>
+                    <div className='flex w-full'>
                         <div>
                             <Avatar src="" sx={{ width: 60, height: 60 }} />
                         </div>
-                        <div className='w-full'>
-                            <div className='rounded-xl pb-4 pr-5 w-full'>
-                                <div className='font-semibold'>Nguyen Van A</div>
-                                <div className='text-sm flex text-gray-500 gap-10'>
-                                    <div>
-                                        <FontAwesomeIcon icon={faClock} />
-                                        <span className='ml-2'>14 gio truoc</span>
+                        <div className='ml-4 w-full'>
+                            {comments?.map((i, index) => (
+                                <div key={index} className='w-full rounded-xl pb-4 pr-5'>
+                                    <div className='font-semibold'>{i?.profile?.firstName} {i?.profile?.lastName}</div>
+                                    <div className='text-sm flex text-gray-500 gap-10'>
+                                        <div >{i?.createAt ? new Date(i?.createAt).toLocaleString() + "" : <></>}</div>
+                                        <div>Trang {i?.pageBook?.pageNo} </div>
                                     </div>
-                                    <div>
-                                        <FontAwesomeIcon icon={faGlasses} />
-                                        <span className='ml-2'>Trang 1</span>
+                                    <div className='mt-2'>{i?.content}</div>
+                                    <div className='flex mt-10 justify-end gap-6 text-gray-600'>
+                                        <div className='flex gap-2'>
+                                            <div>
+                                                <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
+                                            </div>
+                                            <div>0</div>
+                                        </div>
+                                        <div className='flex gap-2'>
+                                            <div>
+                                                <FontAwesomeIcon className='text-gray-400' icon={faReply} />
+                                            </div>
+                                            <div>Trả lời</div>
+                                        </div>
+                                        <div className='flex gap-2'>
+                                            <div>
+                                                <FontAwesomeIcon className='text-gray-400' icon={faFlag} />
+                                            </div>
+                                            <div>Báo xấu</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className='mt-2'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, dolorum.</div>
-                                <div className='w-full flex mt-10 justify-end items-end gap-6 text-gray-600'>
-                                    <div className='flex gap-2'>
-                                        <div>
-                                            <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
-                                        </div>
-                                        <div>0</div>
-                                    </div>
-
-                                    <div className='flex gap-2'>
-                                        <div>
-                                            <FontAwesomeIcon className='text-gray-400' icon={faReply} />
-                                        </div>
-                                        <div>Tra loi</div>
-                                    </div>
-                                    <div className='flex gap-2'>
-                                        <div>
-                                            <FontAwesomeIcon className='text-gray-400' icon={faFlag} />
-                                        </div>
-                                        <div>Bao xau</div>
-                                    </div>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
-                </div>
+                </div>}
             </div>
         </div>
     );

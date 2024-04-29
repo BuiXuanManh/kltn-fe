@@ -12,7 +12,7 @@ function NominatedBook(data) {
     let icon = new IconGlobal();
     const { token, setToken, profile, interactions, setInteractions } = useContext(AppContext);
     const [inter, isInter] = useState(false);
-    let service =new BookService();
+    let service = new BookService();
     const getInteraciton = useQuery({
         queryKey: ['getInteractions', profile?.id],
         queryFn: () => service.getInteractions(token).then((res) => {
@@ -70,8 +70,10 @@ function NominatedBook(data) {
 
                                             </div>
                                         </div>
+                                        <div className="max-w-48 max-h-10 flex items-center">
+                                            <div className='p-1 border max-h-10 truncate  border-tyellow text-orange-600 cursor-pointer'>{item.genres[0]?.name}</div>
+                                        </div>
 
-                                        <div className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{item.genres[0]?.name}</div>
                                     </div>
                                 </div>
                             </div>
