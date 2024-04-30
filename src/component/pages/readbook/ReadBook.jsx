@@ -20,6 +20,7 @@ import AudioService from '../../service/AudioService';
 import PageService from '../../service/PageService';
 import CommentService from '../../service/CommentService';
 import Review from './review/Review';
+import { message } from 'antd';
 const ReadBook = () => {
     const { token, profile, interactions, setInteractions } = useContext(AppContext);
     const [show, setShow] = useState("");
@@ -37,7 +38,6 @@ const ReadBook = () => {
         queryKey: ['page', id, pageNoo],
         queryFn: () => pageService.getPageByBookIdAndPageNo(id, pageNoo).then((res) => {
             if (res?.data) {
-                // console.log(res?.data);
                 setPage(res.data);
                 return res.data;
             }
@@ -86,10 +86,10 @@ const ReadBook = () => {
         }),
         enabled: token !== undefined && token != "" && profile?.id !== undefined && page?.book?.id !== undefined && id != undefined && !isPage,
     });
-    const [rate, setRate] = useState(0);
-    const getCommentt = useQuery({
-        queryKey: ["commentType", page?.id],
-        queryFn: () => commentService.getComment(token, page?.id).then((res) => {
+    const [rate, setRate] = useState(1);
+    const getRate = useQuery({
+        queryKey: ["getRate", page?.id],
+        queryFn: () => pageService.getRatePage(token, page?.id).then((res) => {
             if (res.data) {
                 console.log(res.data);
                 setRate(res.data.rate);
@@ -97,7 +97,7 @@ const ReadBook = () => {
             }
         }).catch((error) => {
             console.error(error);
-        }).enabled = page?.id !== undefined && rate === 0
+        }).enabled = page.id !== undefined && rate === 1 && !isPage && token !== undefined && token !== ""
     })
     let audioService = new AudioService();
     const pageLoad = {
@@ -154,7 +154,7 @@ const ReadBook = () => {
             }
         }).catch((error) => {
             console.error(error);
-        }).enabled = page?.id !== "" && profile?.id !== undefined && !isPage
+        }).enabled = page.id !== "" && profile.id !== undefined && !isPage && token !== undefined && token !== ""
     })
     const [comments, setComments] = useState([]);
     let commentService = new CommentService();
@@ -168,13 +168,13 @@ const ReadBook = () => {
             }
         }).catch((error) => {
             console.error(error);
-        }).enabled = page?.id !== undefined && !isPage && comments.length === 0
+        }).enabled = page.id !== undefined && !isPage && comments.length === 0
     })
     const [content, setContent] = useState("");
     const addComment = useMutation({
         mutationFn: (content) => {
             if (content !== "")
-                commentService.addComment(token, page?.id, JSON.stringify(content)).then((res) => {
+                commentService.addComment(token, page?.id, content).then((res) => {
                     setContent("");
                     if (res.data) {
                         console.log(res.data);
@@ -185,7 +185,9 @@ const ReadBook = () => {
                     console.error(error);
                 })
             else {
-                alert("nhập nội dung bình luận");
+                setTimeout(() => {
+                    message.error("Nhập nội dung bình luận", 2);
+                }, 0);
             }
         }
     })
@@ -285,7 +287,7 @@ const ReadBook = () => {
                         <div className='mt-4 py-10 mx-16'>
                             <div className={` flex gap-10 justify-center items-center text-center`}>
                                 <div onClick={() => handleShow("review")} className='w-20 h-30'>
-                                    <FontAwesomeIcon className={`${rate && rate > 0 ? "text-yellow-700" : ""}`} icon={faStar} />
+                                    <FontAwesomeIcon className={`${rate && rate > 1 ? "text-yellow-700" : ""}`} icon={faStar} />
                                     <br />
                                     <span>Đánh giá</span>
                                 </div>

@@ -3,16 +3,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
-import CommentService from '../../../service/CommentService';
+import PageService from '../../../service/PageService';
 const Review = ({ handleClose, token, pageId, setRate, rate }) => {
     const handleSendRate = () => {
         addRate.mutate(rate);
     }
-    let commentService = new CommentService();
+    let pageService = new PageService();
     const queryClient = useQueryClient();
     const addRate = useMutation({
-        mutationFn: (rate) => commentService.addRate(token, pageId, rate).then((res) => {
+        mutationFn: (rate) => pageService.addRatePage(token, pageId, rate).then((res) => {
             if (res.data) {
                 console.log(res.data);
                 setRate(res.data.rate);
@@ -23,11 +22,12 @@ const Review = ({ handleClose, token, pageId, setRate, rate }) => {
                 return res.data;
             }
         }).catch((error) => {
+            setTimeout(() => {
+                message.error("Gửi thất bại", 2);
+            }, 0);
             console.error(error);
-            message.error("Gửi thất bại", 2);
         })
     })
-    
     return (
         <>
             <div aria-modal aria-hidden tabIndex={-1} role="dialog" className='fixed mx-[35%] h-[47%] top-0 mt-[7%] z-50 bg-white flex'>
@@ -47,7 +47,7 @@ const Review = ({ handleClose, token, pageId, setRate, rate }) => {
                             <div className='w-full justify-center items-center flex'>
                                 <input
                                     type="range"
-                                    min="0"
+                                    min="1"
                                     max="5"
                                     value={rate}
                                     onChange={(e) => setRate(parseFloat(e.target.value))}

@@ -14,13 +14,13 @@ export default class PageService {
     mark(token, pageId, type) {
         return api.post(`/api/pages/flag/${pageId}?type=${type}`, {}, AuthService(token));
     }
-    findRatePageByProfileIdAndPageId(token, pageId) {
-        return api.get(`/api/pages/ratePage/${pageId}`, AuthService(token));
-    }
-    addRatePage(token, pageId, rate) {
-        return api.post(`/api/pages/ratePage/${pageId}`, { point: rate }, AuthService(token));
-    }
     getPagesByBookId(bookId) {
         return api.get(`/api/pages/book/${bookId}`);
+    }
+    addRatePage(token, pageId, rate) {
+        return api.post(`/api/pages/ratePage/${pageId}`, rate, AuthService(token));
+    }
+    getRatePage(token, pageId) {
+        return api.get(`/api/pages/ratePage/${pageId}`, AuthService(token));
     }
 }

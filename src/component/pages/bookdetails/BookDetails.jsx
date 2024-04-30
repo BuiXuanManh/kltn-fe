@@ -1,33 +1,27 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { IonIcon } from '@ionic/react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { starSharp, starHalfSharp } from 'ionicons/icons';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { starSharp, starHalfSharp, bookmarkOutline, roseOutline } from 'ionicons/icons';
 import LinearProgress from '@mui/material/LinearProgress';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Reviews from './reviews/Reviews';
 import Comment from './comments/Comment';
-import { faFilePen } from '@fortawesome/free-solid-svg-icons';
+import { faFilePen, faGlasses } from '@fortawesome/free-solid-svg-icons';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import BookService from '../../service/BookService';
 import IconGlobal from '../../../icon/IconGlobal';
 import PageService from '../../service/PageService';
+import { AppContext } from '../../../context/AppContext';
 const BookDetails = () => {
     const [activeMenu, setActiveMenu] = useState('introduction');
-
     const handleMenuClick = (menuItem) => {
         setActiveMenu(menuItem);
     };
+    const { token, interactions } = useContext(AppContext);
     const [book, setBook] = useState();
     const { id } = useParams();
-    // const data = {
-    //     id: id,
-    //     title: 'Harry Potter và Hòn Đá Phù Thủy',
-    //     img: 'book2.jpg',
-    //     author: 'J.K. Rowling',
-    //     genre: 'Fantasy',
-    //     description: 'Cuốn sách đầu tiên trong loạt truyện Harry Potter.'
-    // }
+    const [isBook, setIsBook] = useState(false);
     const genres = ["lịch sử", "quân sự", "mới", "tiểu thuyết"]
     const rates = {
         id: 1,
@@ -43,14 +37,17 @@ const BookDetails = () => {
         navigate(`/details/read/${id}/1`);
     }
     let service = new BookService();
-    const { data, isLoading } = useQuery({
+    const getBook = useQuery({
         queryKey: ['book', id],
-        queryFn: service.getBookById(id).then((res) => {
-            setBook(res.data);
+        queryFn: () => service.getBookById(id).then((res) => {
+            if (res.data) {
+                setBook(res.data);
+                setIsBook(true);
+            }
         }).catch((err) => {
-            console.error(err.message);
+            console.error(err);
         }),
-        enabled: !!book,
+        enabled: book === undefined && !isBook,
     });
     let icon = new IconGlobal();
     let pageService = new PageService();
@@ -65,10 +62,23 @@ const BookDetails = () => {
                 return res.data;
             }
         }).catch((err) => {
-            console.error(err.message);
+            console.error(err);
         }),
         enabled: !!pages,
     })
+    const [pageNumber, setPageNumber] = useState(0);
+    useEffect(() => {
+        if (interactions.length > 0) {
+            interactions.find((item) => {
+                if (item.book.id === id) {
+                    setPageNumber(item?.book?.pageCount);
+                }
+            })
+        }
+    }, [interactions])
+    const handleReadContinue = () => {
+        navigate(`/details/read/${id}/${pageNumber}`);
+    }
     return (
         <div className='w-full'>
             <div className="w-full relative h-[40rem] z-0 border items-center justify-center border-white rounded-lg bg-white shadow-md" >
@@ -118,9 +128,22 @@ const BookDetails = () => {
                                 <span className='ml-4'>({rates.rater} đánh giá)</span>
                             </div>
                             <div className='flex gap-6'>
-                                <button onClick={() => handleReadBook()} className='bg-tblue text-white p-2 rounded-xl'>Đọc sách</button>
-                                <button className='border p-2 border-black rounded-2xl'>Lưu trữ</button>
-                                <button className='bg-[#F7F5F0] px-6 border rounded-2xl border-tblue'>Đề cử</button>
+                                <button onClick={() => handleReadBook()} className='bg-tblue flex items-center text-white p-2 rounded-xl'>
+                                    <FontAwesomeIcon icon={faGlasses} />
+                                    <p className='ml-2'>Đọc từ đầu</p>
+                                </button>
+                                {pageNumber > 0 && <button onClick={() => handleReadContinue()} className='bg-red-600 flex items-center text-white p-2 rounded-xl'>
+                                    <FontAwesomeIcon icon={faGlasses} />
+                                    <p className='ml-2'>Đọc tiêp</p>
+                                </button>}
+                                <button className='border p-2 pr-4 border-black rounded-2xl flex items-center'>
+                                    <IonIcon className='w-5 h-5' icon={bookmarkOutline} />
+                                    <p className='ml-2'>Lưu trữ</p>
+                                </button>
+                                <button className='bg-[#F7F5F0] px-6 border flex items-center rounded-2xl border-tblue'>
+                                    <IonIcon className='w-5 h-5' icon={roseOutline} />
+                                    <p className='ml-2'>Đề cử</p>
+                                </button>
                             </div>
                         </div>
                         <div className='flex items-center mt-3'>
@@ -151,9 +174,8 @@ const BookDetails = () => {
                             {book?.longDescription}
                         </div>
                     )}
-
                     {activeMenu === 'review' && (
-                        <Reviews />
+                        <Reviews id={id} />
                     )}
 
                     {activeMenu === 'comment' && (
@@ -164,13 +186,17 @@ const BookDetails = () => {
                             <div className='mt-3'>
                                 {pages?.map((page, index) => {
                                     return (
-                                        <div key={index} className='border flex mt-2 hover:text-blue-700 hover:bg-gray-100 p-5 rounded-lg border-gray-300 cursor-pointer'>
-                                            <div className=''>
-                                                <div className='flex'>
-                                                    <h3>Trang {page.pageNo}</h3>
-                                                    <p>{page.name}</p>
+                                        <div key={index} >
+                                            <Link to={`/details/read/${id}/${page?.pageNo}`}>
+                                                <div className='border flex mt-2 hover:text-blue-700 hover:bg-gray-100 p-5 rounded-lg border-gray-300 cursor-pointer'>
+                                                    <div className=''>
+                                                        <div className='flex'>
+                                                            <h3>Trang {page.pageNo}:</h3>
+                                                            <p className='ml-2'>{page.name}</p>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </Link>
                                         </div>
                                     );
                                 })}

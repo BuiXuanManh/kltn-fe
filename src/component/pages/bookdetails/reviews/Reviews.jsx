@@ -1,16 +1,105 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IonIcon } from '@ionic/react';
 import { sendSharp } from 'ionicons/icons';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { faReply, faThumbsUp, faFlag, faStar, faStarHalfAlt, faGlasses } from '@fortawesome/free-solid-svg-icons';
 import { faClock, faStar as star } from '@fortawesome/free-regular-svg-icons';
 import { Avatar } from '@mui/material';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import BookService from '../../../service/BookService';
+import { message } from 'antd';
+import { AppContext } from '../../../../context/AppContext';
+import CommentService from '../../../service/CommentService';
+import RateHandle from '../../../../rateHandle/RateHandle';
+import formatTimeDifference from '../../../service/DateService';
 
-const Reviews = () => {
-    const [usefulness, setUsefulness] = useState(0); // Giá trị tiện ích
-    const [content, setContent] = useState(0); // Giá trị nội dung sách
-    const [understandability, setUnderstandability] = useState(0);
-
+const Reviews = ({ id }) => {
+    const { token } = useContext(AppContext);
+    let service = new BookService();
+    let commentService = new CommentService();
+    const [usefulness, setUsefulness] = useState(1); // Giá trị tiện ích
+    const [contentBook, setContentBook] = useState(1); // Giá trị nội dung sách
+    const [understandability, setUnderstandability] = useState(1);
+    const [content, setContent] = useState('');
+    const [disable, setDisable] = useState(false);
+    const [isRate, setIsRate] = useState(false);
+    const getRateBook = useQuery({
+        queryKey: ['rateBook', id],
+        queryFn: () => service.findRateBookByProfileIdAndBookId(token, id).then((res) => {
+            if (res.data) {
+                setContentBook(res.data.contentBook);
+                setUsefulness(res.data.helpful);
+                setUnderstandability(res.data.understand);
+                setContent(res.data.content);
+                setRateData(res.data)
+                setIsRate(true);
+                isDisable();
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        }), enabled: token !== "" && token !== undefined && id !== undefined && id !== "" && !isRate
+    })
+    const [rateData, setRateData] = useState();
+    const [rates, setRates] = useState([]);
+    const addRateBook = useMutation({
+        mutationFn: (rate) => commentService.addRateBook(token, id, rate).then((res) => {
+            if (res.data) {
+                setRateData(res.data)
+                setRates([res.data,...rates]);
+                // getRates.refetch();
+                setTimeout(() => {
+                    message.success("Đánh giá thành công", 2)
+                }, 0);
+                return res.data;
+            }
+        }).catch((err) => {
+            setTimeout(() => {
+                message.error("Đánh giá thất bại", 2)
+            }, 0);
+            console.error(err);
+        })
+    })
+    const isDisable = () => {
+        if (rateData) {
+            if (rateData.contentBook === contentBook && rateData.helpful === usefulness && rateData.understand === understandability && rateData.content === content) {
+                setDisable(true);
+            }
+            else setDisable(false);
+        }
+    }
+    useEffect(() => {
+        isDisable();
+    }, [usefulness, contentBook, understandability, content, rateData, rates])
+    const handleKeyPress = (e) => {
+        if (e.key === "Enter") {
+            if (content.trim() === "") {
+                setTimeout(() => {
+                    message.error("Hãy nhập nội dung đánh gíá", 2)
+                }, 0);
+            }
+            else if (disable)
+                setTimeout(() => {
+                    message.error("Bạn đã đánh giá rồi hãy sửa đánh đánh để cập nhập", 2)
+                }, 0);
+            else
+                addRateBook.mutate({ contentBook: contentBook, helpful: usefulness, understand: understandability, content: content });
+        }
+    }
+    const [test, setTest] = useState(false);
+    const getRates = useQuery({
+        queryKey: ['getRates', id],
+        queryFn: () => commentService.getCommentByBookId(id, "rate").then((res) => {
+            if (res.data) {
+                console.log(res.data)
+                setRates(res.data);
+                setTest(true);
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        }), enabled: rates.length === 0 && !test
+    })
     return (
         <div>
             <div className='mt-4 grid grid-cols-3 '>
@@ -21,7 +110,7 @@ const Reviews = () => {
                             <div className='grid grid-cols-1 col-span-3'>
                                 <input
                                     type="range"
-                                    min="0"
+                                    min="1"
                                     max="5"
                                     value={usefulness}
                                     onChange={(e) => setUsefulness(parseFloat(e.target.value))}
@@ -36,16 +125,16 @@ const Reviews = () => {
                             <div className='grid grid-cols-1 col-span-3'>
                                 <input
                                     type="range"
-                                    min="0"
+                                    min="1"
                                     max="5"
-                                    value={content}
-                                    onChange={(e) => setContent(parseFloat(e.target.value))}
+                                    value={contentBook}
+                                    onChange={(e) => setContentBook(parseFloat(e.target.value))}
                                     step="0.5"
                                     className=''
                                 />
 
                             </div>
-                            <div className='grid grid-cols-1'>{content}</div>
+                            <div className='grid grid-cols-1'>{contentBook}</div>
 
                         </div>
                         <div className='grid grid-cols-5 mt-4 gap-5'>
@@ -53,7 +142,7 @@ const Reviews = () => {
                             <div className='grid grid-cols-1 col-span-3'>
                                 <input
                                     type="range"
-                                    min="0"
+                                    min="1"
                                     max="5"
                                     value={understandability}
                                     onChange={(e) => setUnderstandability(parseFloat(e.target.value))}
@@ -65,77 +154,73 @@ const Reviews = () => {
                         </div>
                         <div className='mt-4'>
                             <div className='w-full relative '>
-                                <textarea name="review" placeholder='Nhập đánh giá của bạn ...' className='w-full h-16 rounded-xl bg-white focus:outline-none focus:ring focus:ring-indigo-500 px-4 py-2'></textarea>
-                                <button type="submit" className="absolute right-4 top-3 focus:outline-none">
-                                    <IonIcon icon={sendSharp} className="p-2 text-center ml-1 rounded-full text-gray-600 h-7 w-7 cursor-pointer hover:bg-blue-600 hover:text-white" />
+                                <input onKeyPress={e => handleKeyPress(e)} value={content} onChange={e => setContent(e.target.value)} name="review" placeholder='Nhập đánh giá của bạn ...' className='w-full h-16 rounded-xl bg-white focus:outline-none focus:ring focus:ring-indigo-500 px-4 py-2' />
+                                <button disabled={disable} className={`absolute right-4 top-3 focus:outline-none rounded-full ${disable ? "" : "hover:bg-blue-600"} hover:text-white`}>
+                                    <IonIcon icon={sendSharp} className="p-2 text-center ml-1  text-gray-600 h-7 w-7 " />
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div className='mt-10 w-full flex justify-end border-x-0 border-t-0 border p-2'>
+                    {rates?.length > 0 && <><div className='mt-10 w-full flex justify-end border-x-0 border-t-0 border p-2'>
                         <select className='h-9 px-2 border border-solid'>
                             <option value="Newest">Mới nhất</option>
                             <option value="Like">Lượt thích</option>
                             <option value="Oldest">Cũ nhất</option>
                         </select>
                     </div>
-                    <div className='w-full border-b-1 border border-gray-200 border-x-0 border-t-0 mt-5'>
-                        <div className='flex gap-4 w-full'>
-                            <div>
-                                <Avatar src="" sx={{ width: 60, height: 60 }} />
-                            </div>
-                            <div className='w-full'>
-                                <div className='rounded-xl pb-4 pr-5 w-full'>
-                                    <div className='font-semibold'>Nguyen Van A</div>
-                                    <div className='text-sm flex text-gray-500 gap-10 mt-2'>
-                                        <div className='text-yellow-500'>
-                                            <FontAwesomeIcon icon={faStar} />
-                                            <FontAwesomeIcon icon={faStar} />
-                                            <FontAwesomeIcon icon={faStarHalfAlt} />
-                                            <FontAwesomeIcon icon={star} />
-                                            <FontAwesomeIcon icon={star} />
-                                            <span className='text-black ml-2'>3.2</span>
-                                        </div>
-                                        <div>
-                                            <FontAwesomeIcon icon={faGlasses} />
-                                            <span className='ml-2'>Đã đọc: 1 Trang</span>
-                                        </div>
-                                        <div>
-                                            <FontAwesomeIcon icon={faClock} />
-                                            <span className='ml-2'>14 gio truoc</span>
-                                        </div>
-                                    </div>
-                                    <div className='mt-2'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, dolorum.</div>
-                                    <div className='w-full flex mt-10 justify-end items-end gap-6 text-gray-600'>
-                                        <div className='flex gap-2'>
-                                            <div>
-                                                <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
+                        <div className='grid border-b-1 border border-gray-200 border-x-0 border-t-0'>
+                            <div className='flex w-full'>
+                                <div>
+                                    <Avatar src="" sx={{ width: 60, height: 60 }} />
+                                </div>
+                                <div className='ml-4 w-full'>
+                                    {rates?.map((i, index) => (
+                                        <div key={index} className='w-full rounded-xl pb-4 pr-5'>
+                                            <div className='font-semibold'>{i?.profile?.firstName} {i?.profile?.lastName}</div>
+                                            <div className='text-sm flex text-gray-500 gap-10'>
+                                                <div className='text-yellow-500'>
+                                                    <RateHandle rate={i.rate} />
+                                                </div>
+                                                <div>
+                                                    <FontAwesomeIcon icon={faGlasses} />
+                                                    <span className='ml-2'>Trang {i?.pageBook?.pageNo} </span>
+                                                </div>
+                                                <div>
+                                                    <FontAwesomeIcon icon={faClock} />
+                                                    <span className='ml-2'>{i?.createAt ? formatTimeDifference(i?.createAt) + "" : <></>}</span>
+                                                </div>
                                             </div>
-                                            <div>0</div>
-                                        </div>
-
-                                        <div className='flex gap-2'>
-                                            <div>
-                                                <FontAwesomeIcon className='text-gray-400' icon={faReply} />
+                                            <div className='mt-2'>{i?.content}</div>
+                                            <div className='flex mt-10 justify-end gap-6 text-gray-600'>
+                                                <div className='flex gap-2'>
+                                                    <div>
+                                                        <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
+                                                    </div>
+                                                    <div>0</div>
+                                                </div>
+                                                <div className='flex gap-2'>
+                                                    <div>
+                                                        <FontAwesomeIcon className='text-gray-400' icon={faReply} />
+                                                    </div>
+                                                    <div>Trả lời</div>
+                                                </div>
+                                                <div className='flex gap-2'>
+                                                    <div>
+                                                        <FontAwesomeIcon className='text-gray-400' icon={faFlag} />
+                                                    </div>
+                                                    <div>Báo xấu</div>
+                                                </div>
                                             </div>
-                                            <div>Tra loi</div>
                                         </div>
-                                        <div className='flex gap-2'>
-                                            <div>
-                                                <FontAwesomeIcon className='text-gray-400' icon={faFlag} />
-                                            </div>
-                                            <div>Bao xau</div>
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </div></>}
                 </div>
                 <div className='grid grid-cols-1 rounded-md bg-gray-200 ml-3 px-3 py-1 mt-5'>
                     <div>
                         <div className='flex justify-between text-xl font-semibold mt-5'>
-                            <div>Đã có 24 đánh gíá</div>
+                            <div>Đã có {rates?.length} đánh gíá</div>
                             <div className='text-yellow-500 text-lg'>
                                 <FontAwesomeIcon icon={faStar} />
                                 <FontAwesomeIcon icon={faStar} />
