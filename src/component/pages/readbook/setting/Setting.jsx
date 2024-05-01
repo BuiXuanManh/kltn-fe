@@ -1,8 +1,58 @@
 import { faArrowsUpDown, faCheck, faCirclePlay, faFont, faMinus, faPalette, faPlus, faTextHeight, faVolumeHigh, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useState } from 'react';
+import Select from "react-select"
+const Setting = ({ handleClose, handleVoice, showAudio, setShowAudio, audio }) => {
 
-const Setting = ({ handleClose, handleVoice, showAudio, audio }) => {
+    const option = [
+        { value: "femail", label: "Giọng nữ" },
+        { value: "mail", label: "Giọng nam" },
+    ]
+    const [m, setM] = useState(option[0])
+    const customStyles = {
+        control: (baseStyles, state) => ({
+            display: "flex",
+            justify: "center",
+            padding: 0,
+            // width: "9rem",
+            margin: 0,
+        }),
+        menu: (baseStyles, state) => ({
+            ...baseStyles,
+            backgroundColor: "white",
+            width: "9rem",
+            padding: 0,
+            margin: 0,
+        }),
+        valueContainer: (baseStyles, state) => ({
+            display: "flex",
+            padding: 0,
+            margin: 0,
+        }),
+        options: (baseStyles, state) => ({
+            backgroundColor: state.isFocused ? "#e2e2e2" : "white",
+            padding: 0,
+            margin: 0,
+        }),
+        dropdownIndicator: base => ({
+            padding: 0,
+            marginRight: "1rem",
+        }),
+    }
+    const customTheme = (theme) => ({
+        ...theme,
+        borderRadius: 0,
+        colors: {
+            text: '#EF6C00',
+            primary25: '#81D4FA',
+            primary: 'blue',
+        },
+    })
+    const handleAudio = (val) => {
+        setM(val);
+        setShowAudio(false);
+    }
+    console.log(m.value)
     return (
         <div className='fixed h-[70%] w-1/3 z-50 ml-4 top-1 mt-40 right-48 flex whitespace-normal break-words rounded-lg py-1.5 px-3 font-sans text-sm font-normal bg-white focus:outline-none'>
             <div className='ml-4 w-full h-full'>
@@ -105,11 +155,24 @@ const Setting = ({ handleClose, handleVoice, showAudio, audio }) => {
                             Nghe sách
                         </div>
                     </div>
-                    <div className='grid-cols-1 col-span-6 gap-5 '>
-                        <button onClick={() => handleVoice()} className=' rounded-full border flex justify-center items-center'>
+                    <div className='grid-cols-1 col-span-6 flex '>
+                        <button onClick={() => handleVoice(m.value === "femail" ? "A" : "D")} className=' rounded-full border flex justify-center items-center'>
                             <FontAwesomeIcon icon={faCirclePlay} className='w-14 h-14' />
                         </button>
-
+                        <Select
+                            components={{
+                                IndicatorSeparator: () => null
+                            }}
+                            onChange={val =>
+                                handleAudio(val)
+                            }
+                            className={`flex flex-grow items-center justify-center cursor-pointer bg-gray-50`}
+                            theme={customTheme}
+                            styles={customStyles}
+                            isSearchable={false}
+                            options={option}
+                            defaultValue={option[0]}
+                        />
                     </div>
 
 

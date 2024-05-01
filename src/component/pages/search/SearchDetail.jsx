@@ -7,8 +7,6 @@ import BookService from '../../service/BookService';
 import IconGlobal from '../../../icon/IconGlobal';
 import GenreService from '../../service/GenreService';
 import Select from "react-select"
-import { width } from '@fortawesome/free-regular-svg-icons/faAddressBook';
-import { Container } from '@mui/material';
 const SearchDetail = ({ data }) => {
     let icon = new IconGlobal()
     const { keyword, page } = useParams();

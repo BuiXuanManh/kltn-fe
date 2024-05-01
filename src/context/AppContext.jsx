@@ -6,8 +6,10 @@ const AppProvider = ({ children }) => {
     const [profile, setProfile] = useState({});
     const [books, setBooks] = useState({});
     const [interactions, setInteractions] = useState([]);
+    const [computedBook, setComputedBook] = useState({});
+    const [computedPage, setComputedPage] = useState({});
     return (
-        <AppContext.Provider value={{ token, setToken, mssv, setMssvContext, profile, setProfile, books, setBooks, interactions, setInteractions }}>
+        <AppContext.Provider value={{ token, setToken, mssv, setMssvContext, profile, setProfile, books, setBooks, interactions, setInteractions, computedBook, setComputedBook, computedPage, setComputedPage }}>
             {children}
         </AppContext.Provider>
     );

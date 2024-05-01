@@ -3,7 +3,8 @@ import { IonIcon } from '@ionic/react';
 import React, { useContext, useEffect, useState } from 'react';
 import {
     heartOutline, documentTextOutline, bookmarkOutline, arrowBack, arrowForward,
-    alertCircleOutline, menuSharp, settingsOutline, chatbubblesOutline
+    alertCircleOutline, menuSharp, settingsOutline, chatbubblesOutline,
+    book
 } from 'ionicons/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShareFromSquare, faBookmark, faStar, faThumbsUp, faReply, faFlag, faCheck, faFilePen } from '@fortawesome/free-solid-svg-icons';
@@ -21,8 +22,61 @@ import PageService from '../../service/PageService';
 import CommentService from '../../service/CommentService';
 import Review from './review/Review';
 import { message } from 'antd';
+import ComputedService from '../../service/ComputedService';
+import useAddComputedPage from '../../../hook/useAddComputedPage';
+import useAddComputedInteractionBook from '../../../hook/useAddComputedInteractionBook';
+import useAddComputedPageBook from '../../../hook/useAddComputedPageBook';
+import useAddComputedCommentBook from '../../../hook/useAddComputedCommentBook';
+import useAddComputedRateBook from '../../../hook/useAddComputedRateBook';
 const ReadBook = () => {
-    const { token, profile, interactions, setInteractions } = useContext(AppContext);
+    const { token, setInteractions, profile, setComputedBook, computedPage, setComputedPage } = useContext(AppContext);
+    const { mutate: addPage } = useAddComputedInteractionBook();
+    const { mutate: mutatePage } = useAddComputedPage();
+    const handleAddComPage = (id) => {
+        addPage(id, {
+            onSuccess: (newBook) => {
+                setComputedBook(newBook);
+            }
+        });
+    };
+
+    const { mutate: mutatePageBook } = useAddComputedPageBook();
+    const handleAddComPageBook = (id) => {
+        mutatePageBook(id, {
+            onSuccess: (newBook) => {
+                setComputedBook(newBook);
+            }
+        });
+    };
+    const { mutate: mutateCommentBook } = useAddComputedCommentBook();
+    const handleAddComComment = (id) => {
+        mutateCommentBook(id, {
+            onSuccess: (newBook) => {
+                setComputedBook(newBook);
+            }
+        });
+    };
+    const handleAddPage = (id) => {
+        mutatePage(id, {
+            onSuccess: (newPage) => {
+                setComputedPage(newPage);
+            }
+        });
+    };
+    const { id, pageNo } = useParams();
+    let computedService = new ComputedService();
+    const getComputedPage = useQuery({
+        queryKey: ['computedPage', id],
+        queryFn: () => computedService.getComputedPage(id).then((res) => {
+            if (res.data) {
+                console.log(res.data);
+                setComputedPage(res.data);
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        }), enabled: !!computedPage
+    })
     const [show, setShow] = useState("");
     const handleShow = (filter) => {
         filter === show ? setShow("") : filter === "setting" ? setShow("setting") : filter === "listpage" ? setShow("listpage") : filter === "emotion" ? setShow("emotion") : filter === "review" ? setShow("review") : filter === "save" ? setShow("save") : setShow("");
@@ -30,7 +84,6 @@ const ReadBook = () => {
     let icon = new IconGlobal();
     let service = new BookService();
     let pageService = new PageService();
-    const { id, pageNo } = useParams();
     const [pageNoo, setPageNo] = useState(pageNo);
     const [page, setPage] = useState({});
     const [isPage, setIsPage] = useState(false);
@@ -51,6 +104,11 @@ const ReadBook = () => {
             setPageNo(pageNo);
         }
     }, [pageNo, id])
+    useEffect(() => {
+        if (page?.id !== "" && page?.id !== undefined && page?.id !== "") {
+            handleAddPage(page?.id);
+        }
+    }, [page])
     const processedContent = page?.content?.split('.').map((sentence, index) => (
         <React.Fragment key={index}>
             {sentence.trim()}
@@ -77,6 +135,7 @@ const ReadBook = () => {
         queryKey: ["interaction", profile?.id, page?.book?.id],
         queryFn: () => service.updateBookInteraction(token, page?.book?.id, page?.id, pageNoo).then((res) => {
             if (res?.data) {
+                handleAddPage(page?.id)
                 setIsPage(true);
                 setInteractions(res.data);
                 return res.data;
@@ -84,6 +143,9 @@ const ReadBook = () => {
         }).catch((error) => {
             console.error(error);
         }),
+        onSuccess: () => {
+            handleAddComPage(page?.book?.id);
+        },
         enabled: token !== undefined && token != "" && profile?.id !== undefined && page?.book?.id !== undefined && id != undefined && !isPage,
     });
     const [rate, setRate] = useState(1);
@@ -100,41 +162,44 @@ const ReadBook = () => {
         }).enabled = page.id !== undefined && rate === 1 && !isPage && token !== undefined && token !== ""
     })
     let audioService = new AudioService();
-    const pageLoad = {
-        "audioConfig": {
-            "audioEncoding": "MP3",
-            "effectsProfileId": [
-                "small-bluetooth-speaker-class-device"
-            ],
-            "pitch": 0,
-            "speakingRate": 1
-        },
-        "input": {
-            "text": page?.content
-        },
-        "voice": {
-            "languageCode": "vi-VN",
-            "name": "vi-VN-Neural2-A"
-        }
-    }
     const [audio, setAudio] = useState(null);
     const audioMuta = useMutation({
         mutationKey: ['audio', page?.id],
-        mutationFn: (pageLoad) => audioService.getAudio(pageLoad).then((res) => {
-            if (res?.data) {
-                console.log(res.data);
-                setAudio(`data:audio/mp3;base64,${res.data.audioContent}`);
-                return res.data;
+        mutationFn: (gender) => {
+            console.log(gender)
+            const pageLoad = {
+                "audioConfig": {
+                    "audioEncoding": "MP3",
+                    "effectsProfileId": [
+                        "small-bluetooth-speaker-class-device"
+                    ],
+                    "pitch": 0,
+                    "speakingRate": 1
+                },
+                "input": {
+                    "text": page?.content
+                },
+                "voice": {
+                    "languageCode": "vi-VN",
+                    "name": "vi-VN-Neural2-" + gender
+                }
+
             }
-        }).catch((error) => {
-            console.error(error);
-        }),
+            audioService.getAudio(pageLoad).then((res) => {
+                if (res?.data) {
+                    setShowAudio(true)
+                    setAudio(`data:audio/mp3;base64,${res.data.audioContent}`);
+                    return res.data;
+                }
+            }).catch((error) => {
+                console.error(error);
+            })
+        }
     })
-    const handleVoice = () => [
-        audioMuta.mutate(pageLoad),
-        setShowAudio(true)
-    ]
     const [showAudio, setShowAudio] = useState(false);
+    const handleVoice = (gender) => [
+        audioMuta.mutate(gender),
+    ]
     const [interactionPage, setInteractionPage] = useState();
     useEffect(() => {
         updateBookInteraction.refetch();
@@ -170,6 +235,7 @@ const ReadBook = () => {
             console.error(error);
         }).enabled = page.id !== undefined && !isPage && comments.length === 0
     })
+
     const [content, setContent] = useState("");
     const addComment = useMutation({
         mutationFn: (content) => {
@@ -177,6 +243,8 @@ const ReadBook = () => {
                 commentService.addComment(token, page?.id, content).then((res) => {
                     setContent("");
                     if (res.data) {
+                        handleAddPage(page?.id)
+                        handleAddComComment(page?.book?.id);
                         console.log(res.data);
                         setComments([res.data, ...comments]);
                         return res.data;
@@ -194,7 +262,8 @@ const ReadBook = () => {
     const addEmo = useMutation({
         mutationFn: (type) => pageService.addEmotion(token, page?.id, type).then((res) => {
             if (res.data) {
-                console.log(res.data);
+                handleAddPage(page?.id);
+                handleAddComPageBook(page?.book?.id);
                 setInteractionPage(res.data);
                 handleClose();
                 return res.data;
@@ -206,7 +275,8 @@ const ReadBook = () => {
     const mark = useMutation({
         mutationFn: (type) => pageService.mark(token, page?.id, type).then((res) => {
             if (res.data) {
-                console.log(res.data);
+                handleAddPage(page?.id)
+                handleAddComPageBook(page?.book?.id);
                 setInteractionPage(res.data);
                 handleClose();
                 return res.data;
@@ -217,6 +287,7 @@ const ReadBook = () => {
     })
     const handleEmotion = (type) => {
         addEmo.mutate(type);
+
     }
     const handleMark = (type) => {
         mark.mutate(type);
@@ -224,6 +295,7 @@ const ReadBook = () => {
     const handleKey = (e) => {
         if (e.key === "Enter") {
             addComment.mutate(content);
+            handleAddComComment(page?.book?.id);
         }
     }
     return (
@@ -267,12 +339,12 @@ const ReadBook = () => {
                                 <div className='flex justify-center items-center'>
                                     <IonIcon icon={heartOutline}></IonIcon>
                                 </div>
-                                <span className='ml-1'>  30 cảm xúc</span>
+                                <span className='ml-1'>  {computedPage?.emotion ? computedPage?.emotion : 0} cảm xúc</span>
                             </span>
                             <span className='text-sm flex'>
                                 <div className='flex justify-center items-center'>
                                     <IonIcon icon={bookmarkOutline}></IonIcon>
-                                    <span className='ml-1'>  15 đánh dấu</span>
+                                    <span className='ml-1'>  {computedPage?.mark ? computedPage?.mark : 0} đánh dấu</span>
                                 </div>
                             </span>
                         </div>
@@ -320,7 +392,7 @@ const ReadBook = () => {
                         <div className='mx-16 grid gap-10 py-10'>
                             <div className='grid'>
                                 <div className='justify-between flex'>
-                                    <h3 className='text-xl font-semibold'>111 Binh luan</h3>
+                                    <h3 className='text-xl font-semibold'>{computedPage?.commentCount ? computedPage?.commentCount : 0} Binh luan</h3>
                                     <select className='h-9 px-2'>
                                         <option value="Newest">Mới nhất</option>
                                         <option value="Like">Lượt thích</option>
@@ -379,7 +451,7 @@ const ReadBook = () => {
                             </div>
                         </div>
                     </div>
-                    {show === "setting" && <Setting handleClose={handleClose} handleVoice={handleVoice} showAudio={showAudio} audio={audio} />}
+                    {show === "setting" && <Setting handleClose={handleClose} handleVoice={handleVoice} setShowAudio={setShowAudio} showAudio={showAudio} audio={audio} />}
                     {show === "listpage" && <ListPage handleClose={handleClose} />}
                     {/* side bar */}
                     <div className='fixed ml-4 top-4 mt-24 right-[6.5rem] rounded-xl'>
@@ -519,7 +591,7 @@ const ReadBook = () => {
                 </div>
             </div>
             <>
-                {show === "review" && <Review rate={rate} setRate={setRate} token={token} pageId={page?.id} handleClose={handleClose} />}</>
+                {show === "review" && <Review id={page?.book?.id} rate={rate} setRate={setRate} pageId={page?.id} handleClose={handleClose} />}</>
         </div>
     );
 };

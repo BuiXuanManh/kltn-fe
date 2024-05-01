@@ -2,18 +2,28 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import PageService from '../../../service/PageService';
-const Review = ({ handleClose, token, pageId, setRate, rate }) => {
+import { AppContext } from '../../../../context/AppContext';
+import useAddComputedRateBook from '../../../../hook/useAddComputedRateBook';
+const Review = ({ handleClose, pageId, setRate, rate, id }) => {
+    const { token, setComputedBook } = useContext(AppContext);
+    const { mutate: mutateRate } = useAddComputedRateBook();
+    const handleAddComRate = (id) => {
+        mutateRate(id, {
+            onSuccess: (newBook) => {
+                setComputedBook(newBook);
+            }
+        });
+    };
     const handleSendRate = () => {
         addRate.mutate(rate);
     }
     let pageService = new PageService();
-    const queryClient = useQueryClient();
     const addRate = useMutation({
         mutationFn: (rate) => pageService.addRatePage(token, pageId, rate).then((res) => {
             if (res.data) {
-                console.log(res.data);
+                handleAddComRate(id);
                 setRate(res.data.rate);
                 setTimeout(() => {
                     message.success("Gửi thành công", 2)

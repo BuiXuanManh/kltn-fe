@@ -8,30 +8,52 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Reviews from './reviews/Reviews';
 import Comment from './comments/Comment';
 import { faFilePen, faGlasses } from '@fortawesome/free-solid-svg-icons';
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useMutation, useQueries, useQuery } from '@tanstack/react-query';
 import BookService from '../../service/BookService';
 import IconGlobal from '../../../icon/IconGlobal';
 import PageService from '../../service/PageService';
 import { AppContext } from '../../../context/AppContext';
+import ComputedService from '../../service/ComputedService';
+import useAddComputedBook from '../../../hook/useAddComputedBook ';
+import RateHandle from '../../../rateHandle/RateHandle';
+import useAddComputedRateBook from '../../../hook/useAddComputedRateBook';
+import useAddComputedCommentBook from '../../../hook/useAddComputedCommentBook';
+import useAddComputedPageBook from '../../../hook/useAddComputedPageBook';
+import useAddComputedInteractionBook from '../../../hook/useAddComputedInteractionBook';
 const BookDetails = () => {
     const [activeMenu, setActiveMenu] = useState('introduction');
     const handleMenuClick = (menuItem) => {
         setActiveMenu(menuItem);
     };
-    const { token, interactions } = useContext(AppContext);
+    const { token, interactions, computedBook, setComputedBook } = useContext(AppContext);
+    const { mutate } = useAddComputedBook();
+    const { mutate: addInteraction } = useAddComputedInteractionBook();
+    const { mutate: addPage } = useAddComputedPageBook();
+    const handleAddBook = (id) => {
+        mutate(id, {
+            onSuccess: (newBook) => {
+                setComputedBook(newBook);
+            }
+        });
+    };
+    const handleAddComInteraction = (id) => {
+        addInteraction(id, {
+            onSuccess: (newBook) => {
+                setComputedBook(newBook);
+            }
+        });
+    };
+    const handleAddComPage = (id) => {
+        addPage(id, {
+            onSuccess: (newBook) => {
+                setComputedBook(newBook);
+            }
+        });
+    };
+    
     const [book, setBook] = useState();
     const { id } = useParams();
     const [isBook, setIsBook] = useState(false);
-    const genres = ["lịch sử", "quân sự", "mới", "tiểu thuyết"]
-    const rates = {
-        id: 1,
-        page: 4,
-        reader: "234k",
-        saved: "21k",
-        rate: 4,
-        rater: 234,
-        comments: 2345
-    }
     const navigate = useNavigate();
     const handleReadBook = () => {
         navigate(`/details/read/${id}/1`);
@@ -71,14 +93,31 @@ const BookDetails = () => {
         if (interactions.length > 0) {
             interactions.find((item) => {
                 if (item.book.id === id) {
-                    setPageNumber(item?.book?.pageCount);
+                    setPageNumber(item?.readCount);
                 }
             })
         }
     }, [interactions])
+    useEffect(() => {
+        if (id !== "" && id !== undefined && id !== "") {
+            handleAddBook(id);
+        }
+    }, [])
     const handleReadContinue = () => {
         navigate(`/details/read/${id}/${pageNumber}`);
     }
+    let computedService = new ComputedService();
+    const getComputedBook = useQuery({
+        queryKey: ['computedBook', id],
+        queryFn: () => computedService.getComputedBook(id).then((res) => {
+            if (res.data) {
+                setComputedBook(res.data);
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        }), enabled: computedBook === undefined && computedBook?.length === 0
+    })
     return (
         <div className='w-full'>
             <div className="w-full relative h-[40rem] z-0 border items-center justify-center border-white rounded-lg bg-white shadow-md" >
@@ -102,30 +141,27 @@ const BookDetails = () => {
                         <div>
                             <div className='flex'>
                                 <div className='mx-5'>
-                                    <span className='font-extrabold ml-1'> {rates.page}</span>
+                                    <span className='font-extrabold ml-1'> {pageCount ? pageCount : 0}</span>
                                     <br />
                                     <span>Trang</span>
                                 </div>
                                 <div className='mx-5 '>
-                                    <span className='font-extrabold '>{rates.reader} </span>
+                                    <span className='font-extrabold '>{computedBook?.readCount ? computedBook?.readCount : 0} </span>
                                     <br />
                                     <span className=''>Lượt đọc</span>
                                 </div>
                                 <div className='mx-5 '>
-                                    <span className='font-extrabold'>{rates.saved} </span>
+                                    <span className='font-extrabold'>{computedBook?.save ? computedBook?.save : 0}</span>
                                     <br />
                                     <span>Lưu trữ</span>
                                 </div>
 
                             </div>
                             <div className='flex items-center my-2'>
-                                <IonIcon className="text-yellow-500" icon={starSharp}></IonIcon>
-                                <IonIcon className="text-yellow-500" icon={starSharp}></IonIcon>
-                                <IonIcon className="text-yellow-500" icon={starSharp}></IonIcon>
-                                <IonIcon className="text-yellow-500" icon={starSharp}></IonIcon>
-                                <IonIcon className="text-yellow-500" icon={starHalfSharp}></IonIcon>
-                                <span className='ml-1'>{rates.rate}.5/5</span>
-                                <span className='ml-4'>({rates.rater} đánh giá)</span>
+                                <div className='text-yellow-500'>
+                                    <RateHandle rate={computedBook?.totalRate ? computedBook?.totalRate : 5} />
+                                </div>
+                                <span className='ml-4'>({computedBook?.reviewCount ? computedBook?.reviewCount : 0} đánh giá)</span>
                             </div>
                             <div className='flex gap-6'>
                                 <button onClick={() => handleReadBook()} className='bg-tblue flex items-center text-white p-2 rounded-xl'>
@@ -164,9 +200,9 @@ const BookDetails = () => {
                 </div>
                 <div className="flex mt-8 gap-8 text-xl font-semibold">
                     <div className={activeMenu === 'introduction' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('introduction')}>Giới thiệu</div>
-                    <div className={activeMenu === 'listPage' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('listPage')}>Danh sách trang <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{pageCount}</span></div>
-                    <div className={activeMenu === 'review' ? ' text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('review')}>Đánh giá <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{rates.rate}</span></div>
-                    <div className={activeMenu === 'comment' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('comment')}>Bình luận <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{rates.comments}</span></div>
+                    <div className={activeMenu === 'listPage' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('listPage')}>Danh sách trang <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{pageCount ? pageCount : 0}</span></div>
+                    <div className={activeMenu === 'review' ? ' text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('review')}>Đánh giá <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{computedBook?.reviewCount ? computedBook?.reviewCount : 0}</span></div>
+                    <div className={activeMenu === 'comment' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('comment')}>Bình luận <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{computedBook?.commentCount ? computedBook?.commentCount : 0}</span></div>
                 </div>
                 <div className='mb-10 min-h-96'>
                     {activeMenu === 'introduction' && (
@@ -175,11 +211,10 @@ const BookDetails = () => {
                         </div>
                     )}
                     {activeMenu === 'review' && (
-                        <Reviews id={id} />
+                        <Reviews  pageNumber={pageNumber} id={id} />
                     )}
-
                     {activeMenu === 'comment' && (
-                        <Comment />
+                        <Comment pageNumber={pageNumber} id={id} />
                     )}
                     {activeMenu === 'listPage' && (
                         <div className=''>

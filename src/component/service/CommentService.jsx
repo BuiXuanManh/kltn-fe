@@ -6,11 +6,11 @@ export default class CommentService {
         return api.get(`/api/comments/page/${pageId}`);
     }
     addComment(token, pageId, content) {
-        return api.post(`/api/comments/${pageId}?rate=comment`, content, AuthService(token));
+        return api.post(`/api/comments/${pageId}`, content, AuthService(token));
     }
-    // addRate(token, pageId, content) {
-    //     return api.post(`/api/comments/${pageId}?rate=rate`, content, AuthService(token));
-    // }
+    addCommentByBookId(token, bookId, content) {
+        return api.post(`/api/comments/book/${bookId}`, content, AuthService(token));
+    }
     getComment(token, pageId) {
         return api.get(`/api/comments/page/get/${pageId}?type=rate`, AuthService(token));
     }
