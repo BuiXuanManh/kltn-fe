@@ -8,14 +8,11 @@ const DailyTraffic = () => {
     <Card extra="pb-7 p-[20px]">
       <div className="flex flex-row justify-between">
         <div className="ml-1 pt-2">
-          <p className="text-sm font-medium leading-4 text-gray-600">
-            Daily Traffic
+          <p className="text-xl font-bold leading-4 text-navy-700 dark:text-white">
+            User
           </p>
-          <p className="text-[34px] font-bold text-navy-700 dark:text-white">
-            2.579{" "}
-            <span className="text-sm font-medium leading-6 text-gray-600">
-              Visitors
-            </span>
+          <p className="text-[34px] mt-3 font-bold text-navy-700 dark:text-white">
+            2.579
           </p>
         </div>
         <div className="mt-2 flex items-start">

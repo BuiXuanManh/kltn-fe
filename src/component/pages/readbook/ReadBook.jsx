@@ -358,7 +358,7 @@ const ReadBook = () => {
                         <div className='mt-4 py-10 mx-16'>
                             <div className={` flex gap-10 justify-center items-center text-center`}>
                                 <div onClick={() => handleShow("review")} className='w-20 h-30'>
-                                    <FontAwesomeIcon className={`${rate && rate > 1 ? "text-yellow-700" : ""}`} icon={faStar} />
+                                    <FontAwesomeIcon className={`${rate && rate > 1 ? "text-yellow-500" : ""}`} icon={faStar} />
                                     <br />
                                     <span>Đánh giá</span>
                                 </div>

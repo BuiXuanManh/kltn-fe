@@ -69,7 +69,7 @@ export default function Navbar() {
     if (keyword.trim() === "")
       setFindBooks([])
   }, [keyword])
-  const divBorderClassName = isInputFocused ? "tblue" : "gray-400";
+  const divBorderClassName = isInputFocused ? "tblue" : "gray-200";
   return (
     <>
       {
@@ -137,23 +137,23 @@ export default function Navbar() {
                   <Link to={"/login"}>
                     <div className="md:space-x-4 space-x-2 border h-7 border-tblue rounded-full cursor-pointer">
 
-                      <span className="text-gray-600 p-3"><button>Sign in</button></span>
+                      <span className="text-gray-800 p-3"><button>Sign in</button></span>
 
                     </div>
                   </Link>
                   <Link to={"/register"}>
                     <div className="md:space-x-4 space-x-2 border h-7 border-tblue rounded-full cursor-pointer">
-                      <span className="text-gray-600 p-3"><button>Sign up</button></span>
+                      <span className="text-gray-800 p-3"><button>Sign up</button></span>
                     </div>
                   </Link></>) : (<>
                     <div className="relative">
                       <a onClick={() => showSettingHandle()}>
                         <div className="flex h-10 cursor-pointer justify-center items-center space-x-2">
                           <Avatar sx={{ width: 35, height: 35 }} src={profile?.image} />
-                          <span className="text-gray-600 ">{profile?.firstName} {profile?.lastName}</span>
+                          <span className="text-gray-800 ">{profile?.firstName} {profile?.lastName}</span>
                         </div>
                       </a>
-                      {showSetting ? (
+                      {showSetting && (
                         <>
                           <div className="z-50 absolute left-0 w-48 py-2 mt-2 mr-10 bg-white rounded-lg shadow-xl">
                             <Link onClick={() => showSettingHandle()} to={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
@@ -171,7 +171,7 @@ export default function Navbar() {
                           </div>
 
                         </>
-                      ) : null}
+                      )}
                     </div>
                   </>
                 )}

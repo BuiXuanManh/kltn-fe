@@ -200,9 +200,9 @@ const BookDetails = () => {
                 </div>
                 <div className="flex mt-8 gap-8 text-xl font-semibold">
                     <div className={activeMenu === 'introduction' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('introduction')}>Giới thiệu</div>
-                    <div className={activeMenu === 'listPage' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('listPage')}>Danh sách trang <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{pageCount ? pageCount : 0}</span></div>
-                    <div className={activeMenu === 'review' ? ' text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('review')}>Đánh giá <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{computedBook?.reviewCount ? computedBook?.reviewCount : 0}</span></div>
-                    <div className={activeMenu === 'comment' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('comment')}>Bình luận <span className='border px-2 text-gray-600 bg-gray-300 rounded-xl'>{computedBook?.commentCount ? computedBook?.commentCount : 0}</span></div>
+                    <div className={activeMenu === 'listPage' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('listPage')}>Danh sách trang <span className='border px-2 text-gray-700 bg-gray-200 rounded-xl'>{pageCount ? pageCount : 0}</span></div>
+                    <div className={activeMenu === 'review' ? ' text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('review')}>Đánh giá <span className='border px-2 text-gray-700 bg-gray-200 rounded-xl'>{computedBook?.reviewCount ? computedBook?.reviewCount : 0}</span></div>
+                    <div className={activeMenu === 'comment' ? 'text-tblue border-b-4 py-2 border-tblue' : 'py-2 cursor-pointer'} onClick={() => handleMenuClick('comment')}>Bình luận <span className='border px-2 text-gray-700 bg-gray-200 rounded-xl'>{computedBook?.commentCount ? computedBook?.commentCount : 0}</span></div>
                 </div>
                 <div className='mb-10 min-h-96'>
                     {activeMenu === 'introduction' && (

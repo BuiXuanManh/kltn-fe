@@ -19,38 +19,46 @@ export const columnsDataDevelopment = [
 
 export const columnsDataCheck = [
   {
-    Header: "NAME",
+    Header: "STT",
+    accessor: "stt",
+  },
+  {
+    Header: "Tên sách",
     accessor: "name",
   },
   {
-    Header: "PROGRESS",
-    accessor: "progress",
+    Header: "Cảm xúc",
+    accessor: "emotion",
   },
   {
-    Header: "QUANTITY",
-    accessor: "quantity",
+    Header: "Lượt đọc",
+    accessor: "read",
   },
   {
-    Header: "DATE",
+    Header: "Ngày thêm",
     accessor: "date",
   },
 ];
 
 export const columnsDataColumns = [
   {
-    Header: "NAME",
+    Header: "STT",
+    accessor: "stt",
+  },
+  {
+    Header: "Tên sách",
     accessor: "name",
   },
   {
-    Header: "PROGRESS",
-    accessor: "progress",
+    Header: "Cảm xúc",
+    accessor: "emotion",
   },
   {
-    Header: "QUANTITY",
-    accessor: "quantity",
+    Header: "Lượt đọc",
+    accessor: "read",
   },
   {
-    Header: "DATE",
+    Header: "Ngày thêm",
     accessor: "date",
   },
 ];

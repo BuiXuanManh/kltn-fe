@@ -40,7 +40,7 @@ const CheckTable = (props) => {
     <Card extra={"w-full h-full sm:overflow-auto px-6"}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Check Table
+          Sách top
         </div>
 
         <CardMenu />
@@ -50,9 +50,9 @@ const CheckTable = (props) => {
         <table
           {...getTableProps()}
           className="w-full"
-          variant="simple"
+          // variant="simple"
           color="gray-500"
-          mb="24px"
+        // mb="24px"
         >
           <thead>
             {headerGroups.map((headerGroup, index) => (
@@ -78,31 +78,41 @@ const CheckTable = (props) => {
                 <tr {...row.getRowProps()} key={index}>
                   {row.cells.map((cell, index) => {
                     let data = "";
-                    if (cell.column.Header === "NAME") {
+                    if (cell.column.Header === "STT") {
                       data = (
                         <div className="flex items-center gap-2">
-                          <Checkbox />
+                          {/* <Checkbox /> */}
                           <p className="text-sm font-bold text-navy-700 dark:text-white">
-                            {cell.value[0]}
+                            {cell.value}
                           </p>
                         </div>
                       );
-                    } else if (cell.column.Header === "PROGRESS") {
+                    }
+                    if (cell.column.Header === "Tên sách") {
+                      data = (
+                        <div className="flex items-center gap-2">
+                          {/* <Checkbox /> */}
+                          <p className="text-sm font-bold text-navy-700 dark:text-white">
+                            {cell.value}
+                          </p>
+                        </div>
+                      );
+                    } else if (cell.column.Header === "Cảm xúc") {
                       data = (
                         <div className="flex items-center">
                           <p className="text-sm font-bold text-navy-700 dark:text-white">
-                            {cell.value}%
+                            {cell.value}
                           </p>
                         </div>
                       );
-                    } else if (cell.column.Header === "QUANTITY") {
+                    } else if (cell.column.Header === "Lượt đọc") {
                       data = (
                         <p className="text-sm font-bold text-navy-700 dark:text-white">
                           {" "}
                           {cell.value}{" "}
                         </p>
                       );
-                    } else if (cell.column.Header === "DATE") {
+                    } else if (cell.column.Header === "Ngày thêm") {
                       data = (
                         <p className="text-sm font-bold text-navy-700 dark:text-white">
                           {cell.value}

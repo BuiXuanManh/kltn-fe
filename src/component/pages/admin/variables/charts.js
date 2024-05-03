@@ -1,16 +1,25 @@
+import moment from 'moment';
+const date = Date.now()
+const days = [];
+const getDays = () => {
+  for (let i = 0; i < 6; i++) {
+    days.push(moment(date).subtract(i + 1, 'days').format('DD/MM')); // Tính toán và thêm ngày vào mảng
+  }
+  return days.reverse();
+}
 export const barChartDataDailyTraffic = [
   {
-    name: "Daily Traffic",
-    data: [20, 30, 40, 20, 45, 50, 30],
+    name: "Số lượng tạo",
+    data: [20, 30, 40, 20, 45, 50],
   },
 ];
 
 export const barChartOptionsDailyTraffic = {
-  chart: {
-    toolbar: {
-      show: false,
-    },
-  },
+  // chart: {
+  //   toolbar: {
+  //     show: false,
+  //   },
+  // },
   tooltip: {
     style: {
       fontSize: "12px",
@@ -26,12 +35,12 @@ export const barChartOptionsDailyTraffic = {
     theme: "dark",
   },
   xaxis: {
-    categories: ["00", "04", "08", "12", "14", "16", "18"],
+    categories: days,
     show: false,
     labels: {
       show: true,
       style: {
-        colors: "#A3AED0",
+        colors: "#314155",
         fontSize: "14px",
         fontWeight: "500",
       },
@@ -150,19 +159,19 @@ export const pieChartData = [63, 25, 12];
 
 export const barChartDataWeeklyRevenue = [
   {
-    name: "PRODUCT A",
-    data: [400, 370, 330, 390, 320, 350, 360, 320, 380],
+    name: "Cảm xúc",
+    data: [400, 370, 330, 390, 320, 350],
     color: "#6AD2Fa",
   },
   {
-    name: "PRODUCT B",
-    data: [400, 370, 330, 390, 320, 350, 360, 320, 380],
+    name: "Bình luận",
+    data: [400, 370, 330, 390, 320, 350],
     color: "#4318FF",
   },
   {
-    name: "PRODUCT C",
-    data: [400, 370, 330, 390, 320, 350, 360, 320, 380],
-    color: "#EFF4FB",
+    name: "Đánh giá",
+    data: [400, 370, 330, 390, 320, 350],
+    color: "#FFED8A",
   },
 ];
 
@@ -189,12 +198,12 @@ export const barChartOptionsWeeklyRevenue = {
     },
   },
   xaxis: {
-    categories: ["17", "18", "19", "20", "21", "22", "23", "24", "25"],
+    categories: getDays(),
     show: false,
     labels: {
       show: true,
       style: {
-        colors: "#A3AED0",
+        colors: "#314155",
         fontSize: "14px",
         fontWeight: "500",
       },
@@ -258,12 +267,12 @@ export const barChartOptionsWeeklyRevenue = {
 
 export const lineChartDataTotalSpent = [
   {
-    name: "Revenue",
+    name: "lượt đọc",
     data: [50, 64, 48, 66, 49, 68],
     color: "#4318FF",
   },
   {
-    name: "Profit",
+    name: "cảm xúc",
     data: [30, 40, 24, 46, 20, 46],
     color: "#6AD2FF",
   },
@@ -315,14 +324,14 @@ export const lineChartOptionsTotalSpent = {
     },
     labels: {
       style: {
-        colors: "#A3AED0",
-        fontSize: "12px",
+        colors: "#314155",
+        fontSize: "14px",
         fontWeight: "500",
       },
     },
     type: "text",
     range: undefined,
-    categories: ["SEP", "OCT", "NOV", "DEC", "JAN", "FEB"],
+    categories: days,
   },
 
   yaxis: {
