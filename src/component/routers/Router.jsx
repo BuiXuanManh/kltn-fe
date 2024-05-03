@@ -17,6 +17,7 @@ import App from '../../App';
 import AppProvider from '../../context/AppContext';
 import { useQuery } from '@tanstack/react-query';
 import HistoryBook from '../pages/historyBook/HistoryBook';
+import Dashboard from '../pages/admin/DashBoard';
 
 
 const Router = () => {
@@ -38,6 +39,7 @@ const Router = () => {
         <Routes>
             <Route path="/" element={<Home data={data?.pageBook?.content} />} />
             <Route path="/login" element={<SignIn />} />
+            <Route path="/admin" element={<Dashboard />} />
             <Route path="/register" element={<SignUp />} />
             <Route path="/details/:id" element={<BookDetails />} ></Route>
             <Route path="/details/read/:id/:pageNo" element={<ReadBook />} ></Route>

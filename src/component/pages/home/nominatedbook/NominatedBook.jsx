@@ -60,20 +60,17 @@ function NominatedBook(data) {
                                     <div className="mt-2 flex-wrap w-60 flex items-center gap-1">
                                         <span className="line-clamp-3 ml-1">{item?.shortDescription}</span>
                                     </div>
-                                    <div className='flex items-center justify-between  w-full mt-3'>
-
+                                    <div className='flex items-center justify-between w-full mt-3'>
                                         <div className="flex max-w-28 items-center">
                                             <img src={icon?.icon?.author} className='w-5 h-5 mt-1' alt="" />
-
-                                            <div className='flex truncate justify-center items-center'>
+                                            <div className='flex flex-grow truncate justify-center items-center'>
                                                 <p className='ml-1 max-w-24 truncate'>{item?.authors[0]?.name}</p>
 
                                             </div>
                                         </div>
-                                        <div className="max-w-48 max-h-10 flex items-center">
+                                        <div className="max-w-48 max-h-10 flex flex-grow min-w-20 justify-end">
                                             <div className='p-1 border max-h-10 truncate  border-tyellow text-orange-600 cursor-pointer'>{item.genres[0]?.name}</div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>

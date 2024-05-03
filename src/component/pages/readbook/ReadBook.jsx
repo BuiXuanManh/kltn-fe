@@ -166,7 +166,6 @@ const ReadBook = () => {
     const audioMuta = useMutation({
         mutationKey: ['audio', page?.id],
         mutationFn: (gender) => {
-            console.log(gender)
             const pageLoad = {
                 "audioConfig": {
                     "audioEncoding": "MP3",

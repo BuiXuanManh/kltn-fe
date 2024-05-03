@@ -20,7 +20,10 @@ export default class BookService {
     findRateBookByProfileIdAndBookId(token, bookId) {
         return api.get(`/api/books/rateBook/${bookId}`, AuthService(token));
     }
-    findRateBookById(bookId){
+    findRateBookById(bookId) {
         return api.get(`/api/books/rateBook/getAll/${bookId}`);
+    }
+    findBook(keyword) {
+        return api.get(`/api/books/find/${keyword}`);
     }
 }

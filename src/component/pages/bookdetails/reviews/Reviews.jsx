@@ -192,9 +192,9 @@ const Reviews = ({ pageNumber, id }) => {
                         </select>
                     </div>
                         <div className='grid border-b-1 border border-gray-200 border-x-0 border-t-0'>
-                            <div className='flex w-full'>
+                            <div className='w-full'>
                                 {rates?.map((i, index) => (
-                                    <>
+                                    <div key={index} className='flex'>
                                         <div>
                                             <Avatar src="" sx={{ width: 60, height: 60 }} />
                                         </div>
@@ -238,7 +238,7 @@ const Reviews = ({ pageNumber, id }) => {
                                                 </div>
                                             </div>
                                         </div>
-                                    </>))}
+                                    </div>))}
                             </div >
                         </div></>}
                 </div>
