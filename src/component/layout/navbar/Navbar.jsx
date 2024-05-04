@@ -73,7 +73,7 @@ export default function Navbar() {
   return (
     <>
       {
-        <div className={`${location.pathname === '/register' || location.pathname === '/login' ? 'hiden' : null}bg-white shadow-md border w-full`}>
+        <div className={`${location.pathname === "/admin" ? "ml-[17rem]" : ""} bg-white shadow-md !z-50 border`}>
           <div className="mx-auto py-4 flex justify-between items-center ml-10 font-semibold">
             <div className="flex ml-10 space-x-10">
               <Link to="/">

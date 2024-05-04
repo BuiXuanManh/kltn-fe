@@ -15,11 +15,16 @@ export const barChartDataDailyTraffic = [
 ];
 
 export const barChartOptionsDailyTraffic = {
-  // chart: {
-  //   toolbar: {
-  //     show: false,
-  //   },
-  // },
+  chart: {
+    toolbar: {
+      style: {
+        fontSize: "12px",
+        fontFamily: undefined, // Keep your existing font
+        backgroundColor: "bg-gray-800", // Dark gray background for dark mode
+        color: "text-white" // White text and icons for dark mode
+      }
+    },
+  },
   tooltip: {
     style: {
       fontSize: "12px",
