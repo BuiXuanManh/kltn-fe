@@ -25,7 +25,7 @@ function App() {
             <ThemeProvider>
               <Navbar />
               <Router />
-              <ReactQueryDevtools initialIsOpen={false} />
+              {/* <ReactQueryDevtools initialIsOpen={false} /> */}
               <Footer />
             </ThemeProvider>
           </QueryClientProvider>

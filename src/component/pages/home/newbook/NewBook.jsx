@@ -69,10 +69,10 @@ function NewBook(data, rates) {
                         return (
                             <div key={item.id} className='flex max-h-12 justify-between w-full mt-2 p-4 border border-gray-200 min-h-20 '>
                                 <div className='flex mt-2'>
-                                    <div className='w-8 h-12'>
-                                        <img width={40} height={60} className='w-full h-full cursor-pointer' src={item.image} alt='img book' />
+                                    <div className='h-12'>
+                                        <img className='w-full h-full cursor-pointer' src={item.image} />
                                     </div>
-                                    <div>
+                                    <div className="ml-2">
                                         <h3 className="cursor-pointer">{item.name}</h3>
                                         <h3>{item.id}</h3>
                                     </div>

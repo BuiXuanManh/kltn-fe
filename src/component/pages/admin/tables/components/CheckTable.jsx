@@ -50,9 +50,9 @@ const CheckTable = (props) => {
         <table
           {...getTableProps()}
           className="w-full"
-          variant="simple"
+          // variant="simple"
           color="gray-500"
-          mb="24px"
+          // mb="24px"
         >
           <thead>
             {headerGroups.map((headerGroup, index) => (

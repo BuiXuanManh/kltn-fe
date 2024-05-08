@@ -133,12 +133,15 @@ export default function Navbar() {
 
             <div className="md:flex hidden space-x-10 ">
               <div className="md:flex items-center gap-x-10 ">
+                <div>
+                  <Link to={"/admin"} className="block px-4 py-2 rounded-full text-gray-800 hover:bg-indigo-500 hover:text-white">
+                    Admin
+                  </Link>
+                </div>
                 {(token === "") || !token || profile?.firstName === "" || !profile?.lastName ? (<>
                   <Link to={"/login"}>
                     <div className="md:space-x-4 space-x-2 border h-7 border-tblue rounded-full cursor-pointer">
-
                       <span className="text-gray-800 p-3"><button>Sign in</button></span>
-
                     </div>
                   </Link>
                   <Link to={"/register"}>

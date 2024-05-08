@@ -20,12 +20,14 @@ import useAddComputedRateBook from '../../../hook/useAddComputedRateBook';
 import useAddComputedCommentBook from '../../../hook/useAddComputedCommentBook';
 import useAddComputedPageBook from '../../../hook/useAddComputedPageBook';
 import useAddComputedInteractionBook from '../../../hook/useAddComputedInteractionBook';
+import { set } from 'date-fns';
 const BookDetails = () => {
     const [activeMenu, setActiveMenu] = useState('introduction');
     const handleMenuClick = (menuItem) => {
         setActiveMenu(menuItem);
     };
-    const { token, interactions, computedBook, setComputedBook } = useContext(AppContext);
+    const [interaction, setInteraction] = useState();
+    const { token, computedBook, setComputedBook } = useContext(AppContext);
     const { mutate } = useAddComputedBook();
     const { mutate: addInteraction } = useAddComputedInteractionBook();
     const { mutate: addPage } = useAddComputedPageBook();
@@ -36,29 +38,38 @@ const BookDetails = () => {
             }
         });
     };
-    const handleAddComInteraction = (id) => {
+    const handleAddInteractionbookBook = (id) => {
         addInteraction(id, {
             onSuccess: (newBook) => {
                 setComputedBook(newBook);
             }
         });
     };
-    const handleAddComPage = (id) => {
-        addPage(id, {
-            onSuccess: (newBook) => {
-                setComputedBook(newBook);
-            }
-        });
-    };
-    
+    const [follow, setFollow] = useState(false);
+    const [nominate, setNominate] = useState(false);
     const [book, setBook] = useState();
     const { id } = useParams();
+    let service = new BookService()
+    const getInteractions = useQuery({
+        queryKey: ['interaction', id],
+        queryFn: () => service.findInteraction(token, id).then((res) => {
+            if (res.data && res.data != null) {
+                setInteraction(res.data);
+                setPageNumber(res.data?.readCount);
+                setNominate(res.data?.nominated);
+                setFollow(res.data?.followed);
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        }),
+        enabled: token != "" && id !== "" && id !== undefined && id !== ""
+    });
     const [isBook, setIsBook] = useState(false);
     const navigate = useNavigate();
     const handleReadBook = () => {
         navigate(`/details/read/${id}/1`);
     }
-    let service = new BookService();
     const getBook = useQuery({
         queryKey: ['book', id],
         queryFn: () => service.getBookById(id).then((res) => {
@@ -90,15 +101,6 @@ const BookDetails = () => {
     })
     const [pageNumber, setPageNumber] = useState(0);
     useEffect(() => {
-        if (interactions.length > 0) {
-            interactions.find((item) => {
-                if (item.book.id === id) {
-                    setPageNumber(item?.readCount);
-                }
-            })
-        }
-    }, [interactions])
-    useEffect(() => {
         if (id !== "" && id !== undefined && id !== "") {
             handleAddBook(id);
         }
@@ -118,6 +120,60 @@ const BookDetails = () => {
             console.error(err);
         }), enabled: computedBook === undefined && computedBook?.length === 0
     })
+
+    const nominateMutate = useMutation({
+        mutationFn: (type) => {
+            console.log(type);
+            if (type === 'nominate') {
+                return service.nominate(token, id).then((res) => {
+                    if (res.data) {
+                        handleAddInteractionbookBook(id);
+                        setInteraction(res.data)
+                        setNominate(true);
+                        return res.data;
+                    }
+                }).catch((err) => {
+                    console.error(err);
+                });
+            } else if (type === 'nominateCancel') {
+                return service.nominateCancel(token, id).then((res) => {
+                    if (res.data) {
+                        handleAddInteractionbookBook(id);
+                        setInteraction(res.data)
+                        setNominate(false);
+                        return res.data;
+                    }
+                }).catch((err) => {
+                    console.error(err);
+                });
+            } else if (type === 'follow') {
+                return service.follow(token, id).then((res) => {
+                    if (res.data) {
+                        handleAddInteractionbookBook(id);
+                        setInteraction(res.data)
+                        setFollow(true)
+                        return res.data;
+                    }
+                }).catch((err) => {
+                    console.error(err);
+                });
+            } else if (type === 'followCancel') {
+                return service.followCancel(token, id).then((res) => {
+                    if (res.data) {
+                        handleAddInteractionbookBook(id);
+                        setInteraction(res.data)
+                        setFollow(false)
+                        return res.data;
+                    }
+                }).catch((err) => {
+                    console.error(err);
+                });
+            }
+        }
+    })
+    const handleFollow = (type) => {
+        nominateMutate.mutate(type);
+    }
     return (
         <div className='w-full'>
             <div className="w-full relative h-[40rem] z-0 border items-center justify-center border-white rounded-lg bg-white shadow-md" >
@@ -172,14 +228,27 @@ const BookDetails = () => {
                                     <FontAwesomeIcon icon={faGlasses} />
                                     <p className='ml-2'>Đọc tiêp</p>
                                 </button>}
-                                <button className='border p-2 pr-4 border-black rounded-2xl flex items-center'>
-                                    <IonIcon className='w-5 h-5' icon={bookmarkOutline} />
-                                    <p className='ml-2'>Lưu trữ</p>
-                                </button>
-                                <button className='bg-[#F7F5F0] px-6 border flex items-center rounded-2xl border-tblue'>
-                                    <IonIcon className='w-5 h-5' icon={roseOutline} />
-                                    <p className='ml-2'>Đề cử</p>
-                                </button>
+
+                                {follow ?
+                                    <button onClick={() => handleFollow("followCancel")} className='border p-2 pr-4 border-navy-600 dark:border-white rounded-2xl flex items-center'>
+                                        <IonIcon className='w-5 h-5 text-red-600' icon={bookmarkOutline} />
+                                        <p className='ml-2'>Hủy lưu trữ</p>
+                                    </button> :
+                                    <button onClick={() => handleFollow("follow")} className='border p-2 pr-4 border-navy-600 dark:border-white rounded-2xl flex items-center'>
+                                        <IonIcon className='w-5 h-5' icon={bookmarkOutline} />
+                                        <p className='ml-2'>Lưu trữ</p>
+                                    </button>
+                                }
+                                {nominate ?
+                                    <button onClick={() => handleFollow("nominateCancel")} className='bg-[#F7F5F0] px-6 border flex items-center rounded-2xl border-tblue'>
+                                        <IonIcon className='w-5 h-5 text-red-600' icon={roseOutline} />
+                                        <p className='ml-2'>Xoá đề cử</p>
+                                    </button> :
+                                    <button onClick={() => handleFollow("nominate")} className='bg-[#F7F5F0] px-6 border flex items-center rounded-2xl border-tblue'>
+                                        <IonIcon className='w-5 h-5' icon={roseOutline} />
+                                        <p className='ml-2'>Đề cử</p>
+                                    </button>
+                                }
                             </div>
                         </div>
                         <div className='flex items-center mt-3'>
@@ -211,7 +280,7 @@ const BookDetails = () => {
                         </div>
                     )}
                     {activeMenu === 'review' && (
-                        <Reviews  pageNumber={pageNumber} id={id} />
+                        <Reviews pageNumber={pageNumber} id={id} />
                     )}
                     {activeMenu === 'comment' && (
                         <Comment pageNumber={pageNumber} id={id} />

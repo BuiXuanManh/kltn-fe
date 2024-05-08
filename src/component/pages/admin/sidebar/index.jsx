@@ -1,7 +1,9 @@
-import { RiMoonFill, RiSunFill, RiSunLine } from "react-icons/ri";
+import { RiDashboard3Line, RiMoonFill, RiSunFill, RiSunLine } from "react-icons/ri";
 import { useState } from "react";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { Link, useLocation } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBookMedical, faUserCog } from "@fortawesome/free-solid-svg-icons";
 const Sidebar = ({ activeRoute, setActiveRoute }) => {
   const location = useLocation();
   const [darkmode, setDarkmode] = useState(false);
@@ -53,7 +55,7 @@ const Sidebar = ({ activeRoute, setActiveRoute }) => {
                       : "font-medium text-gray-600"
                       }`}
                   >
-                    <AiOutlineDashboard />
+                    <RiDashboard3Line className="w-4 h-4" />
                   </span>
                   <p
                     className={`leading-1 ml-4 flex ${activeRoute === "dashboard"
@@ -80,7 +82,7 @@ const Sidebar = ({ activeRoute, setActiveRoute }) => {
                       : "font-medium text-gray-600"
                       }`}
                   >
-                    <AiOutlineDashboard />
+                    <FontAwesomeIcon className="w-4 h-4" icon={faBookMedical} />
                   </span>
                   <p
                     className={`leading-1 ml-4 flex ${activeRoute === "addBook"
@@ -92,6 +94,33 @@ const Sidebar = ({ activeRoute, setActiveRoute }) => {
                   </p>
                 </li>
                 {activeRoute === "addBook" ? (
+                  <div className="absolute right-0 top-px h-9 w-1 rounded-lg bg-brand-500 dark:bg-brand-400" />
+                ) : null}
+              </div>
+            </div>
+            <div onClick={() => setActiveRoute("access")}>
+              <div className="relative mb-3 flex cursor-pointer">
+                <li
+                  className="my-[3px] flex cursor-pointer items-center px-9"
+                >
+                  <span
+                    className={`${activeRoute === "access"
+                      ? "font-bold text-brand-500 dark:text-white"
+                      : "font-medium text-gray-600"
+                      }`}
+                  >
+                    <FontAwesomeIcon className="w-4 h-4" icon={faUserCog} />
+                  </span>
+                  <p
+                    className={`leading-1 ml-4 flex ${activeRoute === "access"
+                      ? "font-bold text-navy-700 dark:bg-navy-700 dark:text-white"
+                      : "font-medium text-gray-600"
+                      }`}
+                  >
+                    Phân quyền
+                  </p>
+                </li>
+                {activeRoute === "access" ? (
                   <div className="absolute right-0 top-px h-9 w-1 rounded-lg bg-brand-500 dark:bg-brand-400" />
                 ) : null}
               </div>

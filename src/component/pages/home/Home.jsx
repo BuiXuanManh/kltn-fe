@@ -81,11 +81,11 @@ const Home = ({ data }) => {
         </Carousel>
         <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
         <IonIcon className='animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
+        {data?.length > 0 && HotBook(data, rates)}
         {/* Nominated book */}
         {NominatedBook(data)}
         {/* New update book */}
         {NewBook(data, rates)}
-        {data?.length > 0 && HotBook(data, rates)}
     </div>
     );
 };

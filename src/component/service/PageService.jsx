@@ -23,4 +23,7 @@ export default class PageService {
     getRatePage(token, pageId) {
         return api.get(`/api/pages/ratePage/${pageId}`, AuthService(token));
     }
+    savePages(token, pages, bookId) {
+        return api.post(`/api/pages/save/${bookId}`, pages, AuthService(token));
+    }
 }

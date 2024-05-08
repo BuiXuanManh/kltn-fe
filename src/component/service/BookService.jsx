@@ -2,8 +2,11 @@ import api from "../api/api";
 import AuthService from "./AuthService";
 
 export default class BookService {
+    saveBook(token, book) {
+        return api.post(`/api/books/save`, book, AuthService(token));
+    }
     getBooks(page, size) {
-        return api.get(`/api/books/getAll?page=${page}&size=${size}`);
+        return api.get(`/api/books/get/new?page=${page}&size=${size}`);
     }
     getBookById(id) {
         return api.get(`/api/books/${id}`);
@@ -23,7 +26,22 @@ export default class BookService {
     findRateBookById(bookId) {
         return api.get(`/api/books/rateBook/getAll/${bookId}`);
     }
+    findInteraction(token, bookId) {
+        return api.get(`/api/books/interaction/${bookId}`, AuthService(token));
+    }
     findBook(keyword) {
         return api.get(`/api/books/find/${keyword}`);
+    }
+    follow(token, bookId) {
+        return api.post(`/api/books/follow/${bookId}`, {}, AuthService(token));
+    }
+    followCancel(token, bookId) {
+        return api.post(`/api/books/follow/cancel/${bookId}`, {}, AuthService(token));
+    }
+    nominate(token, bookId) {
+        return api.post(`/api/books/nominate/${bookId}`, {}, AuthService(token));
+    }
+    nominateCancel(token, bookId) {
+        return api.post(`/api/books/nominate/cancel/${bookId}`, {}, AuthService(token));
     }
 }

@@ -2,6 +2,7 @@ import Sidebar from "./sidebar";
 import { useState } from "react";
 import DashBoardDetail from "./DashBoardDetail";
 import AddBook from "./AddBook";
+import Access from "./Access";
 
 const Dashboard = () => {
     const [activeRoute, setActiveRoute] = useState("dashboard");
@@ -13,6 +14,7 @@ const Dashboard = () => {
             <div className="col-span-6">
                 {activeRoute === "dashboard" && <DashBoardDetail />}
                 {activeRoute === "addBook" && <AddBook />}
+                {activeRoute === "access" && <Access />}
             </div>
         </div>
     );

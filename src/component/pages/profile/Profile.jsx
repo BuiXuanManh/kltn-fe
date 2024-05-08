@@ -75,7 +75,7 @@ const Profile = ({ data }) => {
                             <ul className="mt-2 text-gray-700">
                                 <li className="flex border-y py-2">
                                     <span className="font-bold w-28">Họ tên:</span>
-                                    <span className="text-gray-700">{user?.name}</span>
+                                    <span className="text-gray-700">{profile?.firstName} {profile?.lastName} </span>
                                 </li>
                                 <li className="flex border-b py-2">
                                     <span className="font-bold w-28">Birthday:</span>
@@ -138,7 +138,7 @@ const Profile = ({ data }) => {
                                             <Paper key={i.id} >
                                                 <div className=" border border-x-0 border-t-4 border-solid w-full bg-center items-center justify-center bg-gray-100 cursor-pointer p-2" >
                                                     <div className='flex mt-5'>
-                                                        <div className='ml-20 mb-3'>
+                                                        <div className='ml-20 mb-3 min-w-52 h-80 w-52'>
                                                             <img className='h-80 object-cover w-52' src={i.image} alt="" />
                                                         </div>
                                                         <div className='ml-10'>

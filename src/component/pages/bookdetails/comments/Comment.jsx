@@ -10,6 +10,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { message } from 'antd';
 import useAddComputedCommentBook from '../../../../hook/useAddComputedCommentBook';
 import { AppContext } from '../../../../context/AppContext';
+import formatTimeDifference from '../../../service/DateService';
 const Comment = ({ pageNumber, id }) => {
     const { token, computedBook, setComputedBook } = useContext(AppContext);
     const [comments, setComments] = useState([]);
@@ -106,7 +107,7 @@ const Comment = ({ pageNumber, id }) => {
                                         <div key={index} className='w-full rounded-xl pb-4 pr-5'>
                                             <div className='font-semibold'>{i?.profile?.firstName} {i?.profile?.lastName}</div>
                                             <div className='text-sm flex text-gray-500 gap-10'>
-                                                <div >{i?.createAt ? new Date(i?.createAt).toLocaleString() + "" : <></>}</div>
+                                                <div >{i?.createAt ? formatTimeDifference(i?.createAt) + "" : <></>}</div>
                                                 {i?.pageBook?.pageNo > 0 && <div>Trang {i?.pageBook?.pageNo} </div>}
                                             </div>
                                             <div className='mt-2'>{i?.content}</div>

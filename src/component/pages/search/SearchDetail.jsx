@@ -183,13 +183,13 @@ const SearchDetail = ({ data }) => {
                                 </div>
                             ))}
                         </div>
-                        <div className='mt-3 pl-2 font-semibold text-yellow-700'>
+                        <div className='mt-3 pl-2 font-semibold text-yellow-500'>
                             Thể loại
                         </div>
                         <div className='flex-wrap flex gap-4 mt-4 p-1 w-full'>
                             {genres?.map((genre, index) => (
                                 <div key={index}>
-                                    <div onClick={() => handleSelected(genre)} className='p-1 px-2 rounded-md border border-yellow-700 cursor-pointer hover:text-yellow-700 hover:border-yellow-700'>{genre?.name}</div>
+                                    <div onClick={() => handleSelected(genre)} className='p-1 px-2 rounded-md border border-yellow-500 cursor-pointer hover:text-yellow-500 hover:border-yellow-500'>{genre?.name}</div>
                                 </div>
                             ))}
                         </div>
@@ -206,7 +206,7 @@ const SearchDetail = ({ data }) => {
                                     setNeww(val);
                                     handleChange("new");
                                 }}
-                                className={`flex flex-grow items-center justify-center ${filter == "new" ? "text-yellow-700" : "text-black"}  cursor-pointer bg-gray-50`}
+                                className={`flex flex-grow items-center justify-center ${filter == "new" ? "text-yellow-500" : "text-black"}  cursor-pointer bg-gray-50`}
                                 theme={customTheme}
                                 styles={customStyles}
                                 isSearchable={false}
@@ -221,7 +221,7 @@ const SearchDetail = ({ data }) => {
                                     setRead(val);
                                     handleChange("read");
                                 }}
-                                className={`flex flex-grow items-center justify-center ${filter === "read" ? "text-yellow-700" : "text-black"}  cursor-pointer bg-gray-50`}
+                                className={`flex flex-grow items-center justify-center ${filter === "read" ? "text-yellow-500" : "text-black"}  cursor-pointer bg-gray-50`}
                                 theme={customTheme}
                                 styles={customStyles}
                                 isSearchable={false}
@@ -236,7 +236,7 @@ const SearchDetail = ({ data }) => {
                                     setRate(val);
                                     handleChange("rate");
                                 }}
-                                className={`flex flex-grow items-center justify-center ${filter === "rate" ? "text-yellow-700" : "text-black"}  cursor-pointer bg-gray-50`}
+                                className={`flex flex-grow items-center justify-center ${filter === "rate" ? "text-yellow-500" : "text-black"}  cursor-pointer bg-gray-50`}
                                 theme={customTheme}
                                 styles={customStyles}
                                 isSearchable={false}
@@ -251,16 +251,16 @@ const SearchDetail = ({ data }) => {
                                     setNomination(val);
                                     handleChange("nomination");
                                 }}
-                                className={`ml-3 flex flex-grow items-center justify-center ${filter === "nomination" ? "text-yellow-700" : "text-black"}  cursor-pointer bg-gray-50`}
+                                className={`ml-3 flex flex-grow items-center justify-center ${filter === "nomination" ? "text-yellow-500" : "text-black"}  cursor-pointer bg-gray-50`}
                                 theme={customTheme}
                                 styles={customStyles}
                                 isSearchable={false}
                                 options={optionsNomination}
                                 placeholder="Đề cử"
                             />
-                            <button onClick={() => handleChange("save")} className={`flex-grow ${filter === "save" ? "text-yellow-700" : "text-black"} hover:text-blue-400`}>lưu trữ</button>
-                            <button onClick={() => handleChange("love")} className={`flex-grow ml-4 ${filter === "love" ? "text-yellow-700" : "text-black"} hover:text-blue-400`}>Yêu thích</button>
-                            <button onClick={() => handleChange("comment")} className={`flex-grow ml-4 ${filter === "comment" ? "text-yellow-700" : "text-black"} hover:text-blue-400`}>Bình luận</button>
+                            <button onClick={() => handleChange("save")} className={`flex-grow ${filter === "save" ? "text-yellow-500" : "text-black"} hover:text-blue-400`}>lưu trữ</button>
+                            <button onClick={() => handleChange("love")} className={`flex-grow ml-4 ${filter === "love" ? "text-yellow-500" : "text-black"} hover:text-blue-400`}>Yêu thích</button>
+                            <button onClick={() => handleChange("comment")} className={`flex-grow ml-4 ${filter === "comment" ? "text-yellow-500" : "text-black"} hover:text-blue-400`}>Bình luận</button>
                         </div>
                     </div>
                     <div className='p-4 w-full'>
@@ -289,7 +289,7 @@ const SearchDetail = ({ data }) => {
 
                                                     </div>
                                                 </div>
-                                                <div className='p-1 border border-tyellow text-orange-600 cursor-pointer'>{item.genres[0]?.name}</div>
+                                                <div className='p-1 border border-yellow-500 text-orange-600 cursor-pointer'>{item.genres[0]?.name}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -313,10 +313,10 @@ const SearchDetail = ({ data }) => {
                                 <FontAwesomeIcon icon={faChevronRight} />
                             </div>
                             <div className='p-1 px-2 rounded-md text-center'>
-                                <input onChange={(e) => setPage(e.target.value)} className='focus:border-yellow-600 border border-gray-400 focus:outline-none rounded-md p-2 max-w-20' type="number" min={1} max={data?.totalPages} value={pagee} />
+                                <input onChange={(e) => setPage(e.target.value)} className='focus:border-yellow-500 border border-gray-400 focus:outline-none rounded-md p-2 max-w-20' type="number" min={1} max={data?.totalPages} value={pagee} />
                             </div>
                             <div className='p-1 px-2 rounded-md text-center'>
-                                <button onClick={() => handlePage(pagee)} className='bg-white border hover:bg-yellow-600 hover:text-white border-yellow-600 text-yellow-600 p-2 rounded-md'>
+                                <button onClick={() => handlePage(pagee)} className='bg-white border hover:bg-yellow-500 hover:text-white border-yellow-500 text-yellow-500 p-2 rounded-md'>
                                     Đến trang
                                 </button>
                             </div>
