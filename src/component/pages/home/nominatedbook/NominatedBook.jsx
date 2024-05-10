@@ -50,12 +50,12 @@ function NominatedBook(data) {
                             <div key={item.id} className='flex text-start w-full min-w-0 max-h-52 p-2 border border-gray-200'>
                                 <div className='w-24 h-28 ml-2 cursor-pointer'>
                                     <Link to={`/details/${item?.id}`}>
-                                        <img width="5rem" height="6rem" className='w-full h-full object-cover' src={item.image} alt='img book' />
+                                        <img width="5rem" height="6rem" className='w-full h-full object-cover' src={item?.image} alt='img book' />
                                     </Link>
                                 </div>
                                 <div className='ml-3 w-full'>
                                     <Link to={`/details/${item?.id}`}>
-                                        <h3 className="cursor-pointer font-semibold hover:text-blue-500">{item.title}</h3>
+                                        <h3 className="cursor-pointer font-semibold hover:text-blue-500">{item?.title}</h3>
                                     </Link>
                                     <div className="mt-2 flex-wrap w-60 flex items-center gap-1">
                                         <span className="line-clamp-3 ml-1">{item?.shortDescription}</span>
@@ -64,12 +64,11 @@ function NominatedBook(data) {
                                         <div className="flex max-w-28 items-center">
                                             <img src={icon?.icon?.author} className='w-5 h-5 mt-1' alt="" />
                                             <div className='flex flex-grow truncate justify-center items-center'>
-                                                <p className='ml-1 max-w-24 truncate'>{item?.authors[0]?.name}</p>
-
+                                                <p className='ml-1 max-w-24 truncate'>{item?.authors ? item?.authors[0]?.name : <></>}</p>
                                             </div>
                                         </div>
                                         <div className="max-w-48 max-h-10 flex flex-grow min-w-20 justify-end">
-                                            <div className='p-1 border max-h-10 truncate  border-tyellow text-orange-600 cursor-pointer'>{item.genres[0]?.name}</div>
+                                            <div className='p-1 border max-h-10 truncate  border-tyellow text-orange-600 cursor-pointer'>{item.genres ? item.genres[0]?.name : <></>}</div>
                                         </div>
                                     </div>
                                 </div>

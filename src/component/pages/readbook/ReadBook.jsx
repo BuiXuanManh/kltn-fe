@@ -148,6 +148,21 @@ const ReadBook = () => {
         },
         enabled: token !== undefined && token != "" && profile?.id !== undefined && page?.book?.id !== undefined && id != undefined && !isPage,
     });
+    const [pages, setPages] = useState([]);
+    const [pageCount, setPageCount] = useState(0);
+    const getPages = useQuery({
+        queryKey: ['pages', id],
+        queryFn: () => pageService.getPagesByBookId(id).then((res) => {
+            if (res.data) {
+                setPages(res.data);
+                setPageCount(res.data.length);
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        }),
+        enabled: !!pages,
+    })
     const [rate, setRate] = useState(1);
     const getRate = useQuery({
         queryKey: ["getRate", page?.id],

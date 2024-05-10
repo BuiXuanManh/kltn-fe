@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from "react-select"
 import AddPage from './AddPage';
 import RunChat from '../../../../google';
 import { message } from 'antd';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import GenreService from '../../service/GenreService';
+import { Link } from 'react-router-dom';
+import BookService from '../../service/BookService';
 const AddBook = () => {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
@@ -77,6 +79,7 @@ const AddBook = () => {
     }
     const optionsGenres = mapGenresToOptions(genres);
     const [showPage, setShowPage] = useState(false);
+    const [id, setId] = useState('');
     const [book, setBook] = useState({});//[title,author,genres,shortDescription,longDescription
     const handleShowPage = () => {
         if (title.trim() === "" || !title) return message.error("Vui lòng nhập tiêu đề sách", 2)
@@ -84,7 +87,7 @@ const AddBook = () => {
         if (selectGenres.length === 0) return message.error("Vui lòng chọn thể loại", 2)
         if (shortDescription.trim() === "" || !shortDescription) return message.error("Vui lòng nhập tóm tắt mô tả", 2)
         if (longDescription.trim() === "" || !longDescription) return message.error("Vui lòng nhập mô tả", 2)
-        setBook({ title, author, genres: mapOptionToGenre(selectGenres), shortDescription, longDescription })
+        setBook({ id: id ? id : "", title, genres: mapOptionToGenre(selectGenres), shortDescription, longDescription })
         setShowPage(!showPage);
     }
     const [loading, setLoading] = useState(false)
@@ -101,11 +104,57 @@ const AddBook = () => {
             setLoading(false);
         } else message.error("Vui lòng nhập tiêu đề sách", 2)
     }
-    // const handleSendAi = async (text) => {
-    //     await RunChat(text);
-    // }
+    const handleReset = () => {
+        setTitle('');
+        setAuthor('');
+        setSelectGenres([]);
+        setShortDescription('');
+        setLongDescription('');
+        setShowPage(false);
+    }
+    let service = new BookService();
+    const [findBooks, setFindBooks] = useState([])
+    const findBok = useMutation({
+        mutationFn: (title) => {
+            service.findByTitle(title).then((res) => {
+                if (res.data) {
+                    console.log(res.data);
+                    setFindBooks(res.data);
+                }
+            }).catch((error) => {
+                console.error(error);
+            })
+        }
+    })
+    useEffect(() => {
+        if (title.trim() === "" && !title)
+            setFindBooks([]);
+        else
+            findBok.mutate(title)
+    }, [title])
+    const [isInputFocused, setIsInputFocused] = useState(false);
+
+    const handleInputFocus = () => {
+        setIsInputFocused(true);
+    };
+
+    const handleInputBlur = () => {
+        setFindBooks([])
+        setIsInputFocused(false);
+    };
+
+    const handleGetBook = (book) => {
+        setId(book?.id);
+        setTitle(book?.title);
+        setAuthor(book?.authors ? book?.authors[0]?.name : '');
+        setShortDescription(book?.shortDescription);
+        setLongDescription(book?.longDescription);
+        setSelectGenres(mapGenresToOptions(book?.genres));
+        setFindBooks([]);
+        setFindBooks(null)
+    }
     return (
-        <div className=' md:mr-10 -ml-20'>
+        <div className=' md:mr-10 -ml-20' >
             {!showPage ?
                 <>
                     <div className=' pt-5s mt-5 rounded-lg pt-5 w-full dark:!bg-navy-800 dark:text-white'>
@@ -136,9 +185,31 @@ const AddBook = () => {
                                 <div className='col-span-3 flex mt-4'>
                                     <input className='w-full mr-4 h-14 px-4 border-2 rounded-lg dark:border-brand-600 dark:bg-navy-700'
                                         value={title} onChange={(e) => setTitle(e.target.value)}
+                                        // onFocus={handleInputFocus}
+                                        // onBlur={handleInputBlur}
                                         placeholder='Nhập tiêu đề sách'
                                         type="text" />
+                                    {findBooks?.length > 0 && <div className="absolute w-96 mt-16 z-50">
+                                        <div className="bg-white border border-gray-300 text-black rounded-lg shadow-lg">
+                                            {findBooks?.map((book, index) => (
+                                                <div onClick={() => handleGetBook(book)} key={index}>
+                                                    <div className="flex items-center hover:bg-gray-200 gap-2 space-x-2 cursor-pointer">
+                                                        <img src={book?.image} className="w-10 h-10" alt="" />
+                                                        <div className="flex flex-col">
+                                                            <span className="font-semibold">{book?.title}</span>
+                                                            <div className="flex">
+                                                                {book?.authors?.map((author, index) => (
+                                                                    <span key={index} className="text-gray-400 ml-1">{author?.name}</span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>}
                                 </div>
+
                             </div>
                             <div className='grid grid-cols-4 mt-4 items-center'>
                                 <div className='col-span-1'>
@@ -169,6 +240,7 @@ const AddBook = () => {
                                         theme={customTheme}
                                         styles={customStyles}
                                         options={optionsGenres}
+                                        value={selectGenres}
                                         placeholder="Chọn thể loại"
                                     />
                                 </div>
@@ -208,10 +280,10 @@ const AddBook = () => {
                         </div>
                     </div>
                 </> : <>
-                    <AddPage book={book} setShowPage={setShowPage} />
+                    <AddPage book={book} author={author} handleReset={handleReset} setShowPage={setShowPage} />
                 </>}
 
-        </div>
+        </div >
     );
 };
 

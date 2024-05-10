@@ -7,13 +7,29 @@ import BookService from '../../service/BookService';
 import PageService from '../../service/PageService';
 import { AppContext } from '../../../context/AppContext';
 import { useMutation } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 
-const AddPage = ({ book, setShowPage }) => {
+const AddPage = ({ book, author, setShowPage, handleReset }) => {
     const [active, setActive] = useState(1);
     const [pages, setPages] = useState([
-        { pageNo: 1, pageName: '', content: '' },
+        { pageNo: 1, name: '', content: '' },
     ]);
-    const [pageNames, setPageNames] = useState(pages.map(page => page.pageName));
+    let bookService = new BookService();
+    let pageService = new PageService();
+    const getPages = (bookId) => {
+        pageService.getPagesByBookId(bookId).then((res) => {
+            if (res.data) {
+                setPages(res.data);
+            }
+        }).catch((error) => {
+            console.error(error);
+        })
+    }
+    useEffect(() => {
+        if (book?.id)
+            getPages(book.id);
+    }, [book])
+    const [pageNames, setPageNames] = useState(pages.map(page => page.name));
     const [pageContents, setPageContents] = useState(pages.map(page => page.content));
     const { token } = useContext(AppContext);
     const addPage = () => {
@@ -22,7 +38,10 @@ const AddPage = ({ book, setShowPage }) => {
         setActive(newPageNo)
     };
     const deletePage = (pageNo) => {
-        if (pages.length === 1) return message.error("phải có ít nhất 1 trang", 2)
+        if (pages.length === 1) {
+            toast.error("phải có ít nhất 1 trang")
+            return
+        }
         const newPages = pages.filter((page) => page.pageNo !== pageNo);
         const updatedPages = newPages.map((page, index) => ({ ...page, pageNo: index + 1 }));
         setPages(updatedPages);
@@ -38,13 +57,13 @@ const AddPage = ({ book, setShowPage }) => {
         setShowPage(false)
     ]
     useEffect(() => {
-        setPageNames(pages.map(page => page.pageName));
+        setPageNames(pages.map(page => page.name));
         setPageContents(pages.map(page => page.content));
     }, [pages])
     const handleNameChange = (pageNo, newName) => {
         setPages(currentPages => currentPages.map(page =>
             page.pageNo === pageNo
-                ? { ...page, pageName: newName }
+                ? { ...page, name: newName }
                 : page
         ));
     };
@@ -53,41 +72,47 @@ const AddPage = ({ book, setShowPage }) => {
     const handleShowByte = (content) => {
         return encoder.encode(content).length;
     }
-    let bookService = new BookService();
-    let pageService = new PageService();
-    const addPages = useMutation({
-        mutationFn: (bookId) => pageService.savePages(token, pages, bookId).then((res) => {
-            if (res.data) {
-                console.log(res.data);
-                message.success("Thêm sách thành công", 2);
-                return res.data;
-            }
-        }).catch((error) => {
-            console.error(error);
-        })
+
+    const addPages = (bookId) => pageService.savePages(token, pages, bookId).then((res) => {
+        if (res.data) {
+            console.log(res.data);
+            toast.success("Thêm sách thành công");
+            handlePageReset();
+            return res.data;
+        }
+    }).catch((error) => {
+        console.error(error);
     })
+
     const addBook = useMutation({
-        mutationFn: () => bookService.saveBook(token, book).then((res) => {
+        mutationFn: () => bookService.saveBook(token, book, author).then((res) => {
             if (res.data) {
                 console.log(res.data);
-                addPages.mutate(res.data.id);
-                return res.data;
+                addPages(res.data.id);
             }
         }).catch((error) => {
             console.error(error);
         })
     })
+    const handlePageReset = () => {
+        handleReset();
+        setPages([
+            { pageNo: 1, name: '', content: '' },
+        ]);
+    }
     async function handleSave() {
+        console.log("luu");
         for (const page of pages) {
             if (handleShowByte(page.content) > 5000) {
-                message.error("Trang " + page.pageNo + " vượt quá 5000 từ", 2);
+                toast.error("Trang " + page.pageNo + " vượt quá 5000 bytes", 2);
                 return Promise.reject(); // Từ chối Promise nếu gặp lỗi
             }
         }
         const saveFunction = async () => {
+            console.log("save");
             addBook.mutate();
         };
-        return saveFunction;
+        await saveFunction();
     }
     const handleGenerate = async () => {
         if (book?.title !== "" && book?.title) {
@@ -99,8 +124,8 @@ const AddPage = ({ book, setShowPage }) => {
                 const updatePageContent = { ...page, content: result1.replace(regex, "") };
                 promises.push(updatePageContent);
             }
-            setPages(promises);
             await Promise.all(promises);
+            setPages(promises);
             setLoading(false);
         } else message.error("Không có tiêu đề sách", 2)
     }
@@ -179,7 +204,7 @@ const AddPage = ({ book, setShowPage }) => {
                             </button>
                         </div>
                         <div className='flex p-2 cursor-pointer hover:bg-brand-500 bg-green-500 mr-4 px-10 rounded-full h-10 items-center justify-center'>
-                            <button onClick={handleSave()}>
+                            <button onClick={() => handleSave()}>
                                 Lưu sách
                             </button>
                         </div>

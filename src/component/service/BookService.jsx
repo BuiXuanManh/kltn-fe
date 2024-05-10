@@ -2,8 +2,11 @@ import api from "../api/api";
 import AuthService from "./AuthService";
 
 export default class BookService {
-    saveBook(token, book) {
-        return api.post(`/api/books/save`, book, AuthService(token));
+    saveBook(token, book, author) {
+        return api.post(`/api/books/save?author=${author}`, book, AuthService(token));
+    }
+    findByTitle(title) {
+        return api.get(`/api/books/title/${title}`);
     }
     getBooks(page, size) {
         return api.get(`/api/books/get/new?page=${page}&size=${size}`);

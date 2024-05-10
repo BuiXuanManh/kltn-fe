@@ -7,9 +7,40 @@ import BookService from '../../service/BookService';
 import IconGlobal from '../../../icon/IconGlobal';
 import GenreService from '../../service/GenreService';
 import Select from "react-select"
-const SearchDetail = ({ data }) => {
+const SearchDetail = () => {
+    const [data, setData] = useState([]);
+    let service = new BookService();
+    const [findBooks, setFindBooks] = useState([]);
+    const findBook = () => {
+        service.findBook(keyword).then((res) => {
+            if (res.data) {
+                console.log(res.data);
+                setFindBooks(res.data);
+            }
+        }).catch((error) => {
+            console.error(error);
+        })
+    }
+
+    const getDate = useQuery({
+        queryKey: ["dataBooks"],
+        queryFn: () => service.getBooks(1, 12).then((res) => {
+            if (res.data) {
+                console.log(res.data)
+                setData(res.data)
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        }), enabled: data.length === 0
+    })
     let icon = new IconGlobal()
     const { keyword, page } = useParams();
+    useEffect(() => {
+        findBook(keyword)
+        if (keyword?.trim() === "")
+            setFindBooks([])
+    }, [keyword])
     const [genres, setGenres] = useState([]);
     const [filterGenres, isFilterGenres] = useState(false);
     const [filter, setFilter] = useState("new");
@@ -23,7 +54,6 @@ const SearchDetail = ({ data }) => {
         setPage(p);
         navigate(`/${p}/search/${keyword ? keyword : ""}`);
     }
-    let service = new BookService();
     const mutation = useMutation({
         mutationKey: ["page", pagee],
         mutationFn: (page) => {
@@ -211,7 +241,7 @@ const SearchDetail = ({ data }) => {
                                 styles={customStyles}
                                 isSearchable={false}
                                 options={optionsNew}
-                                defaultValue={optionsNew[0]}
+                                defaultValue={optionsNew[1]}
                             />
                             <Select
                                 components={{
@@ -265,7 +295,7 @@ const SearchDetail = ({ data }) => {
                     </div>
                     <div className='p-4 w-full'>
                         <div className=' pb-4 grid grid-cols-2 col-span-2 gap-4 max-w-full justify-start'>
-                            {searchData?.pageBook?.content?.map((item) => {
+                            {data?.pageBook?.content?.map((item) => {
                                 return (
                                     <div key={item.id} className='flex text-start w-full mt-3 max-h-52 p-3 shadow-md'>
                                         <div className='w-24 h-28 ml-2 cursor-pointer'>

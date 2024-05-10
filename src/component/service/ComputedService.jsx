@@ -25,5 +25,10 @@ export default class ComputedService {
     addComputedPage(pageId) {
         return api.post(`/api/computed/pages/${pageId}`);
     }
-
+    nonimate(date) {
+        return api.get(`/api/computed/nominate?date=${date}`);
+    }
+    read(date) {
+        return api.get(`/api/computed/read?date=${date}`);
+    }
 }
