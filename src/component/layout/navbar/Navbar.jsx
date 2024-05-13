@@ -45,44 +45,83 @@ export default function Navbar() {
   const handleInputBlur = () => {
     setFindBooks([])
     setIsInputFocused(false);
+    setShowFind(false);
   };
   const [keyword, setKeyWord] = useState("");
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      navigate("1/search/" + keyword);
+      navigate("/1/search/" + keyword);
+      setFindBooks([]);
+      setShowFind(false)
     }
   }
   let bookService = new BookService();
   const [findBooks, setFindBooks] = useState([]);
-  const findBook = () => {
-    bookService.findBook(keyword).then((res) => {
-      if (res.data) {
-        console.log(res.data);
-        setFindBooks(res.data);
-      }
-    }).catch((error) => {
-      console.error(error);
-    })
+  const [showFind, setShowFind] = useState(false);
+  const findBook = useQuery({
+    queryKey: ["findByKey", keyword],
+    queryFn: () => bookService.findBook(keyword, 1, 12)
+      .then((res) => {
+        if (res.data) {
+          setFindBooks(res.data.pageBook.content);
+          setShowFind(true);
+          return res.data.pageBook.content;
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      }),
+    onError: () => {
+      setFindBooks([]);
+      setShowFind(false);
+    }, enabled: showFind
+  });
+  const divBorderClassName = isInputFocused ? "tblue" : "gray-200";
+  const handleDetails = (id) => {
+    if (id !== null && id !== "") {
+      navigate("/details/" + id);
+      console.log("ok");
+      console.log(id)
+      setFindBooks([]);
+      setShowFind(false)
+      setKeyWord("");
+    }
+  }
+  const handleBack = () => {
+    navigate("/");
+    setFindBooks([]);
+    setShowFind(false);
+    setKeyWord("");
   }
   useEffect(() => {
-    findBook(keyword)
-    if (keyword.trim() === "")
-      setFindBooks([])
-  }, [keyword])
-  const divBorderClassName = isInputFocused ? "tblue" : "gray-200";
+    const parts = location.pathname.split('/');
+    const page = parts[1];
+    const search = parts[2];
+
+    if (search === 'search') {
+      setFindBooks([]);
+      setShowFind(false);
+    } else if (keyword?.trim() === "" || !keyword) {
+      // setFindBooks([]);
+      setShowFind(false);
+    } else {
+      findBook.refetch();
+      setShowFind(true);
+    }
+  }, [location.pathname, keyword, showFind]);
   return (
     <>
       {
         <div className={`${location.pathname === "/admin" ? "ml-[17rem]" : ""} bg-white shadow-md !z-50 border`}>
           <div className="mx-auto py-4 flex justify-between items-center ml-10 font-semibold">
             <div className="flex ml-10 space-x-10">
-              <Link to="/">
+              <div onClick={() => handleBack()}>
                 <div className="flex items-center space-x-2 ml-20 cursor-pointer bg-black">
                   <span className=" w-15 h-10">
                     <img src="logo.png" className=" bg-white w-15 h-10" width={60} height={40} alt="" />
                   </span>
                 </div>
-              </Link>
+              </div>
               <div className="flex items-center space-x-2 cursor-pointer">
                 <FontAwesomeIcon icon={faBars} />
                 <span className="">Thể loại</span>
@@ -105,29 +144,27 @@ export default function Navbar() {
                   className="h-7 bg-white focus:outline-none px-4 py-2 border-none rounded-full"
                   type="text"
                   placeholder="Tìm kiếm"
-                  onFocus={handleInputFocus}
-                  onBlur={handleInputBlur}
+                  // onFocus={handleInputFocus}
+                  // onBlur={handleInputBlur}
                   onKeyPress={handleKeyPress}
                 />
               </div>
-              {findBooks?.length > 0 && <div className="absolute mt-11 z-50">
-                <div className="bg-white w-80 border border-gray-300 rounded-lg shadow-lg">
-                  {findBooks.map((book, index) => (
-                    <Link to={"/book/" + book.id} key={index}>
-                      <div className="flex items-center hover:bg-gray-200 gap-2 space-x-2 cursor-pointer">
-                        <img src={book.image} className="w-10 h-10" alt="" />
-                        <div className="flex flex-col">
-                          <span className="font-semibold">{book.title}</span>
-                          <div className="flex">
-                            {book.authors.map((author, index) => (
-                              <span key={index} className="text-gray-400 ml-1">{author.name}</span>
-                            ))}
-                          </div>
+              {showFind && location.pathname != "/search" && <div className="absolute mt-11 z-50 bg-white w-80 border border-gray-300 rounded-lg shadow-lg">
+                {findBook?.data?.map((book, index) => (
+                  <div onClick={() => handleDetails(book?.id)} key={index} className="cursor-pointer">
+                    <div className="flex items-center hover:bg-gray-200 gap-2 ">
+                      <img src={book.image} className="w-10 h-10" alt="" />
+                      <div className="flex flex-col">
+                        <span className="font-semibold">{book.title}</span>
+                        <div className="flex">
+                          {book.authors.map((author, index) => (
+                            <span key={index} className="text-gray-400 ml-1">{author.name}</span>
+                          ))}
                         </div>
                       </div>
-                    </Link>
-                  ))}
-                </div>
+                    </div>
+                  </div>
+                ))}
               </div>}
             </div>
 

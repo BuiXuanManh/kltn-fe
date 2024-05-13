@@ -20,7 +20,6 @@ import useAddComputedRateBook from '../../../hook/useAddComputedRateBook';
 import useAddComputedCommentBook from '../../../hook/useAddComputedCommentBook';
 import useAddComputedPageBook from '../../../hook/useAddComputedPageBook';
 import useAddComputedInteractionBook from '../../../hook/useAddComputedInteractionBook';
-import { set } from 'date-fns';
 const BookDetails = () => {
     const [activeMenu, setActiveMenu] = useState('introduction');
     const handleMenuClick = (menuItem) => {
@@ -63,8 +62,9 @@ const BookDetails = () => {
         }).catch((err) => {
             console.error(err);
         }),
-        enabled: token != "" && id !== "" && id !== undefined && id !== ""
+        enabled: token != "" && id !== "" && id !== undefined && id !== "" && !!id
     });
+
     const [isBook, setIsBook] = useState(false);
     const navigate = useNavigate();
     const handleReadBook = () => {
@@ -82,6 +82,9 @@ const BookDetails = () => {
         }),
         enabled: book === undefined && !isBook,
     });
+    useEffect(() => {
+        getBook.refetch()
+    }, [id])
     let icon = new IconGlobal();
     let pageService = new PageService();
     const [pages, setPages] = useState([]);
@@ -177,12 +180,15 @@ const BookDetails = () => {
     return (
         <div className='w-full'>
             <div className="w-full relative h-[40rem] z-0 border items-center justify-center border-white rounded-lg bg-white shadow-md" >
-                <img src={book?.bgImage} className='h-[40rem] w-full' alt="" />
+                <img src={book?.bgImage ? book?.bgImage : "bookBg.png"} className='h-[40rem] w-full' alt="" />
+                {!book?.bgImage && <div className='-mt-80 font-semibold text-4xl flex text-center justify-center w-full'>
+                    <p>{book?.title}</p>
+                </div>}
             </div>
             <div className='mx-52 -mt-5 relative z-50 p-5 bg-white rounded-md' >
                 <div className='flex'>
                     <div className='w-52 h-72 min-w-52'>
-                        <img className='w-full h-full' src={book?.image} alt="" />
+                        <img className='w-full h-full' src={book?.image ? book?.image : "avatarBook.jpg"} alt="" />
                     </div>
                     <div className='mx-10'>
                         <h3 className='font-semibold text-2xl'>{book?.title}</h3>

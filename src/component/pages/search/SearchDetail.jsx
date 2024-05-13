@@ -7,43 +7,57 @@ import BookService from '../../service/BookService';
 import IconGlobal from '../../../icon/IconGlobal';
 import GenreService from '../../service/GenreService';
 import Select from "react-select"
+import ComputedService from '../../service/ComputedService';
+import { IonIcon } from '@ionic/react';
+import { bookmarkSharp, eyeOutline, heartOutline, heartSharp } from 'ionicons/icons';
+import { LuCalendarDays } from "react-icons/lu";
+import formatTimeDifference from '../../service/DateService';
+import { MdOutlineAutoGraph, MdStarRate } from "react-icons/md";
+import { GoStarFill } from "react-icons/go";
+import { PiFlowerTulipThin } from "react-icons/pi";
+import { FaAcquisitionsIncorporated, FaRegCommentDots } from "react-icons/fa";
 const SearchDetail = () => {
     const [data, setData] = useState([]);
+    const { keyword, page } = useParams();
+    const [filter, setFilter] = useState("new");
     let service = new BookService();
     const [findBooks, setFindBooks] = useState([]);
-    const findBook = () => {
-        service.findBook(keyword).then((res) => {
-            if (res.data) {
-                console.log(res.data);
-                setFindBooks(res.data);
-            }
-        }).catch((error) => {
-            console.error(error);
-        })
-    }
-
-    const getDate = useQuery({
-        queryKey: ["dataBooks"],
-        queryFn: () => service.getBooks(1, 12).then((res) => {
-            if (res.data) {
-                console.log(res.data)
-                setData(res.data)
-                return res.data;
-            }
-        }).catch((err) => {
-            console.error(err);
-        }), enabled: data.length === 0
-    })
-    let icon = new IconGlobal()
-    const { keyword, page } = useParams();
+    const findBook = useQuery({
+        queryKey: ["findBook", keyword],
+        queryFn: () => service.findBook(keyword, page, 12)
+            .then((res) => {
+                if (res.data) {
+                    setData(res.data);
+                    return res.data;
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            })
+    });
     useEffect(() => {
-        findBook(keyword)
-        if (keyword?.trim() === "")
-            setFindBooks([])
+        if (keyword === "" || !keyword)
+            getNewbook.refetch();
+        else
+            findBook.refetch();
     }, [keyword])
+    // const getDate = useQuery({
+    //     queryKey: ["dataBooks"],
+    //     queryFn: () => service.getBooks(1, 12, "createdAt").then((res) => {
+    //         if (res.data) {
+    //             console.log(res.data)
+    //             setData(res.data)
+    //             return res.data;
+    //         }
+    //     }).catch((err) => {
+    //         console.error(err);
+    //     })
+    // })
+
+    let icon = new IconGlobal()
+
     const [genres, setGenres] = useState([]);
     const [filterGenres, isFilterGenres] = useState(false);
-    const [filter, setFilter] = useState("new");
     const [pagee, setPage] = useState(page);
     const [searchData, setSearchData] = useState(data);
     const navigate = useNavigate();
@@ -69,17 +83,7 @@ const SearchDetail = () => {
             });
         }
     })
-    const handleChange = (field) => {
-        setFilter(
-            field === "read" ? "read" :
-                "new" === field ? "new" :
-                    "nomination" === field ? "nomination" :
-                        "save" === field ? "save" :
-                            "love" === field ? "love" :
-                                "rate" === field ? "rate" :
-                                    "comment" === field ? "comment" : "read"
-        );
-    };
+
     const [selectedGenres, setSelectedGenres] = useState([]);
     const handleSelected = (genre) => {
         setSelectedGenres(prevSelectedGenres => [...prevSelectedGenres, genre]);
@@ -102,14 +106,15 @@ const SearchDetail = () => {
             console.error(err)
         ]), enabled: genres.length === 0
     })
+    let computedService = new ComputedService();
     const findByGenres = useMutation({
         mutationKey: ["findBookGenres"],
-        mutationFn: (page) => service.getBookByGenres(selectedGenres, page, 2).then((res) => {
+        mutationFn: () => computedService.findByGenres(data.field, selectedGenres, keyword, page, 12).then((res) => {
             if (res.data) {
                 console.log(res.data)
-                setSearchData(res.data);
+                setData(res.data);
                 isFilterGenres(true);
-            }
+            } else setData([]);
         }).catch((err) => {
             console.error(err);
         })
@@ -122,9 +127,8 @@ const SearchDetail = () => {
         setPage(1);
         navigate(`/1/search/${keyword ? keyword : ""}`);
     }
-
     const optionsNew = [
-        { value: "newUpdate", label: "Mới cập nhật" },
+        { value: "  ", label: "Mới cập nhật" },
         { value: "newCreate", label: "Mới đăng" },
     ]
     const optionsRead = [
@@ -144,9 +148,70 @@ const SearchDetail = () => {
         { value: "ratePoint", label: "Điểm đánh giá" },
     ]
     const [read, setRead] = useState();
-    const [neww, setNeww] = useState(optionsNew[0]);
+    const [neww, setNeww] = useState(optionsNew[1]);
     const [rate, setRate] = useState();
     const [nomination, setNomination] = useState();
+    const handleChange = (field, val) => {
+        setFilter(
+            field === "read" ? "read" :
+                "new" === field ? "new" :
+                    "nomination" === field ? "nomination" :
+                        "save" === field ? "save" :
+                            "love" === field ? "love" :
+                                "rate" === field ? "rate" :
+                                    "comment" === field ? "comment" : "read"
+        );
+        // console.log(val)
+        field === "read" ? val.value === "readDay" ? getRead.mutate("day") : val.value === "readMonth" ? getRead.mutate("month") : val.value === "readWeek" ? getRead.mutate("week") : getRead.mutate("total") :
+            field === "new" ? val.value === "newCreate" ? getNew.mutate("createdAt") : getNew.mutate("updateDate") :
+                field === "rate" ? val.value === "ratePoint" ? findMutate.mutate("rate") : findMutate.mutate("rateCount") :
+                    field === "nomination" ? val.value === "nominationDay" ? getNomination.mutate("day") : val.value === "nominationWeek" ? getNomination.mutate("week") : val.value == "nominationMonth" ? getNomination.mutate("month") : getNomination.mutate("total") :
+                        field === "save" ? findMutate.mutate("save") :
+                            field === "love" ? findMutate.mutate("love") :
+                                findMutate.mutate("comment");
+    };
+    const getNewbook = useQuery({
+        queryKey: ["newBooks"],
+        queryFn: () => service.getNewBooks(1, 12).then((res) => {
+            if (res.data) {
+                setData(res.data)
+                return res.data;
+            } else setData([]);
+        }).catch((err) => {
+            console.error(err);
+        }), enabled: filter === "new" && neww === optionsNew[1]
+    })
+    const getNew = useMutation({
+        mutationFn: (field) =>
+            service.getBooks(page, 12, field).then((res) => {
+                if (res.data) {
+                    setData(res.data);
+                    return res.data;
+                } else setData([]);
+            }).catch((res) => {
+                console.error(res);
+            })
+    })
+    const getRead = useMutation({
+        mutationFn: (date) => computedService.read(date, page, 12).then((res) => {
+            if (res.data) {
+                setData(res.data);
+                return res.data;
+            } else setData([]);
+        }).catch((res) => {
+            console.error(res);
+        })
+    })
+    const getNomination = useMutation({
+        mutationFn: (date) => computedService.nonimate(date, page, 12).then((res) => {
+            if (res.data) {
+                setData(res.data);
+                return res.data;
+            } else setData([]);
+        }).catch((res) => {
+            console.error(res);
+        })
+    })
     const customStyles = {
         control: (baseStyles, state) => ({
             display: "flex",
@@ -189,6 +254,17 @@ const SearchDetail = () => {
             primary25: '#81D4FA',
             primary: 'blue',
         },
+    })
+    const findMutate = useMutation({
+        mutationFn: (type) => computedService.find(type, page, 12).then((res) => {
+            if (res.data) {
+                console.log(res.data);
+                setData(res.data);
+                return res.data;
+            } else setData([]);
+        }).catch((res) => {
+            console.error(res);
+        })
     })
 
     return (
@@ -234,7 +310,7 @@ const SearchDetail = () => {
                                 }}
                                 onChange={val => {
                                     setNeww(val);
-                                    handleChange("new");
+                                    handleChange("new", val);
                                 }}
                                 className={`flex flex-grow items-center justify-center ${filter == "new" ? "text-yellow-500" : "text-black"}  cursor-pointer bg-gray-50`}
                                 theme={customTheme}
@@ -249,7 +325,7 @@ const SearchDetail = () => {
                                 }}
                                 onChange={val => {
                                     setRead(val);
-                                    handleChange("read");
+                                    handleChange("read", val);
                                 }}
                                 className={`flex flex-grow items-center justify-center ${filter === "read" ? "text-yellow-500" : "text-black"}  cursor-pointer bg-gray-50`}
                                 theme={customTheme}
@@ -264,7 +340,7 @@ const SearchDetail = () => {
                                 }}
                                 onChange={val => {
                                     setRate(val);
-                                    handleChange("rate");
+                                    handleChange("rate", val);
                                 }}
                                 className={`flex flex-grow items-center justify-center ${filter === "rate" ? "text-yellow-500" : "text-black"}  cursor-pointer bg-gray-50`}
                                 theme={customTheme}
@@ -279,7 +355,7 @@ const SearchDetail = () => {
                                 }}
                                 onChange={val => {
                                     setNomination(val);
-                                    handleChange("nomination");
+                                    handleChange("nomination", val);
                                 }}
                                 className={`ml-3 flex flex-grow items-center justify-center ${filter === "nomination" ? "text-yellow-500" : "text-black"}  cursor-pointer bg-gray-50`}
                                 theme={customTheme}
@@ -294,7 +370,7 @@ const SearchDetail = () => {
                         </div>
                     </div>
                     <div className='p-4 w-full'>
-                        <div className=' pb-4 grid grid-cols-2 col-span-2 gap-4 max-w-full justify-start'>
+                        {data?.pageBook?.content?.length > 0 ? <div className=' pb-4 grid grid-cols-2 col-span-2 gap-4 max-w-full justify-start'>
                             {data?.pageBook?.content?.map((item) => {
                                 return (
                                     <div key={item.id} className='flex text-start w-full mt-3 max-h-52 p-3 shadow-md'>
@@ -307,8 +383,39 @@ const SearchDetail = () => {
                                             <Link to={"/details/" + item.id}>
                                                 <h3 className="cursor-pointer font-semibold hover:text-blue-500">{item.title}</h3>
                                             </Link>
-                                            <div className="mt-2 flex-wrap w-60 flex items-center gap-1">
+                                            <div className="mt-2 flex-wrap flex items-center gap-1">
                                                 <span className="line-clamp-3 ml-1">{item?.shortDescription}</span>
+                                            </div>
+                                            <div className='flex mt-1'>
+                                                {filter === "read" ? <div className='flex items-center gap-1'>
+                                                    <IonIcon icon={eyeOutline} />
+                                                    <p className='ml-2'>{item?.bookComputed?.read}</p>
+                                                </div> : filter === "rate" ? rate.value === "ratePoint" ? <div className='flex items-center gap-1'>
+                                                    <GoStarFill />
+                                                    <p className='ml-2'>{item?.bookComputed?.rate}</p>
+                                                </div> : <div className='flex items-center gap-1'>
+                                                    <MdOutlineAutoGraph className='text-yellow-700' />
+                                                    <p className='ml-2'>{item?.bookComputed?.rateCount}</p>
+                                                </div> : filter === "nomination" ? <div className='flex items-center gap-1'>
+                                                    <PiFlowerTulipThin className='text-pink-600' />
+                                                    <p className='ml-2'>{item?.bookComputed?.nominated}</p>
+                                                </div> : filter === "save" ? <div className='flex items-center gap-1'>
+                                                    <IonIcon className='text-red-500' icon={bookmarkSharp} />
+                                                    <p className='ml-2'>{item?.bookComputed?.save}</p>
+                                                </div> : filter === "love" ? <div className='flex items-center gap-1'>
+                                                    <IonIcon className='text-pink-400' icon={heartSharp} />
+                                                    <p className='ml-2'>{item?.bookComputed?.love}</p>
+                                                </div> : filter === "comment" ? <div className='flex items-center gap-1'>
+                                                    <FaRegCommentDots />
+                                                    <p className='ml-2'>{item?.bookComputed?.comment}</p>
+                                                </div> : filter === "new" && neww.value === "newCreate" ? <div className='flex items-center gap-1'>
+                                                    <LuCalendarDays />
+                                                    <p className='ml-2'>{item?.createdAt ? formatTimeDifference(item?.createdAt) + "" : <></>}</p>
+                                                </div> : <div className='flex items-center gap-1'>
+                                                    <LuCalendarDays />
+                                                    <p className='ml-2'>{item?.updateDate ? formatTimeDifference(item?.updateDate) + "" : <></>}</p>
+                                                </div>
+                                                }
                                             </div>
                                             <div className='flex items-center justify-between w-full mt-3'>
                                                 <div className="flex max-w-28 items-center">
@@ -325,32 +432,33 @@ const SearchDetail = () => {
                                     </div>
                                 );
                             })}
-                        </div>
+                        </div> : <><h2>Không tìm thấy kết quả</h2></>}
                     </div>
                     <div className='p-4 w-full mt-5'>
-                        <div className='flex gap-1 justify-center items-center'>
-                            <div className='cursor-pointer p-2 px-4 hover:bg-yellow-500 rounded-md text-center'>
-                                <FontAwesomeIcon icon={faChevronLeft} />
-                            </div>
-                            <div className='gap-2 flex '>
-                                {searchData?.pageNumbers?.map((page) => {
-                                    return (
-                                        <div key={page} onClick={() => handlePage(page)} className={`${pagee === page ? "bg-yellow-500 " : " "} cursor-pointer p-2 px-4 hover:bg-yellow-500 rounded-md`}>{page}</div>
-                                    );
-                                })}
-                            </div>
-                            <div className='cursor-pointer p-2 px-4 hover:bg-yellow-500 rounded-md text-center'>
-                                <FontAwesomeIcon icon={faChevronRight} />
-                            </div>
-                            <div className='p-1 px-2 rounded-md text-center'>
-                                <input onChange={(e) => setPage(e.target.value)} className='focus:border-yellow-500 border border-gray-400 focus:outline-none rounded-md p-2 max-w-20' type="number" min={1} max={data?.totalPages} value={pagee} />
-                            </div>
-                            <div className='p-1 px-2 rounded-md text-center'>
-                                <button onClick={() => handlePage(pagee)} className='bg-white border hover:bg-yellow-500 hover:text-white border-yellow-500 text-yellow-500 p-2 rounded-md'>
-                                    Đến trang
-                                </button>
-                            </div>
-                        </div>
+                        {data?.pageNumbers > 1 &&
+                            <div className='flex gap-1 justify-center items-center'>
+                                <div className='cursor-pointer p-2 px-4 hover:bg-yellow-500 rounded-md text-center'>
+                                    <FontAwesomeIcon icon={faChevronLeft} />
+                                </div>
+                                <div className='gap-2 flex '>
+                                    {data?.pageNumbers?.map((page) => {
+                                        return (
+                                            <div key={page} onClick={() => handlePage(page)} className={`${pagee === page ? "bg-yellow-500 " : " "} cursor-pointer p-2 px-4 hover:bg-yellow-500 rounded-md`}>{page}</div>
+                                        );
+                                    })}
+                                </div>
+                                <div className='cursor-pointer p-2 px-4 hover:bg-yellow-500 rounded-md text-center'>
+                                    <FontAwesomeIcon icon={faChevronRight} />
+                                </div>
+                                <div className='p-1 px-2 rounded-md text-center'>
+                                    <input onChange={(e) => setPage(e.target.value)} className='focus:border-yellow-500 border border-gray-400 focus:outline-none rounded-md p-2 max-w-20' type="number" min={1} max={data?.totalPages} value={pagee} />
+                                </div>
+                                <div className='p-1 px-2 rounded-md text-center'>
+                                    <button onClick={() => handlePage(pagee)} className='bg-white border hover:bg-yellow-500 hover:text-white border-yellow-500 text-yellow-500 p-2 rounded-md'>
+                                        Đến trang
+                                    </button>
+                                </div>
+                            </div>}
                     </div>
                 </div>
             </div>

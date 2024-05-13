@@ -26,7 +26,7 @@ function NewBook(data, rates) {
                             <div key={item.id} className='flex text-start w-full mt-5 max-h-52 border-b p-2 border-gray-200'>
                                 <div className='w-24 h-32 ml-2'>
                                     <Link to={`/details/${item?.id}`}>
-                                        <img width="5rem" height="6rem" className='w-full h-full object-cover' src={item.image} alt='img book' />
+                                        <img width="5rem" height="6rem" className='w-full h-full object-cover' src={item?.image ? item?.image : "avatarBook.jpg"} alt='img book' />
                                     </Link>
                                 </div>
                                 <div className='ml-3 w-full'>
@@ -70,7 +70,7 @@ function NewBook(data, rates) {
                             <div key={item.id} className='flex max-h-12 justify-between w-full mt-2 p-4 border border-gray-200 min-h-20 '>
                                 <div className='flex mt-2'>
                                     <div className='h-12'>
-                                        <img className='w-full h-full cursor-pointer' src={item.image} />
+                                        <img className='w-full h-full cursor-pointer' src={item?.image ? item?.image : "avatarBook.jpg"} />
                                     </div>
                                     <div className="ml-2">
                                         <h3 className="cursor-pointer">{item.name}</h3>

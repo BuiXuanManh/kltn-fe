@@ -27,7 +27,10 @@ function HotBook(data, rates) {
                             <div className='h-80 mx-3 border border-gray-200' key={item.id} >
                                 <div className='relative w-full'>
                                     <Link to={"/details/" + item.id}>
-                                        <img className='h-80 cursor-pointer' src={item.image} alt={"book " + item.id} />
+                                        <img className='h-80 cursor-pointer' src={item?.image ? item?.image : "avatarBook.jpg"} alt={"book " + item.id} />
+                                        {!item?.image && <div className='-mt-44 font-semibold flex text-center justify-center w-full'>
+                                            <p>{item?.title}</p>
+                                        </div>}
                                         <div className='bg-red-500 cursor-pointer p-2 absolute rounded-md top-2 left-2 text-white'>
                                             {rates.map((rate) => {
                                                 if (rate.id === index + 1) {

@@ -2,6 +2,9 @@ import api from "../api/api";
 import AuthService from "./AuthService";
 
 export default class PageService {
+    postInteraction(pageId) {
+        return api.post(`/api/pages/interactions/create/${pageId}`);
+    }
     getPageByBookIdAndPageNo(bookId, pageNo) {
         return api.get(`/api/pages/${bookId}/${pageNo}`);
     }

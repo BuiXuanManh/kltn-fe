@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Select from "react-select"
 import AddPage from './AddPage';
 import RunChat from '../../../../google';
@@ -87,7 +87,7 @@ const AddBook = () => {
         if (selectGenres.length === 0) return message.error("Vui lòng chọn thể loại", 2)
         if (shortDescription.trim() === "" || !shortDescription) return message.error("Vui lòng nhập tóm tắt mô tả", 2)
         if (longDescription.trim() === "" || !longDescription) return message.error("Vui lòng nhập mô tả", 2)
-        setBook({ id: id ? id : "", title, genres: mapOptionToGenre(selectGenres), shortDescription, longDescription })
+        setBook({ id: id ? id : "", title, genres: mapOptionToGenre(selectGenres), shortDescription, longDescription, image: avatar, bgImage: background })
         setShowPage(!showPage);
     }
     const [loading, setLoading] = useState(false)
@@ -110,6 +110,8 @@ const AddBook = () => {
         setSelectGenres([]);
         setShortDescription('');
         setLongDescription('');
+        setAvatar('');
+        setBackground('');
         setShowPage(false);
     }
     let service = new BookService();
@@ -118,8 +120,7 @@ const AddBook = () => {
         mutationFn: (title) => {
             service.findByTitle(title).then((res) => {
                 if (res.data) {
-                    console.log(res.data);
-                    setFindBooks(res.data);
+                    setFindBooks(res.data.pageBook.content);
                 }
             }).catch((error) => {
                 console.error(error);
@@ -132,26 +133,45 @@ const AddBook = () => {
         else
             findBok.mutate(title)
     }, [title])
-    const [isInputFocused, setIsInputFocused] = useState(false);
-
-    const handleInputFocus = () => {
-        setIsInputFocused(true);
-    };
-
-    const handleInputBlur = () => {
-        setFindBooks([])
-        setIsInputFocused(false);
-    };
-
+    const [avatar, setAvatar] = useState('');
+    const [background, setBackground] = useState('');
     const handleGetBook = (book) => {
         setId(book?.id);
         setTitle(book?.title);
         setAuthor(book?.authors ? book?.authors[0]?.name : '');
+        setAvatar(book?.image);
+        setBackground(book?.bgImage);
         setShortDescription(book?.shortDescription);
         setLongDescription(book?.longDescription);
         setSelectGenres(mapGenresToOptions(book?.genres));
         setFindBooks([]);
         setFindBooks(null)
+    }
+    const avatarRef = useRef();
+    const handleChangeAvatar = () => {
+        avatarRef.current.click();
+    }
+    const uploadImageAvatar = () => {
+        const file = avatarRef.current.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            console.log('called: ', reader.result)
+            setAvatar(reader.result);
+        };
+        reader.readAsDataURL(file);
+    }
+    const bgRef = useRef();
+    const handleChangeBg = () => {
+        bgRef.current.click();
+    }
+    const uploadImageBg = () => {
+        const file = bgRef.current.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setBackground(reader.result);
+        };
+        reader.readAsDataURL(file);
+
     }
     return (
         <div className=' md:mr-10 -ml-20' >
@@ -176,6 +196,26 @@ const AddBook = () => {
                             </div>
                         </div>
                         <div className=' pb-1 mb-4 pt-5s mt-5 rounded-lg dark:!bg-navy-800 dark:text-white'>
+                            <div className='w-full flex relative'>
+                                <div onClick={() => handleChangeBg()} className='w-[78%]'>
+                                    <img src={background ? background : "bookBg.png"} className='w-full' alt="" />
+                                    <input accept='image/*' ref={bgRef} onChange={() => uploadImageBg()} type="file" className='hidden' />
+                                    <div className='flex justify-center'>
+                                        <div className='mt-3 font-semibold'>
+                                            Ảnh nền sách
+                                        </div>
+                                    </div>
+                                </div>
+                                <div onClick={() => handleChangeAvatar()} className='w-[20%] absolute right-0 bottom-0'>
+                                    <img src={avatar ? avatar : "avatarBook.jpg"} className='' alt="" />
+                                    <input accept='image/*' ref={avatarRef} onChange={() => uploadImageAvatar()} type="file" className='hidden' />
+                                    <div className='flex justify-center'>
+                                        <div className='mt-3 font-semibold'>
+                                            Ảnh đại diện sách
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div className='grid grid-cols-4 mt-4 items-center'>
                                 <div className='col-span-1'>
                                     <div className='ml-6'>

@@ -50,7 +50,7 @@ function NominatedBook(data) {
                             <div key={item.id} className='flex text-start w-full min-w-0 max-h-52 p-2 border border-gray-200'>
                                 <div className='w-24 h-28 ml-2 cursor-pointer'>
                                     <Link to={`/details/${item?.id}`}>
-                                        <img width="5rem" height="6rem" className='w-full h-full object-cover' src={item?.image} alt='img book' />
+                                        <img width="5rem" height="6rem" className='w-full h-full object-cover' src={item?.image ? item?.image : "avatarBook.jpg"} alt='img book' />
                                     </Link>
                                 </div>
                                 <div className='ml-3 w-full'>
@@ -84,18 +84,13 @@ function NominatedBook(data) {
                             <div key={item.id} className='flex text-start w-full mt-5 max-h-30 p-4 border border-gray-200'>
                                 <div className='w-10 h-12'>
                                     <Link to={`/details/${item?.id}`}>
-                                        <img className='w-full h-full cursor-pointer object-cover' src={item.image} width="2.5rem" height="3rem" alt='img book' />
+                                        <img className='w-full h-full cursor-pointer object-cover' src={item.image ? item?.image : "avatarBook.jpg"} width="2.5rem" height="3rem" alt='img book' />
                                     </Link>
                                 </div>
                                 <div className='ml-3'>
                                     <Link to={`/details/${item?.id}`}>
                                         <h3 className="cursor-pointer hover:text-blue-500">{item.title}</h3>
                                     </Link>
-                                    {/* {item.genres?.map((genre) => {
-                                        return (
-                                            <div key={genre} >{genre}</div>
-                                        )
-                                    })} */}
                                     <div>{item?.genres[0]?.name}</div>
                                 </div>
                             </div>
@@ -107,19 +102,13 @@ function NominatedBook(data) {
                                     <div key={item.id} className='flex text-start w-full mt-5 max-h-30 p-4 border border-gray-200'>
                                         <div className='w-10 h-12'>
 
-                                            <img className='w-full h-full cursor-pointer object-cover' src={item?.book?.image} width="2.5rem" height="3rem" alt='img book' />
+                                            <img className='w-full h-full cursor-pointer object-cover' src={item?.book?.image ? item?.book?.image : "avatarBook.jpg"} width="2.5rem" height="3rem" alt='img book' />
                                         </div>
                                         <div className="flex justify-center w-full">
                                             <div className='ml-3 w-48'>
                                                 <Link to={`/details/${item?.book?.id}`}>
                                                     <h3 className="cursor-pointer font-semibold hover:text-blue-500 truncate">{item?.book?.title}</h3>
                                                 </Link>
-                                                {/* {item.genres?.map((genre) => {
-                                        return (
-                                            <div key={genre} >{genre}</div>
-                                        )
-                                    })} */}
-
                                                 <div className="mt-1 flex text-gray-500 text-sm">
                                                     <div>Đã đọc:</div>
                                                     <div className="ml-2">{item?.readCount}</div>

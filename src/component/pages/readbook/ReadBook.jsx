@@ -28,6 +28,7 @@ import useAddComputedInteractionBook from '../../../hook/useAddComputedInteracti
 import useAddComputedPageBook from '../../../hook/useAddComputedPageBook';
 import useAddComputedCommentBook from '../../../hook/useAddComputedCommentBook';
 import useAddComputedRateBook from '../../../hook/useAddComputedRateBook';
+import { toast } from 'react-toastify';
 const ReadBook = () => {
     const { token, setInteractions, profile, setComputedBook, computedPage, setComputedPage } = useContext(AppContext);
     const { mutate: addPage } = useAddComputedInteractionBook();
@@ -91,6 +92,7 @@ const ReadBook = () => {
         queryKey: ['page', id, pageNoo],
         queryFn: () => pageService.getPageByBookIdAndPageNo(id, pageNoo).then((res) => {
             if (res?.data) {
+                console.log(res.data);
                 setPage(res.data);
                 return res.data;
             }
@@ -99,6 +101,20 @@ const ReadBook = () => {
         }),
         enabled: id !== undefined && pageNoo !== undefined
     });
+    const postInteraction = useMutation({
+        mutationFn: () => pageService.postInteraction(page?.id).then((res) => {
+            if (res?.data) {
+                handleAddPage(page?.id);
+                setIsPage(true);
+                setInteractions(res.data);
+                handleAddComPageBook(page?.book?.id);
+                return res.data;
+            }
+        })
+            .catch((err) => {
+                console.error(err);
+            })
+    })
     useEffect(() => {
         if (pageNo) {
             setPageNo(pageNo);
@@ -109,6 +125,11 @@ const ReadBook = () => {
             handleAddPage(page?.id);
         }
     }, [page])
+    useEffect(() => {
+        if (token === "" || token === undefined) {
+            postInteraction.mutate();
+        }
+    }, [token])
     const processedContent = page?.content?.split('.').map((sentence, index) => (
         <React.Fragment key={index}>
             {sentence.trim()}
@@ -133,16 +154,20 @@ const ReadBook = () => {
     }
     const updateBookInteraction = useQuery({
         queryKey: ["interaction", profile?.id, page?.book?.id],
-        queryFn: () => service.updateBookInteraction(token, page?.book?.id, page?.id, pageNoo).then((res) => {
-            if (res?.data) {
-                handleAddPage(page?.id)
-                setIsPage(true);
-                setInteractions(res.data);
-                return res.data;
+        queryFn: () => {
+            if (token !== undefined && token !== "" && token !== null && page?.book?.id !== undefined && page?.id !== undefined && pageNoo !== undefined) {
+                service.updateBookInteraction(token, page?.book?.id, page?.id, pageNoo).then((res) => {
+                    if (res?.data) {
+                        handleAddPage(page?.id)
+                        setIsPage(true);
+                        setInteractions(res.data);
+                        return res.data;
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                })
             }
-        }).catch((error) => {
-            console.error(error);
-        }),
+        },
         onSuccess: () => {
             handleAddComPage(page?.book?.id);
         },
@@ -166,15 +191,19 @@ const ReadBook = () => {
     const [rate, setRate] = useState(1);
     const getRate = useQuery({
         queryKey: ["getRate", page?.id],
-        queryFn: () => pageService.getRatePage(token, page?.id).then((res) => {
-            if (res.data) {
-                console.log(res.data);
-                setRate(res.data.rate);
-                return res.data;
+        queryFn: () => {
+            if (token !== undefined && token !== "" && token !== null) {
+                pageService.getRatePage(token, page?.id).then((res) => {
+                    if (res.data) {
+                        console.log(res.data);
+                        setRate(res.data.rate);
+                        return res.data;
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                })
             }
-        }).catch((error) => {
-            console.error(error);
-        }).enabled = page.id !== undefined && rate === 1 && !isPage && token !== undefined && token !== ""
+        }, enabled: page.id !== undefined && rate === 1 && !isPage && token !== undefined && token !== ""
     })
     let audioService = new AudioService();
     const [audio, setAudio] = useState(null);
@@ -267,9 +296,7 @@ const ReadBook = () => {
                     console.error(error);
                 })
             else {
-                setTimeout(() => {
-                    message.error("Nhập nội dung bình luận", 2);
-                }, 0);
+                toast.error("Nhập nội dung bình luận");
             }
         }
     })

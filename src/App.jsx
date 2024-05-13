@@ -34,7 +34,7 @@ function App() {
               <ToastContainer />
               <Navbar />
               <Router />
-              {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+              <ReactQueryDevtools initialIsOpen={false} />
               <Footer />
             </ThemeProvider>
           </QueryClientProvider>

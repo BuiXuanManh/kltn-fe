@@ -8,14 +8,17 @@ export default class BookService {
     findByTitle(title) {
         return api.get(`/api/books/title/${title}`);
     }
-    getBooks(page, size) {
+    getBooks(page, size, field) {
+        return api.get(`/api/books/getAll?field=${String(field)}&page=${page}&size=${size}`);
+    }
+    getNewBooks(page, size) {
         return api.get(`/api/books/get/new?page=${page}&size=${size}`);
     }
     getBookById(id) {
         return api.get(`/api/books/${id}`);
     }
-    getBookByGenres(genres, page, size) {
-        return api.post(`/api/books/genres?page=${page}&size=${size}`, genres);
+    getBookByGenres(genres, dto, page, size) {
+        return api.post(`/api/books/genres?page=${page}&size=${size}`, { genres: genres, dto: dto });
     }
     updateBookInteraction(token, bookId, pageId, page) {
         return api.post(`/api/books/interactions/read/${bookId}/${pageId}/${page}`, {}, AuthService(token));
@@ -32,8 +35,8 @@ export default class BookService {
     findInteraction(token, bookId) {
         return api.get(`/api/books/interaction/${bookId}`, AuthService(token));
     }
-    findBook(keyword) {
-        return api.get(`/api/books/find/${keyword}`);
+    findBook(keyword, page, size) {
+        return api.get(`/api/books/find/keyword?keyword=${keyword}&page=${page}&size=${size}`);
     }
     follow(token, bookId) {
         return api.post(`/api/books/follow/${bookId}`, {}, AuthService(token));

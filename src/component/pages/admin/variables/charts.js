@@ -3,7 +3,7 @@ const date = Date.now()
 const days = [];
 const getDays = () => {
   for (let i = 0; i < 6; i++) {
-    days.push(moment(date).subtract(i + 1, 'days').format('DD/MM')); // Tính toán và thêm ngày vào mảng
+    days.push(moment(date).subtract(i, 'days').format('DD/MM')); // Tính toán và thêm ngày vào mảng
   }
   return days.reverse();
 }
@@ -162,20 +162,20 @@ export const pieChartOptions = {
 
 export const pieChartData = [63, 25, 12];
 
-export const barChartDataWeeklyRevenue = [
+export const barChartDataWeeklyRevenue = (emo, comment, rate) => [
   {
     name: "Cảm xúc",
-    data: [400, 370, 330, 390, 320, 350],
+    data: emo,
     color: "#6AD2Fa",
   },
   {
     name: "Bình luận",
-    data: [400, 370, 330, 390, 320, 350],
+    data: comment,
     color: "#4318FF",
   },
   {
     name: "Đánh giá",
-    data: [400, 370, 330, 390, 320, 350],
+    data: rate,
     color: "#FFED8A",
   },
 ];
@@ -270,19 +270,18 @@ export const barChartOptionsWeeklyRevenue = {
   },
 };
 
-export const lineChartDataTotalSpent = [
+export const lineChartDataTotalSpent = (readList, emoList) => [
   {
     name: "lượt đọc",
-    data: [50, 64, 48, 66, 49, 68],
+    data: readList,
     color: "#4318FF",
   },
   {
-    name: "cảm xúc",
-    data: [30, 40, 24, 46, 20, 46],
+    name: "đề cử",
+    data: emoList,
     color: "#6AD2FF",
   },
 ];
-
 export const lineChartOptionsTotalSpent = {
   legend: {
     show: false,
@@ -294,9 +293,9 @@ export const lineChartOptionsTotalSpent = {
   chart: {
     type: "line",
 
-    toolbar: {
-      show: false,
-    },
+    // toolbar: {
+    //   show: false,
+    // },
   },
 
   dataLabels: {

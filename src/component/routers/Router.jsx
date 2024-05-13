@@ -20,7 +20,7 @@ const Router = () => {
     useEffect(() => {
         const fetchBooks = async () => {
             try {
-                const res = await bookService.getBooks(1, 12);
+                const res = await bookService.getBooks(1, 12, "new");
                 setData(res.data);
             } catch (err) {
                 console.log(err);

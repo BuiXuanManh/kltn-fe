@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import Card from "./card";
 import BarChart from "./charts/BarChart";
 import {
@@ -5,8 +6,48 @@ import {
   barChartOptionsWeeklyRevenue,
 } from "./variables/charts";
 import { MdBarChart } from "react-icons/md";
+import { useState } from "react";
+import ComputedService from "../../service/ComputedService";
 
 const WeeklyRevenue = () => {
+  const [emoList, setEmoList] = useState([]);
+  const [rateList, setRateList] = useState([]);
+  const [commentList, setCommentList] = useState([]);
+  let service = new ComputedService();
+  const getEmo = useQuery({
+    queryKey: ["emoList"],
+    queryFn: () => service.getEmo().then((res) => {
+      if (res.data) {
+        setEmoList(res.data);
+        return res.data;
+      }
+    }).catch((err) => {
+      console.error(err);
+    })
+  })
+  const getRate = useQuery({
+    queryKey: ["rateList"],
+    queryFn: () => service.getRate().then((res) => {
+      if (res.data) {
+        setRateList(res.data);
+        return res.data;
+      }
+    }).catch((err) => {
+      console.error(err);
+    })
+  })
+  const getComment = useQuery({
+    queryKey: ["commentList"],
+    queryFn: () => service.getComment().then((res) => {
+      if (res.data) {
+        setCommentList(res.data);
+        return res.data;
+      }
+    }).catch((err) => {
+      console.error(err);
+    })
+  })
+  console.log(emoList)
   return (
     <Card extra="flex flex-col bg-white w-full rounded-3xl py-6 px-2 text-center">
       <div className="mb-auto flex items-center justify-between px-6">
@@ -21,7 +62,7 @@ const WeeklyRevenue = () => {
       <div className="md:mt-16 lg:mt-0">
         <div className="h-[250px] w-full xl:h-[350px]">
           <BarChart
-            chartData={barChartDataWeeklyRevenue}
+            chartData={barChartDataWeeklyRevenue(emoList, commentList, rateList)}
             chartOptions={barChartOptionsWeeklyRevenue}
           />
         </div>
