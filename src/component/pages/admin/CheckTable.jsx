@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import CardMenu from "./card/CardMenu";
 import Checkbox from "./checkbox";
 import Card from "./card";
@@ -9,13 +9,13 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
+import NominatedBookService from "../../service/NominatedBookService";
+import { useQuery } from "@tanstack/react-query";
 
 const CheckTable = (props) => {
   const { columnsData, tableData } = props;
-
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => tableData, [tableData]);
-
   const tableInstance = useTable(
     {
       columns,
@@ -49,7 +49,7 @@ const CheckTable = (props) => {
       <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
         <table
           {...getTableProps()}
-          className="w-full"
+          className="w-full table-auto border-collapse "
           // variant="simple"
           color="gray-500"
         // mb="24px"
@@ -71,11 +71,11 @@ const CheckTable = (props) => {
               </tr>
             ))}
           </thead>
-          <tbody {...getTableBodyProps()}>
+          <tbody {...getTableBodyProps()} className="">
             {page.map((row, index) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()} key={index}>
+                <tr {...row.getRowProps()} key={index} className="hover:bg-gray-100">
                   {row.cells.map((cell, index) => {
                     let data = "";
                     if (cell.column.Header === "STT") {
@@ -97,20 +97,13 @@ const CheckTable = (props) => {
                           </p>
                         </div>
                       );
-                    } else if (cell.column.Header === "Cảm xúc") {
+                    } else if (cell.column.Header === "Lượt đề cử") {
                       data = (
-                        <div className="flex items-center">
-                          <p className="text-sm font-bold text-navy-700 dark:text-white">
+                        <div className="flex items-center text-center ">
+                          <p className="text-sm w-full text-center font-bold text-navy-700 dark:text-white">
                             {cell.value}
                           </p>
                         </div>
-                      );
-                    } else if (cell.column.Header === "Lượt đọc") {
-                      data = (
-                        <p className="text-sm font-bold text-navy-700 dark:text-white">
-                          {" "}
-                          {cell.value}{" "}
-                        </p>
                       );
                     } else if (cell.column.Header === "Ngày thêm") {
                       data = (

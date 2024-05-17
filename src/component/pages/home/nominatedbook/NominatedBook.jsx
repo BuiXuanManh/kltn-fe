@@ -97,34 +97,36 @@ function NominatedBook(data) {
                         );
                     }) : <div>
                         {
-                            interactions?.map((item) => {
-                                return (
-                                    <div key={item.id} className='flex text-start w-full mt-5 max-h-30 p-4 border border-gray-200'>
-                                        <div className='w-10 h-12'>
-
-                                            <img className='w-full h-full cursor-pointer object-cover' src={item?.book?.image ? item?.book?.image : "avatarBook.jpg"} width="2.5rem" height="3rem" alt='img book' />
-                                        </div>
-                                        <div className="flex justify-center w-full">
-                                            <div className='ml-3 w-48'>
-                                                <Link to={`/details/${item?.book?.id}`}>
-                                                    <h3 className="cursor-pointer font-semibold hover:text-blue-500 truncate">{item?.book?.title}</h3>
-                                                </Link>
-                                                <div className="mt-1 flex text-gray-500 text-sm">
-                                                    <div>Đã đọc:</div>
-                                                    <div className="ml-2">{item?.readCount}</div>
-                                                    <div>/ {item?.book?.pageCount}</div>
-                                                    <div className='flex items-center ml-2 hover:text-red-500'>
-                                                        <FontAwesomeIcon className='' icon={faTrash} />
+                            interactions?.length > 0 && interactions?.map((item) => {
+                                if (item?.book?.pageCount > 0) {
+                                    return (
+                                        <div key={item.id} className='flex text-start w-full mt-5 max-h-30 p-4 border border-gray-200'>
+                                            <div className='w-10 h-12'>
+                                                <img className='w-full h-full cursor-pointer object-cover' src={item?.book?.image ? item?.book?.image : "avatarBook.jpg"} width="2.5rem" height="3rem" alt='img book' />
+                                            </div>
+                                            <div className="flex justify-center w-full">
+                                                <div className='ml-3 w-48'>
+                                                    <Link to={`/details/${item?.book?.id}`}>
+                                                        <h3 className="cursor-pointer font-semibold hover:text-blue-500 truncate">{item?.book?.title}</h3>
+                                                    </Link>
+                                                    <div className="mt-1 flex text-gray-500 text-sm">
+                                                        <div>Đã đọc:</div>
+                                                        <div className="ml-2">{item?.readCount}</div>
+                                                        <div>/ {item?.book?.pageCount}</div>
+                                                        <div className='flex items-center ml-2 hover:text-red-500'>
+                                                            <FontAwesomeIcon className='' icon={faTrash} />
+                                                        </div>
                                                     </div>
                                                 </div>
-
+                                                <Link to={`/details/read/${item?.book?.id}/${item?.readCount}`}>
+                                                    <div className='p-1 items-start text-start text-orange-500 text-sm cursor-pointer font-medium'>Đọc tiếp</div>
+                                                </Link>
                                             </div>
-                                            <Link to={`/details/read/${item?.book?.id}/${item?.readCount}`}>
-                                                <div className='p-1 items-start text-start text-orange-500 text-sm cursor-pointer font-medium'>Đọc tiếp</div>
-                                            </Link>
                                         </div>
-                                    </div>
-                                );
+                                    );
+                                } else {
+                                    return <></>;
+                                }
                             })
                         }
                     </div>}

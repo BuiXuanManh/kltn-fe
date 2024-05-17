@@ -23,13 +23,18 @@ const SignIn = () => {
         queryKey: ["token"],
         queryFn: async () => {
             if (mssv && password) {
-                const data = await service.login({ mssv, password });
-                console.log(data)
-                if (data.data) {
-                    setToken(data.data.accessToken);
-                    setMssvContext(mssv);
-                    return data.data;
+                try {
+                    const data = await service.login({ mssv, password });
+                    console.log(data)
+                    if (data.data) {
+                        setToken(data.data.accessToken);
+                        setMssvContext(mssv);
+                        return data.data;
+                    }
+                } catch (error) {
+                    console.error(error);
                 }
+
             }
 
         },

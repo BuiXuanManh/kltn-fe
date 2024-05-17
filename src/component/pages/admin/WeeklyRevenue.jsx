@@ -5,10 +5,9 @@ import {
   barChartDataWeeklyRevenue,
   barChartOptionsWeeklyRevenue,
 } from "./variables/charts";
-import { MdBarChart } from "react-icons/md";
 import { useState } from "react";
 import ComputedService from "../../service/ComputedService";
-
+import Chart from 'react-apexcharts';
 const WeeklyRevenue = () => {
   const [emoList, setEmoList] = useState([]);
   const [rateList, setRateList] = useState([]);
@@ -18,6 +17,7 @@ const WeeklyRevenue = () => {
     queryKey: ["emoList"],
     queryFn: () => service.getEmo().then((res) => {
       if (res.data) {
+        console.log(res.data);
         setEmoList(res.data);
         return res.data;
       }
@@ -29,7 +29,6 @@ const WeeklyRevenue = () => {
     queryKey: ["rateList"],
     queryFn: () => service.getRate().then((res) => {
       if (res.data) {
-        setRateList(res.data);
         return res.data;
       }
     }).catch((err) => {
@@ -47,23 +46,22 @@ const WeeklyRevenue = () => {
       console.error(err);
     })
   })
-  console.log(emoList)
   return (
     <Card extra="flex flex-col bg-white w-full rounded-3xl py-6 px-2 text-center">
       <div className="mb-auto flex items-center justify-between px-6">
         <h2 className="text-lg font-bold text-navy-700 dark:text-white">
-          Weekly Revenue
+          Cảm xúc / Bình luận/ Đánh giá
         </h2>
-        <button className="!linear z-[1] flex items-center justify-center rounded-lg bg-lightPrimary p-2 text-brand-500 !transition !duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10">
-          <MdBarChart className="h-6 w-6" />
-        </button>
       </div>
 
       <div className="md:mt-16 lg:mt-0">
         <div className="h-[250px] w-full xl:h-[350px]">
-          <BarChart
-            chartData={barChartDataWeeklyRevenue(emoList, commentList, rateList)}
-            chartOptions={barChartOptionsWeeklyRevenue}
+          <Chart
+            options={barChartOptionsWeeklyRevenue}
+            series={barChartDataWeeklyRevenue(emoList, commentList, rateList)}
+            type="bar"
+            width="100%"
+            height="100%"
           />
         </div>
       </div>

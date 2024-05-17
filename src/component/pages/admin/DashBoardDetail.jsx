@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TotalSpent from "./TotalSpent";
 import PieChartCard from "./PieChartCard";
 import { IoBookSharp } from "react-icons/io5";
@@ -12,12 +12,15 @@ import WeeklyRevenue from "./WeeklyRevenue";
 import { chatbubbleEllipsesSharp, eyeSharp, heartSharp } from "ionicons/icons";
 import { IonIcon } from "@ionic/react";
 import { HiUsers } from "react-icons/hi";
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import ComputedService from '../../service/ComputedService';
+import NominatedBookService from '../../service/NominatedBookService';
+import AdminService from '../../service/AdminService';
 
 const DashBoardDetail = () => {
     const [totalComputed, setTotalComputed] = useState();
     let service = new ComputedService();
+    const [tableData, setTableData] = useState([]);
     const getTotal = useQuery({
         queryKey: 'totalComputed',
         queryFn: () => service.getTotal().then((res) => {
@@ -27,8 +30,28 @@ const DashBoardDetail = () => {
             }
         })
     })
+    const [nominatedBooks, setNominatedBooks] = useState([]);
+    let nominatedService = new NominatedBookService();
+    let adminService= new AdminService();
+    const getNominatedBooks = useQuery({
+        queryKey: ['nominatedBooks'],
+        queryFn: () => nominatedService.getNominatedBook().then((res) => {
+            if (res.data) {
+                console.log(nominatedBooks)
+                setNominatedBooks(res.data);
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        })
+    })
+    useEffect(() => {
+        if (nominatedBooks.length > 0) {
+            setTableData(tableDataCheck(nominatedBooks));
+        }
+    }, [nominatedBooks])
     return (
-        <div className="-ml-20 pt-5s h-full min-h-[84vh] md:pr-10">
+        <div className="-ml-20 pt-5s h-full min-h-[84vh] md:pr-10 mb-20">
             <div className='' >
                 <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-6">
                     <Widget
@@ -68,13 +91,13 @@ const DashBoardDetail = () => {
                 </div>
                 <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
                     <div>
-                        <CheckTable
+                        {tableData.length > 0 && <CheckTable
                             columnsData={columnsDataCheck}
-                            tableData={tableDataCheck}
-                        />
+                            tableData={tableData}
+                        />}
                     </div>
                     <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">
-                        <DailyTraffic />
+                        <DailyTraffic userCount={totalComputed?.activeUser} />
                         <PieChartCard />
                     </div>
                     <div className="grid grid-cols-1 gap-5 rounded-[20px] md:grid-cols-2">

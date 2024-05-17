@@ -13,6 +13,8 @@ import CommentService from '../../../service/CommentService';
 import RateHandle from '../../../../rateHandle/RateHandle';
 import formatTimeDifference from '../../../service/DateService';
 import useAddComputedRateBook from '../../../../hook/useAddComputedRateBook';
+import useAddComputedCommentBook from '../../../../hook/useAddComputedCommentBook';
+import { toast } from 'react-toastify';
 
 const Reviews = ({ pageNumber, id }) => {
     const { token, computedBook, setComputedBook, profile } = useContext(AppContext);
@@ -104,10 +106,51 @@ const Reviews = ({ pageNumber, id }) => {
     useEffect(() => {
         isDisable();
     }, [usefulness, contentBook, understandability, content, rateData, rates])
+    const [childrens, setChildrens] = useState({});
+    const addComment = useMutation({
+        mutationFn: (content) => {
+            if (content !== "") {
+                commentService.addCommentRate(token, id, content?.content, content?.id).then((res) => {
+                    if (res.data) {
+                        setContent("");
+                        setRates(prevComments => [res.data, ...prevComments]);
+                        getRates.refetch();
+                        if (res.data.parent?.id) {
+                            setChildrens(prevChildrens => {
+                                const updatedChildren = [...(prevChildrens[res.data.parent.id] || []), res.data];
+                                return {
+                                    ...prevChildrens,
+                                    [res.data.parent.id]: updatedChildren
+                                };
+                            });
+                        }
+
+                        return res.data;
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                });
+            } else {
+                toast.error("Nhập nội dung bình luận");
+            }
+        }
+    });
     const handleKeyPress = (e) => {
         if (e.key === "Enter") {
             handleAddRate();
         }
+    }
+    const handleKey = (e, id) => {
+        if (id !== undefined && id !== "" && id !== null && id !== "") {
+            if (e.key === "Enter") {
+                addComment.mutate({ content: e.target.value, id: id });
+                // handleAddRate(id);
+            }
+        }
+        else if (e.key === "Enter") {
+            addComment.mutate({ content: e.target.value });
+        }
+
     }
     const [test, setTest] = useState(false);
     const getRates = useQuery({
@@ -122,7 +165,64 @@ const Reviews = ({ pageNumber, id }) => {
             console.error(err);
         }), enabled: rates.length === 0 && !test
     })
-    console.log(rates)
+    const postHandleLike = useMutation({
+        mutationFn: (id) => {
+            if (token !== undefined && token !== "" && token !== null) {
+                commentService.handleLike(token, id).then((res) => {
+                    if (res.data) {
+                        // getRates.refetch();
+                        const updatedComment = res.data;
+                        const updatedComments = rates.map(comment =>
+                            comment.id === updatedComment.id ? updatedComment : comment
+                        );
+
+                        setChildrens(prevChildrens => {
+                            const updatedChildrens = { ...prevChildrens }; // Tạo bản sao mới của childrens
+
+                            // Tìm comment cha chứa bình luận con vừa được like
+                            for (const parentId in prevChildrens) {
+                                const updatedChildren = prevChildrens[parentId]?.map(child =>
+                                    child.id === updatedComment.id ? updatedComment : child
+                                );
+
+                                if (updatedChildren) {
+                                    updatedChildrens[parentId] = updatedChildren; // Cập nhật danh sách con nếu tìm thấy
+                                    break; // Thoát vòng lặp khi đã tìm thấy
+                                }
+                            }
+
+                            return updatedChildrens;
+                        });
+                        setRates(updatedComments);
+                        getRates.refetch()
+                        return updatedComment;
+                    }
+                }).catch((err) => {
+                    console.error(err);
+                })
+            } else toast.error("Vui lòng đăng nhập");
+        }
+    })
+    const handleLike = (id) => {
+        postHandleLike.mutate(id);
+    }
+    const [showReply, setShowReply] = useState({});
+    const handleShowReply = (id) => {
+        handleShowChild(id)
+        setShowReply(prevShowReply => ({
+            ...prevShowReply,
+            [id]: !prevShowReply[id]
+        }));
+    };
+    const handleShowChild = (id) => {
+        const filteredChildren = rates.filter(comment => comment?.parent?.id === id);
+        setChildrens(prevChildrens => ({
+            ...prevChildrens,
+            [id]: filteredChildren
+        }));
+    };
+    useEffect(() => {
+    }, [rates, showReply])
     return (
         <div>
             <div className='mt-4 grid grid-cols-3 '>
@@ -185,60 +285,101 @@ const Reviews = ({ pageNumber, id }) => {
                         </div>
                     </div>
                     {rates?.length > 0 && <><div className='mt-10 w-full flex justify-end border-x-0 border-t-0 border p-2'>
-                        <select className='h-9 px-2 border border-solid'>
-                            <option value="Newest">Mới nhất</option>
-                            <option value="Like">Lượt thích</option>
-                            <option value="Oldest">Cũ nhất</option>
-                        </select>
                     </div>
                         <div className='grid border-b-1 border border-gray-200 border-x-0 border-t-0'>
                             <div className='w-full'>
                                 {rates?.map((i, index) => (
-                                    <div key={index} className='flex'>
-                                        <div>
-                                            <Avatar src="" sx={{ width: 60, height: 60 }} />
-                                        </div>
-                                        <div className='ml-4 w-full'>
+                                    <>{!i?.parent?.id ?
+                                        <div key={index} className='flex'>
+                                            <div>
+                                                <Avatar src="" sx={{ width: 60, height: 60 }} />
+                                            </div>
+                                            <div className='ml-4 w-full'>
 
-                                            <div key={index} className='w-full rounded-xl pb-4 pr-5'>
-                                                <div className='font-semibold'>{i?.profile?.firstName} {i?.profile?.lastName}</div>
-                                                <div className='text-sm flex text-gray-500 gap-10'>
-                                                    <div className='text-yellow-500'>
-                                                        <RateHandle rate={i.rate} />
-                                                    </div>
-                                                    <div>
-                                                        <FontAwesomeIcon icon={faGlasses} />
-                                                        <span className='ml-2'>Trang {i?.pageBook?.pageNo} </span>
-                                                    </div>
-                                                    <div>
-                                                        <FontAwesomeIcon icon={faClock} />
-                                                        <span className='ml-2'>{i?.createAt ? formatTimeDifference(i?.createAt) + "" : <></>}</span>
-                                                    </div>
-                                                </div>
-                                                <div className='mt-2'>{i?.content}</div>
-                                                <div className='flex mt-10 justify-end gap-6 text-gray-600'>
-                                                    <div className='flex gap-2'>
-                                                        <div>
-                                                            <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
+                                                <div key={index} className='w-full rounded-xl pb-4 pr-5'>
+                                                    <div className='font-semibold'>{i?.profile?.firstName} {i?.profile?.lastName}</div>
+                                                    <div className='text-sm flex text-gray-500 gap-10'>
+                                                        <div className='text-yellow-500'>
+                                                            <RateHandle rate={i.rate} />
                                                         </div>
-                                                        <div>0</div>
-                                                    </div>
-                                                    <div className='flex gap-2'>
+                                                        {/* <div>
+                                                            <FontAwesomeIcon icon={faGlasses} />
+                                                            <span className='ml-2'>Trang {i?.pageBook?.pageNo} </span>
+                                                        </div> */}
                                                         <div>
-                                                            <FontAwesomeIcon className='text-gray-400' icon={faReply} />
+                                                            <FontAwesomeIcon icon={faClock} />
+                                                            <span className='ml-2'>{i?.createAt ? formatTimeDifference(i?.createAt) + "" : <></>}</span>
                                                         </div>
-                                                        <div>Trả lời</div>
                                                     </div>
-                                                    <div className='flex gap-2'>
-                                                        <div>
-                                                            <FontAwesomeIcon className='text-gray-400' icon={faFlag} />
+                                                    <div className='mt-2'>{i?.content}</div>
+                                                    <div className='flex mt-10 justify-end gap-6 text-gray-600'>
+                                                        <div onClick={() => handleLike(i?.id)} className='flex gap-2 cursor-pointer'>
+                                                            {i?.liker?.find(l => l?.id === profile?.id) ? <div className='flex items-center'>
+                                                                <img src="like.png" alt="" className='w-6 h-6 cursor-pointer' />
+                                                            </div>
+                                                                : <div className='flex items-center'>
+                                                                    <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
+                                                                </div>}
+                                                            <div>{i?.liker ? i?.liker?.length : 0}</div>
                                                         </div>
-                                                        <div>Báo xấu</div>
+                                                        <div onClick={() => handleShowReply(i?.id)} className='flex gap-2 cursor-pointer'>
+                                                            <div>
+                                                                <FontAwesomeIcon className='text-gray-400' icon={faReply} />
+                                                            </div>
+                                                            <div>{i?.childrenCount ? i?.childrenCount : 0} Trả lời</div>
+                                                        </div>
                                                     </div>
+                                                    {showReply[i?.id] && <div className='m-4'>
+                                                        {i?.childrenCount > 0 && (
+                                                            <div className='grid border-b-1 border border-gray-200 border-x-0 border-t-0'>
+                                                                <div className='w-full'>
+                                                                    {childrens[i?.id].map((child, key) => (
+                                                                        <div key={key} className='flex mt-5 border-b-2 border-gray-50'>
+                                                                            <div>
+                                                                                <Avatar src="" sx={{ width: 60, height: 60 }} />
+                                                                            </div>
+                                                                            <div className='ml-4 w-full'>
+                                                                                <div key={key} className='w-full rounded-xl pb-4 pr-5'>
+                                                                                    <div className='font-semibold'>{child?.profile?.firstName} {child?.profile?.lastName}</div>
+                                                                                    <div className='text-sm flex text-gray-500 gap-10'>
+                                                                                        <div >{i?.createAt ? formatTimeDifference(i?.createAt) + "" : <></>}</div>
+                                                                                    </div>
+                                                                                    <div className='mt-2'>{child?.content}</div>
+                                                                                    <div className='flex justify-end gap-6 text-gray-600'>
+                                                                                        <div onClick={() => handleLike(child?.id)} className='flex gap-2 cursor-pointer'>
+                                                                                            {child?.liker?.find(l => l?.id === profile?.id) ? (
+                                                                                                <div className='flex items-center'>
+                                                                                                    <img src="like.png" alt="" className='w-6 h-6 cursor-pointer' />
+                                                                                                </div>
+                                                                                            ) : (
+                                                                                                <div className='flex items-center'>
+                                                                                                    <FontAwesomeIcon className='text-gray-400' icon={faThumbsUp} />
+                                                                                                </div>
+                                                                                            )}
+                                                                                            <div>{child?.liker ? child?.liker?.length : 0}</div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        <div className='flex w-full my-10 border-b-2 border border-gray-50 border-x-0 border-t-0 pb-4'>
+                                                            <div>
+                                                                <Avatar src="" sx={{ width: 60, height: 60 }} />
+                                                            </div>
+                                                            <div className='ml-4 w-full'>
+                                                                <input onKeyPress={(e) => handleKey(e, i?.id)} placeholder='Nhập bình luận của bạn ...' className='w-full h-16 rounded-xl bg-gray-200 focus:outline-none focus:ring focus:ring-indigo-500 px-4 py-2' />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>))}
+                                        : <></>}</>))}
                             </div >
                         </div></>}
                 </div>

@@ -87,7 +87,9 @@ const AddBook = () => {
         if (selectGenres.length === 0) return message.error("Vui lòng chọn thể loại", 2)
         if (shortDescription.trim() === "" || !shortDescription) return message.error("Vui lòng nhập tóm tắt mô tả", 2)
         if (longDescription.trim() === "" || !longDescription) return message.error("Vui lòng nhập mô tả", 2)
-        setBook({ id: id ? id : "", title, genres: mapOptionToGenre(selectGenres), shortDescription, longDescription, image: avatar, bgImage: background })
+        if (id && id !== "")
+            setBook({ id: id ? id : "", title, genres: mapOptionToGenre(selectGenres), shortDescription, longDescription, image: avatar, bgImage: background })
+        else setBook({ title, genres: mapOptionToGenre(selectGenres), shortDescription, longDescription, image: avatar, bgImage: background })
         setShowPage(!showPage);
     }
     const [loading, setLoading] = useState(false)

@@ -1,6 +1,12 @@
 import api from "../api/api";
 
 export default class ComputedService {
+    getGenres() {
+        return api.get(`/api/computed/books/genres`);
+    }
+    getUser() {
+        return api.get(`/api/computed/books/user/date`);
+    }
     getComment() {
         return api.get(`/api/computed/books/comment/date`);
     }

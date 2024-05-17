@@ -1,3 +1,4 @@
+import { book } from 'ionicons/icons';
 import moment from 'moment';
 const date = Date.now()
 const days = [];
@@ -7,41 +8,11 @@ const getDays = () => {
   }
   return days.reverse();
 }
-export const tableDataCheck =
-  [
-    {
-      "stt": 1,
-      "name": "Marketplace",
-      "read": 200,
-      "date": "12-12-2022",
-      "emotion": 400
-    },
-    {
-      "stt": 2,
-      "name": "Marketplace",
-      "read": 200,
-      "date": "12-12-2022",
-      "emotion": 400
-    },
-    {
-      "stt": 3,
-      "name": "Marketplace",
-      "read": 200,
-      "date": "12-12-2022",
-      "emotion": 400
-    },
-    {
-      "stt": 4,
-      "name": "Marketplace",
-      "read": 200,
-      "date": "12-12-2022",
-      "emotion": 400
-    },
-    {
-      "stt": 5,
-      "name": "Marketplace",
-      "read": 200,
-      "date": "12-12-2022",
-      "emotion": 400
-    },
-  ]
+export const tableDataCheck = (nominatedBook) =>
+  nominatedBook?.map((book, index) => ({
+    stt: index + 1,
+    name: book?.nominatedBook?.book?.title,
+    nominate: book?.nominated,
+    date: book?.nominatedBook?.updateAt
+  }));
+

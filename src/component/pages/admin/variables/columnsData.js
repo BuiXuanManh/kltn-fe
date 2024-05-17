@@ -27,12 +27,8 @@ export const columnsDataCheck = [
     accessor: "name",
   },
   {
-    Header: "Cảm xúc",
-    accessor: "emotion",
-  },
-  {
-    Header: "Lượt đọc",
-    accessor: "read",
+    Header: "Lượt đề cử",
+    accessor: "nominate",
   },
   {
     Header: "Ngày thêm",
@@ -50,12 +46,8 @@ export const columnsDataColumns = [
     accessor: "name",
   },
   {
-    Header: "Cảm xúc",
-    accessor: "emotion",
-  },
-  {
-    Header: "Lượt đọc",
-    accessor: "read",
+    Header: "Lượt đề cử",
+    accessor: "nominate",
   },
   {
     Header: "Ngày thêm",

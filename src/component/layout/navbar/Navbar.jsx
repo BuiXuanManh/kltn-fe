@@ -43,7 +43,7 @@ export default function Navbar() {
   };
 
   const handleInputBlur = () => {
-    setFindBooks([])
+    // setFindBooks([])
     setIsInputFocused(false);
     setShowFind(false);
   };
@@ -64,7 +64,7 @@ export default function Navbar() {
       .then((res) => {
         if (res.data) {
           setFindBooks(res.data.pageBook.content);
-          setShowFind(true);
+          // setShowFind(true);
           return res.data.pageBook.content;
         }
       })
@@ -74,7 +74,7 @@ export default function Navbar() {
     onError: () => {
       setFindBooks([]);
       setShowFind(false);
-    }, enabled: showFind
+    }
   });
   const divBorderClassName = isInputFocused ? "tblue" : "gray-200";
   const handleDetails = (id) => {
@@ -109,6 +109,11 @@ export default function Navbar() {
       setShowFind(true);
     }
   }, [location.pathname, keyword, showFind]);
+  useEffect(() => {
+    if (keyword === "") {
+      setShowFind(false);
+    }
+  })
   return (
     <>
       {
@@ -144,8 +149,8 @@ export default function Navbar() {
                   className="h-7 bg-white focus:outline-none px-4 py-2 border-none rounded-full"
                   type="text"
                   placeholder="Tìm kiếm"
-                  // onFocus={handleInputFocus}
-                  // onBlur={handleInputBlur}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
                   onKeyPress={handleKeyPress}
                 />
               </div>

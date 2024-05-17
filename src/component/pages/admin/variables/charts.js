@@ -7,10 +7,10 @@ const getDays = () => {
   }
   return days.reverse();
 }
-export const barChartDataDailyTraffic = [
+export const barChartDataDailyTraffic = (userList) => [
   {
-    name: "Số lượng tạo",
-    data: [20, 30, 40, 20, 45, 50],
+    name: "Số lượng user",
+    data: userList,
   },
 ];
 
@@ -116,11 +116,15 @@ export const barChartOptionsDailyTraffic = {
   },
 };
 
-export const pieChartOptions = {
-  labels: ["Your files", "System", "Empty"],
-  colors: ["#4318FF", "#6AD2FF", "#EFF4FB"],
+export const pieChartOptions = (name) => ({
+  labels: name,
+  colors: ["#4318FF", "#6AD2FF", "#FFED8A", "#EAE4D3"],
   chart: {
     width: "50px",
+    stacked: true,
+    toolbar: {
+      show: true,
+    },
   },
   states: {
     hover: {
@@ -139,15 +143,13 @@ export const pieChartOptions = {
   plotOptions: {
     donut: {
       expandOnClick: false,
-      donut: {
-        labels: {
-          show: false,
-        },
+      labels: {
+        show: false,
       },
     },
   },
   fill: {
-    colors: ["#4318FF", "#6AD2FF", "#EFF4FB"],
+    colors: ["#4318FF", "#6AD2FF", "#FFED8A", "#EAE4D3"],
   },
   tooltip: {
     enabled: true,
@@ -155,27 +157,27 @@ export const pieChartOptions = {
     style: {
       fontSize: "12px",
       fontFamily: undefined,
-      backgroundColor: "#000000"
+      backgroundColor: "#000000",
     },
   },
-};
+});
 
-export const pieChartData = [63, 25, 12];
 
-export const barChartDataWeeklyRevenue = (emo, comment, rate) => [
+export const pieChartData = (percent) => percent;
+export const barChartDataWeeklyRevenue = (emoList, commentList, rateList) => [
   {
     name: "Cảm xúc",
-    data: emo,
+    data: emoList,
     color: "#6AD2Fa",
   },
   {
     name: "Bình luận",
-    data: comment,
+    data: commentList,
     color: "#4318FF",
   },
   {
     name: "Đánh giá",
-    data: rate,
+    data: rateList,
     color: "#FFED8A",
   },
 ];
@@ -183,9 +185,9 @@ export const barChartDataWeeklyRevenue = (emo, comment, rate) => [
 export const barChartOptionsWeeklyRevenue = {
   chart: {
     stacked: true,
-    toolbar: {
-      show: false,
-    },
+    // toolbar: {
+    //   show: false,
+    // },
   },
   // colors:['#ff3322','#faf']
   tooltip: {
