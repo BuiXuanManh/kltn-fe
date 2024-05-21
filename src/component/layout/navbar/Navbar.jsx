@@ -207,13 +207,13 @@ export default function Navbar() {
                               Profile
                             </Link>
                             <Link onClick={() => showSettingHandle()} to={"/changPass/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
-                              Dôi mât khâu
+                              Đổi mật khẩu
                             </Link>
                             <Link onClick={() => showSettingHandle()} to={"/history/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
-                              Lích sử đọc
+                              Lịch sử đọc
                             </Link>
                             <a onClick={(e) => handleLogout(e)} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
-                              Đăng xuât
+                              Đăng xuất
                             </a>
                           </div>
 

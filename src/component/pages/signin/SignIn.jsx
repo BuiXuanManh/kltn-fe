@@ -34,6 +34,19 @@ const SignIn = () => {
                         return data.data;
                     }
                 } catch (error) {
+                    if (error.response.status === 401) {
+                        swal({
+                            title: "Sai thông tin đăng nhập",
+                            // text: "You have pressed the button!",
+                            icon: "error"
+                        });
+                    } else if (error.response.status === 403) {
+                        swal({
+                            title: "Tài khoản của bạn đã bị khóa",
+                            // text: "You have pressed the button!",
+                            icon: "error"
+                        });
+                    }
                     console.error(error);
                 }
 

@@ -12,7 +12,7 @@ import swal from "sweetalert";
 
 const NominatedBook = ({ data }) => {
     let icon = new IconGlobal();
-    const { token, setToken, profile, interactions, setInteractions } = useContext(AppContext);
+    const { token, setToken, mssv, profile, interactions, setInteractions } = useContext(AppContext);
     const [inter, isInter] = useState(false);
     let service = new BookService();
     const getInteraciton = useQuery({
@@ -77,7 +77,7 @@ const NominatedBook = ({ data }) => {
                 <div className='px-4 grid grid-cols-1 w-full border border-gray-200'>
                     <div className='flex justify-between'>
                         <h3 className='p-3 items-start text-start'>Đang đọc</h3>
-                        <Link to='/1/search/new/' className='p-3 items-start text-start text-orange-500 text-sm cursor-pointer font-medium'>Xem tất cả</Link>
+                        <Link to={`/history/${mssv}`} className='p-3 items-start text-start text-orange-500 text-sm cursor-pointer font-medium'>Xem tất cả</Link>
                     </div>
                 </div>
             </div>
