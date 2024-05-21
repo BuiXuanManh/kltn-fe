@@ -32,8 +32,8 @@ import { toast } from 'react-toastify';
 import formatTimeDifference from '../../service/DateService';
 const ReadBook = () => {
     const { token, setInteractions, profile, setComputedBook, computedPage, setComputedPage } = useContext(AppContext);
+
     const { mutate: addPage } = useAddComputedInteractionBook();
-    const { mutate: mutatePage } = useAddComputedPage();
     const handleAddComPage = (id) => {
         addPage(id, {
             onSuccess: (newBook) => {
@@ -58,6 +58,8 @@ const ReadBook = () => {
             }
         });
     };
+    const { id, pageNo } = useParams();
+    const { mutate: mutatePage } = useAddComputedPage();
     const handleAddPage = (id) => {
         mutatePage(id, {
             onSuccess: (newPage) => {
@@ -65,13 +67,11 @@ const ReadBook = () => {
             }
         });
     };
-    const { id, pageNo } = useParams();
     let computedService = new ComputedService();
     const getComputedPage = useQuery({
         queryKey: ['computedPage', id],
         queryFn: () => computedService.getComputedPage(id).then((res) => {
             if (res.data) {
-                console.log(res.data);
                 setComputedPage(res.data);
                 return res.data;
             }
@@ -86,51 +86,70 @@ const ReadBook = () => {
     let icon = new IconGlobal();
     let service = new BookService();
     let pageService = new PageService();
-    const [pageNoo, setPageNo] = useState(pageNo);
+    // const [pageNo, setPageNo] = useState(pageNo);
     const [page, setPage] = useState({});
     const [isPage, setIsPage] = useState(false);
+    const [pageCount, setPageCount] = useState(0);
     const getPage = useQuery({
-        queryKey: ['page', id, pageNoo],
-        queryFn: () => pageService.getPageByBookIdAndPageNo(id, pageNoo).then((res) => {
-            if (res?.data) {
-                console.log(res.data);
-                setPage(res.data);
-                return res.data;
-            }
-        }).catch((err) => {
-            console.error(err.message);
-        }),
-        enabled: id !== undefined && pageNoo !== undefined
+        queryKey: ['page', id, pageNo],
+        queryFn: () => {
+            pageService.getPageByBookIdAndPageNo(id, pageNo).then((res) => {
+                if (res?.data) {
+                    setPage(res.data);
+                    if (pageNo > 0 && pageNo <= res.data?.book?.pageCount)
+                        setPageCount(res.data?.book?.pageCount);
+                    else {
+                        toast.error("Không tìm thấy trang");
+                    }
+                    return res.data;
+                }
+            }).catch((err) => {
+                console.error(err.message);
+            })
+        }
     });
     const postInteraction = useMutation({
-        mutationFn: () => pageService.postInteraction(page?.id).then((res) => {
-            if (res?.data) {
-                handleAddPage(page?.id);
-                setIsPage(true);
-                setInteractions(res.data);
-                handleAddComPageBook(page?.book?.id);
-                return res.data;
-            }
-        })
-            .catch((err) => {
-                console.error(err);
-            })
+        mutationFn: () => {
+            if (page?.id !== undefined && page?.id !== null && page?.id !== "" && page?.book?.id !== undefined && page?.book?.id !== "" && page?.book?.id !== null && page?.book?.id !== "")
+                pageService.postInteraction(page?.id).then((res) => {
+                    if (res?.data) {
+                        handleAddPage(page?.id);
+                        setIsPage(true);
+                        setInteractions(res.data);
+                        handleAddComPageBook(page?.book?.id);
+                        return res.data;
+                    }
+                })
+                    .catch((err) => {
+                        console.error(err);
+                    })
+        }
     })
     useEffect(() => {
-        if (pageNo) {
-            setPageNo(pageNo);
-        }
+        // if (pageNo > 0 && pageNo< page?.book?.pageCount) {
+        //     setPageNo(pageNo);
+        // }
+        // if (pageCount > 0 && pageNo < pageCount) {
+        //     setPageNo(pageCount);
+        // }
+        // if (pageCount > 0) {
+        //     if (pageCount <= 0 && pageNo >= pageCount) {
+        //         toast.error("Không tìm thấy trang");
+        //         navigate("/")
+        //     }
+        // }
     }, [pageNo, id])
     useEffect(() => {
-        if (page?.id !== "" && page?.id !== undefined && page?.id !== "") {
+        if (pageNo > 0 && page?.id != undefined && page?.id !== "" && page?.id !== null)
             handleAddPage(page?.id);
-        }
-    }, [page])
+    }, [pageNo])
     useEffect(() => {
         if (token === "" || token === undefined) {
             postInteraction.mutate();
         }
-    }, [token])
+        updateBookInteraction.mutate()
+        getPage.refetch()
+    }, [])
     const processedContent = page?.content?.split('.').map((sentence, index) => (
         <React.Fragment key={index}>
             {sentence.trim()}
@@ -141,23 +160,22 @@ const ReadBook = () => {
     const queryClient = useQueryClient();
     const handlePrePage = (e) => {
         e.preventDefault();
-        if (pageNoo > 1) {
-            const no = Number(pageNoo) - 1;
+        if (pageNo > 1) {
+            const no = Number(pageNo) - 1;
             navigate(`/details/read/${id}/${Number(no)}`);
         }
     }
     const handleNextPage = (e) => {
         e.preventDefault();
-        if (pageNoo < page?.book?.pageCount) {
-            const no = Number(pageNoo) + 1;
+        if (pageNo < page?.book?.pageCount) {
+            const no = Number(pageNo) + 1;
             navigate(`/details/read/${id}/${Number(no)}`);
         }
     }
-    const updateBookInteraction = useQuery({
-        queryKey: ["interaction", profile?.id, page?.book?.id],
-        queryFn: () => {
-            if (token !== undefined && token !== "" && token !== null && page?.book?.id !== undefined && page?.id !== undefined && pageNoo !== undefined) {
-                service.updateBookInteraction(token, page?.book?.id, page?.id, pageNoo).then((res) => {
+    const updateBookInteraction = useMutation({
+        mutationFn: () => {
+            if (token !== undefined && token !== "" && token !== null && page?.book?.id !== undefined && page?.id !== undefined && pageNo !== undefined) {
+                service.updateBookInteraction(token, page?.book?.id, page?.id, pageNo).then((res) => {
                     if (res?.data) {
                         handleAddPage(page?.id)
                         setIsPage(true);
@@ -168,32 +186,14 @@ const ReadBook = () => {
                     console.error(error);
                 })
             }
-        },
-        onSuccess: () => {
-            handleAddComPage(page?.book?.id);
-        },
-        enabled: token !== undefined && token != "" && profile?.id !== undefined && page?.book?.id !== undefined && id != undefined && !isPage,
+        }
     });
-    const [pages, setPages] = useState([]);
-    const [pageCount, setPageCount] = useState(0);
-    const getPages = useQuery({
-        queryKey: ['pages', id],
-        queryFn: () => pageService.getPagesByBookId(id).then((res) => {
-            if (res.data) {
-                setPages(res.data);
-                setPageCount(res.data.length);
-                return res.data;
-            }
-        }).catch((err) => {
-            console.error(err);
-        }),
-        enabled: !!pages,
-    })
+
     const [rate, setRate] = useState(1);
     const getRate = useQuery({
         queryKey: ["getRate", page?.id],
         queryFn: () => {
-            if (token !== undefined && token !== "" && token !== null) {
+            if (token !== undefined && token !== "" && token !== null && pageNo > 0 && pageNo <= page?.book?.pageCount) {
                 pageService.getRatePage(token, page?.id).then((res) => {
                     if (res.data) {
                         console.log(res.data);
@@ -204,7 +204,7 @@ const ReadBook = () => {
                     console.error(error);
                 })
             }
-        }, enabled: page.id !== undefined && rate === 1 && !isPage && token !== undefined && token !== ""
+        }
     })
     let audioService = new AudioService();
     const [audio, setAudio] = useState(null);
@@ -246,25 +246,35 @@ const ReadBook = () => {
     ]
     const [interactionPage, setInteractionPage] = useState();
     useEffect(() => {
-        updateBookInteraction.refetch();
-    }, [pageNoo, audio]);
+        if (pageNo !== undefined && pageNo > 0 && page?.id !== undefined && pageNo <= page?.book?.pageCount)
+            updateBookInteraction.mutate();
+    }, [pageNo, audio, page]);
     const [isHover, setIsHover] = useState(null);
     const handleMouseLeave = () => setIsHover(null);
     const handleClose = () => setShow("");
     const handleBack = () => navigate(`/details/${id}`);
     const getInteraction = useQuery({
         queryKey: ["interactionPage", profile?.id, page?.id],
-        queryFn: () => pageService.getInteractionPage(token, page?.id).then((res) => {
-            if (res?.data) {
-                console.log(res.data);
-                setIsPage(true);
-                setInteractionPage(res.data);
-                return res.data;
-            }
-        }).catch((error) => {
-            console.error(error);
-        }).enabled = page.id !== "" && profile.id !== undefined && !isPage && token !== undefined && token !== ""
+        queryFn: () => {
+            if (page.id !== "" && profile.id !== undefined && !isPage && token !== undefined && token !== "" && pageNo > 0 && page?.id !== undefined)
+                pageService.getInteractionPage(token, page?.id).then((res) => {
+                    if (res?.data) {
+                        console.log(res.data);
+                        setIsPage(true);
+                        setInteractionPage(res.data);
+                        return res.data;
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                })
+        }
     })
+    useEffect(() => {
+        if (page?.id !== undefined && page?.id !== "" && token !== undefined && token !== "" && token !== null) {
+            getInteraction.refetch();
+            getRate.refetch();
+        }
+    }, [page])
     const [comments, setComments] = useState([]);
     let commentService = new CommentService();
     const getComment = useQuery({
@@ -281,9 +291,6 @@ const ReadBook = () => {
                 }).catch((error) => {
                     console.error(error);
                 })
-            // else {
-            //     toast.error("Không tìm thấy trang");
-            // }
         }
     })
 
@@ -433,10 +440,10 @@ const ReadBook = () => {
                         {/* header page */}
                         <div className='mt-5 flex mx-20 justify-between'>
                             <div className=''>
-                                <button disabled={Number(pageNoo) === 1} onClick={(e) => handlePrePage(e)} className={`rounded-3xl px-8 h-10  ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center1`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
+                                <button disabled={Number(pageNo) === 1} onClick={(e) => handlePrePage(e)} className={`rounded-3xl px-8 h-10  ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center1`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
                             </div>
                             <div className=''>
-                                <button disabled={Number(pageNoo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`rounded-3xl px-8 h-10 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
+                                <button disabled={Number(pageNo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`rounded-3xl px-8 h-10 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
                             </div>
                         </div>
                         <div className='mt-5 '>
@@ -500,7 +507,7 @@ const ReadBook = () => {
                     <div className='mt-4 mx-48 border bg-[#EAE4D3] border-white h-25 rounded-md'>
                         <div className='mx-16 flex gap-10  py-10'>
                             <div className='w-[45%] h-full'>
-                                <button disabled={Number(pageNoo) === 1} onClick={(e) => handlePrePage(e)} className={`w-full px-8 h-10 ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
+                                <button disabled={Number(pageNo) === 1} onClick={(e) => handlePrePage(e)} className={`w-full px-8 h-10 ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
                             </div>
                             <div className='justify-center text-center h-full items-center w-[10%]'>
                                 <button className='px-8 h-10 bg-[#F0ECDF] justify-center items-center'>
@@ -508,7 +515,7 @@ const ReadBook = () => {
                                 </button>
                             </div>
                             <div className='w-[45%] h-full justify-end flex'>
-                                <button disabled={Number(pageNoo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`ml-auto w-full px-8 h-10 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"}`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
+                                <button disabled={Number(pageNo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`ml-auto w-full px-8 h-10 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"}`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
                             </div>
                         </div>
                     </div>
@@ -630,10 +637,10 @@ const ReadBook = () => {
                                 <IonIcon className='w-7 h-7' icon={menuSharp} />
                                 {isHover === "pages" && (
                                     <div
-                                        className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                        className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-tblack py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
                                         role="tooltip" >
                                         <span
-                                            className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                            className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-tblack border-t border-r border-gray-300"></span>
                                         Danh sách trang
                                     </div>
                                 )}
@@ -646,10 +653,10 @@ const ReadBook = () => {
                                 <IonIcon className='w-6 h-6' icon={settingsOutline} />
                                 {isHover === "setting" && (
                                     <div
-                                        className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                        className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-tblack py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
                                         role="tooltip"  >
                                         <span
-                                            className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                            className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-tblack border-t border-r border-gray-300"></span>
                                         Cài đặt
                                     </div>
                                 )}
@@ -662,10 +669,10 @@ const ReadBook = () => {
                                 <IonIcon className='w-6 h-6' icon={arrowBack} />
                                 {isHover === "back" && (
                                     <div
-                                        className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                        className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-tblack py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
                                         role="tooltip"  >
                                         <span
-                                            className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                            className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-tblack border-t border-r border-gray-300"></span>
                                         Trở về trang thông tin sách
                                     </div>
                                 )}
@@ -711,10 +718,10 @@ const ReadBook = () => {
                                             <IonIcon className='w-7 h-7' icon={heartOutline} />}
                                     {isHover === "emotion" && (
                                         <div
-                                            className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                            className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-tblack py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
                                             role="tooltip"  >
                                             <span
-                                                className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                                className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-tblack border-t border-r border-gray-300"></span>
                                             Cảm xúc
                                         </div>
                                     )}
@@ -727,10 +734,10 @@ const ReadBook = () => {
                                     {show === "save" ? <FontAwesomeIcon className='w-7 h-7' icon={faCheck} /> : <IonIcon className='w-7 h-7' icon={bookmarkOutline} />}
                                     {isHover === "save" && (
                                         <div
-                                            className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                            className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-tblack py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
                                             role="tooltip"  >
                                             <span
-                                                className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                                className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-tblack border-t border-r border-gray-300"></span>
                                             Lưu trữ
                                         </div>
                                     )}
@@ -742,10 +749,10 @@ const ReadBook = () => {
                                     <IonIcon className='w-7 h-7' icon={chatbubblesOutline} />
                                     {isHover === "comment" && (
                                         <div
-                                            className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-black py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
+                                            className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-tblack py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
                                             role="tooltip"  >
                                             <span
-                                                className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-black border-t border-r border-gray-300"></span>
+                                                className="absolute -right-1.5 top-1/2 -z-10 h-3 w-3 -translate-y-1/2 rotate-45 rounded-sm bg-tblack border-t border-r border-gray-300"></span>
                                             Xem bình luận
                                         </div>
                                     )}

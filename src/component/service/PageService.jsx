@@ -2,6 +2,9 @@ import api from "../api/api";
 import AuthService from "./AuthService";
 
 export default class PageService {
+    getInteractionByMark(token) {
+        return api.get(`/api/pages/interactions/mark`, AuthService(token));
+    }
     postInteraction(pageId) {
         return api.post(`/api/pages/interactions/create/${pageId}`);
     }

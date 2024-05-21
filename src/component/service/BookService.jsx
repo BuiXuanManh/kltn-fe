@@ -2,6 +2,21 @@ import api from "../api/api";
 import AuthService from "./AuthService";
 
 export default class BookService {
+    deleteInteraction(token, interactionId) {
+        return api.post(`/api/books/interaction/delete/${interactionId}`, {}, AuthService(token));
+    }
+    getNominateTotal(page, size) {
+        return api.get(`/api/books/nominate/total?page=${page}&size=${size}`);
+    }
+    geNewTotal(page, size) {
+        return api.get(`/api/books/new/total?page=${page}&size=${size}`);
+    }
+    findByRaterecent() {
+        return api.get(`/api/books/rate/recent?page=1&size=12`);
+    }
+    getInteractionsBySave(token) {
+        return api.get(`/api/books/interactions/save`, AuthService(token));
+    }
     saveBook(token, book, author) {
         return api.post(`/api/books/save?author=${author}`, book, AuthService(token));
     }

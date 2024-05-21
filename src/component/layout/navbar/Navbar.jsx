@@ -11,6 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Skeleton } from "@mui/material";
 import { AppContext } from "../../../context/AppContext";
 import BookService from "../../service/BookService";
+import AccountService from "../../service/AccountService";
 export default function Navbar() {
   const { token, setToken, mssv, profile, setProfile, setInteractions } = useContext(AppContext);
   const [showMenu, setShowMenu] = useState(false);
@@ -32,9 +33,10 @@ export default function Navbar() {
     setName("");
     setProfile({});
     setShowSetting(false);
-    setInteractions({})
-    queryClient.removeQueries(["token"]);
-    queryClient.removeQueries(["profile"]);
+    setInteractions([])
+    Cookies.remove("token");
+    Cookies.remove("profile");
+    Cookies.remove("mssv");
   }
   const [isInputFocused, setIsInputFocused] = useState(false);
 
@@ -50,7 +52,7 @@ export default function Navbar() {
   const [keyword, setKeyWord] = useState("");
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      navigate("/1/search/" + keyword);
+      navigate("/1/search/new/" + keyword);
       setFindBooks([]);
       setShowFind(false)
     }
@@ -97,7 +99,6 @@ export default function Navbar() {
     const parts = location.pathname.split('/');
     const page = parts[1];
     const search = parts[2];
-
     if (search === 'search') {
       setFindBooks([]);
       setShowFind(false);
@@ -113,11 +114,11 @@ export default function Navbar() {
     if (keyword === "") {
       setShowFind(false);
     }
-  })
+  }, [keyword])
   return (
     <>
       {
-        <div className={`${location.pathname === "/admin" ? "ml-[17rem]" : ""} bg-white shadow-md !z-50 border`}>
+        < div className={`${location.pathname === "/admin" ? "ml-[17rem]" : ""} bg-white shadow-md !z-50 border`}>
           <div className="mx-auto py-4 flex justify-between items-center ml-10 font-semibold">
             <div className="flex ml-10 space-x-10">
               <div onClick={() => handleBack()}>
@@ -125,18 +126,22 @@ export default function Navbar() {
                   <span className=" w-15 h-10">
                     <img src="logo.png" className=" bg-white w-15 h-10" width={60} height={40} alt="" />
                   </span>
+                  {/* <div className="text-3xl font-extrabold text-indigo-600">OKLIB</div> */}
                 </div>
               </div>
-              <div className="flex items-center space-x-2 cursor-pointer">
+              <div onClick={() => handleBack()} className="flex items-center space-x-2 cursor-pointer">
+                <div className="text-3xl font-extrabold text-indigo-600">OKLIB</div>
+              </div>
+              {/* <div className="flex items-center space-x-2 cursor-pointer">
                 <FontAwesomeIcon icon={faBars} />
                 <span className="">Thể loại</span>
               </div>
               <div className="flex items-center space-x-2 cursor-pointer">
                 <FontAwesomeIcon icon={faTrophy} />
                 <span className="">Bảng xếp hạng</span>
-              </div>
+              </div> */}
             </div>
-            <div className="md:flex space-x-15">
+            <div className="md:flex ml-10 space-x-15">
               <div className={`md:flex hidden md:items-center w-80 bg-white py-1 px-2 rounded-full border-2 border-${divBorderClassName}`}>
                 <span>
                   <svg xmlns="http://www.w3.org/2000/svg" className={`h-7 w-7 text-${divBorderClassName} cursor-pointer`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,11 +180,6 @@ export default function Navbar() {
 
             <div className="md:flex hidden space-x-10 ">
               <div className="md:flex items-center gap-x-10 ">
-                <div>
-                  <Link to={"/admin"} className="block px-4 py-2 rounded-full text-gray-800 hover:bg-indigo-500 hover:text-white">
-                    Admin
-                  </Link>
-                </div>
                 {(token === "") || !token || profile?.firstName === "" || !profile?.lastName ? (<>
                   <Link to={"/login"}>
                     <div className="md:space-x-4 space-x-2 border h-7 border-tblue rounded-full cursor-pointer">
@@ -201,6 +201,9 @@ export default function Navbar() {
                       {showSetting && (
                         <>
                           <div className="z-50 absolute left-0 w-48 py-2 mt-2 mr-10 bg-white rounded-lg shadow-xl">
+                            {profile?.user?.role === "ADMIN" && <Link to={"/admin"} onClick={() => showSettingHandle()} className="block px-4 py-2 rounded-full text-gray-800 hover:bg-indigo-500 hover:text-white">
+                              Admin
+                            </Link>}
                             <Link onClick={() => showSettingHandle()} to={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                               Profile
                             </Link>
@@ -211,7 +214,7 @@ export default function Navbar() {
                               Lích sử đọc
                             </Link>
                             <a onClick={(e) => handleLogout(e)} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
-                              Logout
+                              Đăng xuât
                             </a>
                           </div>
 

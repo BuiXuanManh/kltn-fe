@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import ComputedService from '../component/service/ComputedService';
 
 const useAddComputedCommentBook = () => {
-    let computedService= new ComputedService()
+    let computedService = new ComputedService()
     return useMutation({
         mutationFn: (id) => computedService.addComputedCommentBook(id).then((res) => {
             if (res.data) {

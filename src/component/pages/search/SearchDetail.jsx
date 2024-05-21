@@ -18,7 +18,7 @@ import { PiFlowerTulipThin } from "react-icons/pi";
 import { FaAcquisitionsIncorporated, FaRegCommentDots } from "react-icons/fa";
 const SearchDetail = () => {
     const [data, setData] = useState([]);
-    const { keyword, page } = useParams();
+    const { keyword, page, field } = useParams();
     const [filter, setFilter] = useState("new");
     let service = new BookService();
     const [findBooks, setFindBooks] = useState([]);
@@ -41,6 +41,22 @@ const SearchDetail = () => {
         else
             findBook.refetch();
     }, [keyword])
+    useEffect(() => {
+        if (field === "read")
+            getRead.mutate("total")
+        else if (field === "rate")
+            findMutate.mutate("rateCount")
+        else if (field === "nomination")
+            getNomination.mutate("total")
+        else if (field === "save")
+            findMutate.mutate("save")
+        else if (field === "love")
+            findMutate.mutate("love")
+        else if (field === "comment")
+            findMutate.mutate("comment")
+        else if (field === "new")
+            getNew.mutate("createdAt")
+    }, [field])
     // const getDate = useQuery({
     //     queryKey: ["dataBooks"],
     //     queryFn: () => service.getBooks(1, 12, "createdAt").then((res) => {
@@ -66,7 +82,7 @@ const SearchDetail = () => {
         filterGenres ? findByGenres.mutate(p) :
             mutation.mutate(p);
         setPage(p);
-        navigate(`/${p}/search/${keyword ? keyword : ""}`);
+        navigate(`/${p}/search/${field}/${keyword ? keyword : ""}`);
     }
     const mutation = useMutation({
         mutationKey: ["page", pagee],
@@ -125,7 +141,7 @@ const SearchDetail = () => {
     const handleSearch = () => {
         findByGenres.mutate(1);
         setPage(1);
-        navigate(`/1/search/${keyword ? keyword : ""}`);
+        navigate(`/1/search/${field}/${keyword ? keyword : ""}`);
     }
     const optionsNew = [
         { value: "  ", label: "Mới cập nhật" },
@@ -391,7 +407,7 @@ const SearchDetail = () => {
                                                     <IonIcon icon={eyeOutline} />
                                                     <p className='ml-2'>{item?.bookComputed?.read}</p>
                                                 </div> : filter === "rate" ? rate.value === "ratePoint" ? <div className='flex items-center gap-1'>
-                                                    <GoStarFill />
+                                                    <GoStarFill className='text-yellow-500' />
                                                     <p className='ml-2'>{item?.bookComputed?.rate}</p>
                                                 </div> : <div className='flex items-center gap-1'>
                                                     <MdOutlineAutoGraph className='text-yellow-700' />

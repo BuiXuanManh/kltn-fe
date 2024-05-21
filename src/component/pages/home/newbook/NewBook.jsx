@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import IconGlobal from "../../../../icon/IconGlobal";
+import { Avatar } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
 
-function NewBook(data, rates) {
+const NewBook = ({ data, rates }) => {
     let icon = new IconGlobal();
     return (
         <div className=''>
@@ -9,19 +12,19 @@ function NewBook(data, rates) {
                 <div className='px-4 grid grid-cols-1 col-span-2 w-full border border-gray-200'>
                     <div className='flex justify-between '>
                         <h3 className='p-3 items-start text-start'>Sách mới</h3>
-                        <a href='/books' className='p-3 items-start text-start text-orange-500 text-sm cursor-pointer font-medium'>Xem tất cả</a>
+                        <Link to='/1/search/new/' className='p-3 items-start text-start text-orange-500 text-sm cursor-pointer font-medium'>Xem tất cả</Link>
                     </div>
                 </div>
                 <div className='px-4 grid grid-cols-1 w-full border border-gray-200'>
                     <div className='flex justify-between'>
                         <h3 className='p-3 items-start text-start'>Mới đánh giá</h3>
-                        <div className='p-3 items-start text-start text-orange-500 text-sm cursor-pointer font-medium'>Xem tất cả</div>
+                        {/* <div className='p-3 items-start text-start text-orange-500 text-sm cursor-pointer font-medium'>Xem tất cả</div> */}
                     </div>
                 </div>
             </div>
             <div className='grid grid-cols-3 mx-48 border border-white border-t-0 rounded-lg bg-white'>
                 <div className='col-span-2 gap-4 max-w-full justify-start pb-4 px-4'>
-                    {data?.map((item) => {
+                    {data?.pageBook?.content?.map((item) => {
                         return (
                             <div key={item.id} className='flex text-start w-full mt-5 max-h-52 border-b p-2 border-gray-200'>
                                 <div className='w-24 h-32 ml-2'>
@@ -64,21 +67,48 @@ function NewBook(data, rates) {
                         );
                     })}
                 </div>
-                <div className='mt-4 grid grid-cols-1 max-w-full'>
-                    {rates?.map((item) => {
+                <div className='mt-4 grid grid-cols-1 gap-4 max-w-full items-start'>
+                    {rates?.content?.map((item) => {
                         return (
-                            <div key={item.id} className='flex max-h-12 justify-between w-full mt-2 p-4 border border-gray-200 min-h-20 '>
-                                <div className='flex mt-2'>
-                                    <div className='h-12'>
-                                        <img className='w-full h-full cursor-pointer' src={item?.image ? item?.image : "avatarBook.jpg"} />
+                            <div key={item?.comment?.id} className="p-4 border border-gray-200">
+                                <div className="flex justify-between items-start text-start ">
+                                    <div className='mt-2 p-4 min-h-20 '>
+                                        <div className='flex mt-2'>
+                                            <div className='w-14 h-20 min-w-14'>
+                                                <img className='w-14 h-20 cursor-pointer object-cover' src={item?.comment?.book?.image ? item?.comment?.book?.image : "avatarBook.jpg"} width="2.5rem" height="3rem" alt='img book' />
+                                            </div>
+                                            <div className="ml-2 ">
+                                                <h3 className="cursor-pointer font-semibold hover:text-blue-500">{item?.comment?.book?.title}</h3>
+                                                <div className="line-clamp-3 text-sm mt-2 text-gray-600">
+                                                    {item?.comment?.book?.shortDescription}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="ml-2">
-                                        <h3 className="cursor-pointer">{item.name}</h3>
-                                        <h3>{item.id}</h3>
+                                    <div className='flex justify-center text-center cursor-pointer mt-4 p-4 items-center'>
+                                        <span>{item.rate}/5</span>
+                                        <FontAwesomeIcon icon={faStar} className='text-yellow-500 ml-2' />
                                     </div>
                                 </div>
-                                <div className='text-center cursor-pointer mt-2'><span>{item.rate}</span></div>
+                                <div className="flex w-full justify-between items-start">
+                                    <div className='p-4 flex mt-5'>
+                                        <div className='w-14 h-20 min-w-14'>
+                                            <Avatar sx={{ width: 40, height: 40 }} src={item?.comment?.profile?.image} />
+                                        </div>
+                                        <div className="ml-2 ">
+                                            <h3 className="font-semibold">{item?.comment.profile?.firstName} {item?.comment.profile?.lastName}</h3>
+                                            <div className="line-clamp-3">
+                                                {item?.comment?.content}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className='flex justify-center text-center cursor-pointer mt-4 p-4 items-center'>
+                                        <span>{item?.comment?.rate}/5</span>
+                                        <FontAwesomeIcon icon={faStar} className='text-yellow-500 ml-2' />
+                                    </div>
+                                </div>
                             </div>
+
                         );
                     })}
                 </div>

@@ -37,8 +37,8 @@ const Router = () => {
             <Route path="/details/:id" element={<BookDetails />} ></Route>
             <Route path="/details/read/:id/:pageNo" element={<ReadBook />} ></Route>
             <Route path="/profile/:mssv" element={<Profile data={data?.pageBook?.content} />} ></Route>
-            <Route path=":page/search/:keyword" element={<SearchDetail />} ></Route>
-            <Route path=":page/search/*" element={<SearchDetail />} />
+            <Route path=":page/search/:field/:keyword" element={<SearchDetail />} ></Route>
+            <Route path=":page/search/:field/*" element={<SearchDetail />} />
             <Route path="/history/:mssv" element={<HistoryBook data={data} />} />
             <Route path="*" element={<NotFound />}></Route>
         </Routes>

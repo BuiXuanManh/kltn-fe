@@ -2,6 +2,9 @@ import api from "../api/api";
 import AuthService from "./AuthService";
 
 export default class CommentService {
+    getRatesRecent() {
+        return api.get(`/api/comments/rate/recent?page=1&síze=12`);
+    }
     getCommentByPageId(pageId) {
         return api.get(`/api/comments/page/${pageId}`);
     }

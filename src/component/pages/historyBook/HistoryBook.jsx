@@ -4,6 +4,11 @@ import HistoryRead from './history/HistoryRead';
 import Bookmark from './flag/Bookmark';
 import FollowBook from './follow/FollowBook';
 import { AppContext } from '../../../context/AppContext';
+import { useQuery } from '@tanstack/react-query';
+import BookService from '../../service/BookService';
+import useAddComputedInteractionBook from '../../../hook/useAddComputedInteractionBook';
+import { toast } from 'react-toastify';
+import PageService from '../../service/PageService';
 
 const HistoryBook = ({ data }) => {
     const { mssv } = useParams();
@@ -11,13 +16,54 @@ const HistoryBook = ({ data }) => {
     const showSettingHandle = () => {
         setShowSetting(!showSetting);
     }
-    const { token, user, profile } = useContext(AppContext);
     const [activeMenu, setActiveMenu] = useState('reading');
 
     const handleMenuClick = (menuItem) => {
         setActiveMenu(menuItem);
     };
-    console.log(data);
+    const [dataMark, setDataMark] = useState([]);
+    const [dataFollow, setDataFollow] = useState([]);
+
+    const { token, setComputedBook } = useContext(AppContext);
+    let service = new BookService();
+
+    const { mutate: addInteraction } = useAddComputedInteractionBook();
+    let pageService = new PageService();
+    const getInteractionByMark = useQuery({
+        queryKey: ['getInteractionByMark'],
+        queryFn: () => {
+            if (token !== "" && token !== undefined) {
+                pageService.getInteractionByMark(token).then((res) => {
+                    if (res.data) {
+                        setDataMark(res.data);
+                        return res.data;
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                })
+            } else {
+                toast.error("Vui lòng đăng nhập");
+            }
+        }
+    });
+    const getInteractionByFollow = useQuery({
+        queryKey: ['getInteractionByFollow'],
+        queryFn: () => {
+            if (token !== "" && token !== undefined) {
+                service.getInteractionsBySave(token).then((res) => {
+                    if (res.data) {
+                        console.log(res.data);
+                        setDataFollow(res.data);
+                        return res.data;
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                })
+            } else {
+                toast.error("Vui lòng đăng nhập");
+            }
+        }
+    });
     return (
         <div className='mx-96 mt-8 border border-white border-b-0 rounded-lg bg-white shadow-md'>
             <div className="flex mt-8 ml-8 gap-8 text-xl font-semibold">
@@ -31,11 +77,11 @@ const HistoryBook = ({ data }) => {
                 )}
 
                 {activeMenu === 'flag' && (
-                    <Bookmark data={data} />
+                    <Bookmark dataMark={dataMark} setDataMark={setDataMark} />
                 )}
 
                 {activeMenu === 'follow' && (
-                    <FollowBook data={data} />
+                    <FollowBook dataFollow={dataFollow} setDataFollow={setDataFollow} />
                 )}
             </div>
         </div>

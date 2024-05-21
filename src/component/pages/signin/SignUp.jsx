@@ -45,11 +45,9 @@ const SignUp = () => {
                     setToken(res.data.token);
                     setMssvContext(res.data.profile.mssv);
                     setProfile(res.data.profile);
-                    // swal({
-                    //     title: "Success",
-                    //     text: res.data.message,
-                    //     icon: "success"
-                    // });
+                    Cookies.set("token", res.data.token);
+                    Cookies.set("mssv", mssv);
+                    Cookies.set("profile", JSON.stringify(res.data.profile));
                     navigate("/");
                 }
             }

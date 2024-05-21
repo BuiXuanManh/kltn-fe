@@ -5,7 +5,7 @@ export default function formatTimeDifference(timestamp) {
     const minutesDifference = differenceInMinutes(currentDate, parsedTimestamp);
 
     if (minutesDifference < 1) {
-        return `${Math.floor(minutesDifference)} giây trước`;
+        return `vài giây trước`;
     }
 
     const hoursDifference = differenceInHours(currentDate, parsedTimestamp);
@@ -33,7 +33,7 @@ export default function formatTimeDifference(timestamp) {
 }
 export function formatDate(d) {
     const date = new Date(d);
-    
+
     // Adjust the time zone offset to Asia/Ho_Chi_Minh
     const timeZoneOffset = 7 * 60; // 7 hours ahead in minutes
     const localTime = date.getTime() + (timeZoneOffset * 60 * 1000);

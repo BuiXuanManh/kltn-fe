@@ -28,7 +28,7 @@ const BookDetails = () => {
     const [interaction, setInteraction] = useState();
     const { token, computedBook, setComputedBook } = useContext(AppContext);
     const { mutate } = useAddComputedBook();
-    const { mutate: addInteraction } = useAddComputedInteractionBook();
+    
     const { mutate: addPage } = useAddComputedPageBook();
     const handleAddBook = (id) => {
         mutate(id, {
@@ -37,6 +37,7 @@ const BookDetails = () => {
             }
         });
     };
+    const { mutate: addInteraction } = useAddComputedInteractionBook();
     const handleAddInteractionbookBook = (id) => {
         addInteraction(id, {
             onSuccess: (newBook) => {

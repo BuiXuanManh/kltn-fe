@@ -29,6 +29,8 @@ const SignIn = () => {
                     if (data.data) {
                         setToken(data.data.accessToken);
                         setMssvContext(mssv);
+                        Cookies.set("token", data.data.accessToken);
+                        Cookies.set("mssv", mssv);
                         return data.data;
                     }
                 } catch (error) {
@@ -70,6 +72,7 @@ const SignIn = () => {
                 // Cookies.set("token", t.data.accessToken);
                 if (data.data) {
                     setProfile(data.data);
+                    Cookies.set("profile", JSON.stringify(data.data));
                     return data.data;
                 }
             }
