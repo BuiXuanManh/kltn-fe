@@ -30,6 +30,8 @@ import useAddComputedCommentBook from '../../../hook/useAddComputedCommentBook';
 import useAddComputedRateBook from '../../../hook/useAddComputedRateBook';
 import { toast } from 'react-toastify';
 import formatTimeDifference from '../../service/DateService';
+import swal from 'sweetalert';
+import SettingService from '../../service/SettingService';
 const ReadBook = () => {
     const { token, setInteractions, profile, setComputedBook, computedPage, setComputedPage } = useContext(AppContext);
 
@@ -126,18 +128,6 @@ const ReadBook = () => {
         }
     })
     useEffect(() => {
-        // if (pageNo > 0 && pageNo< page?.book?.pageCount) {
-        //     setPageNo(pageNo);
-        // }
-        // if (pageCount > 0 && pageNo < pageCount) {
-        //     setPageNo(pageCount);
-        // }
-        // if (pageCount > 0) {
-        //     if (pageCount <= 0 && pageNo >= pageCount) {
-        //         toast.error("Không tìm thấy trang");
-        //         navigate("/")
-        //     }
-        // }
     }, [pageNo, id])
     useEffect(() => {
         if (pageNo > 0 && page?.id != undefined && page?.id !== "" && page?.id !== null)
@@ -196,7 +186,6 @@ const ReadBook = () => {
             if (token !== undefined && token !== "" && token !== null && pageNo > 0 && pageNo <= page?.book?.pageCount) {
                 pageService.getRatePage(token, page?.id).then((res) => {
                     if (res.data) {
-                        console.log(res.data);
                         setRate(res.data.rate);
                         return res.data;
                     }
@@ -240,6 +229,67 @@ const ReadBook = () => {
             })
         }
     })
+    const [follow, setFollow] = useState(false);
+    const getInteractions = useQuery({
+        queryKey: ['interaction', id],
+        queryFn: () => service.findInteraction(token, id).then((res) => {
+            if (res.data && res.data != null) {
+                setFollow(res.data?.followed);
+                return res.data;
+            }
+        }).catch((err) => {
+            console.error(err);
+        }),
+        enabled: token != "" && id !== "" && id !== undefined && id !== "" && !!id
+    });
+    const { mutate: addInteraction } = useAddComputedInteractionBook();
+    const handleAddInteractionbookBook = (id) => {
+        addInteraction(id, {
+            onSuccess: (newBook) => {
+                setComputedBook(newBook);
+            }
+        });
+    };
+    const followMutation = useMutation({
+        mutationFn: (type) => {
+            if (type === 'follow') {
+                return service.follow(token, id).then((res) => {
+                    if (res.data) {
+                        handleAddInteractionbookBook(id);
+                        setFollow(true)
+                        return res.data;
+                    }
+                }).catch((err) => {
+                    console.error(err);
+                });
+            } else if (type === 'followCancel') {
+                return service.followCancel(token, id).then((res) => {
+                    if (res.data) {
+                        handleAddInteractionbookBook(id);
+                        setFollow(false)
+                        return res.data;
+                    }
+                }).catch((err) => {
+                    console.error(err);
+                });
+            }
+        }
+    })
+    const handleFollow = (type) => {
+        if (token !== "" && token !== null && token !== undefined && id !== "" && id !== null && id !== undefined && id !== "")
+            followMutation.mutate(type);
+        else swal({
+            title: "Bạn có muỐn đăng nhập không?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    navigate("/login")
+                }
+            });
+    }
     const [showAudio, setShowAudio] = useState(false);
     const handleVoice = (gender) => [
         audioMuta.mutate(gender),
@@ -275,6 +325,43 @@ const ReadBook = () => {
             getRate.refetch();
         }
     }, [page])
+    const [pages, setPages] = useState([]);
+    const getPages = useQuery({
+        queryKey: ['pages', id],
+        queryFn: () => {
+            if (id !== "" && id !== null && id !== undefined)
+                pageService.getPagesByBookId(id).then((res) => {
+                    if (res.data) {
+                        console.log(res.data)
+                        setPages(res.data);
+                        setPageCount(res.data.length);
+                        return res.data;
+                    }
+                }).catch((err) => {
+                    console.error(err);
+                })
+        }
+    })
+    useEffect(() => {
+
+    }, [pages])
+    const [setting, setSetting] = useState({})
+    let settingService = new SettingService();
+    const getSetting = useQuery({
+        queryKey: ['getSetting', profile.id],
+        queryFn: () => {
+            if (token !== "" && token !== undefined) {
+                settingService.getSetting(token).then((res) => {
+                    if (res.data) {
+                        setSetting(res.data);
+                        return res.data;
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                })
+            }
+        }
+    })
     const [comments, setComments] = useState([]);
     let commentService = new CommentService();
     const getComment = useQuery({
@@ -429,21 +516,53 @@ const ReadBook = () => {
     };
     useEffect(() => {
     }, [comments, showReply])
-
+    const colorOptions = [
+        { color: "#F5E4E4" },
+        { color: "#F5EBCD" },
+        { color: "#E2EEE2" },
+        { color: "#E1E8E8" },
+        { color: "#EAE4D3" },
+        { color: "#E5E3DF" },
+        { color: "#222222" }
+    ];
+    useEffect(() => {
+        if (Object.keys(setting).length > 0) { // Kiểm tra xem setting có chứa thuộc tính nào không
+            if (setting?.color < 7) {
+                document.body.style.backgroundColor = colorOptions[setting?.color - 1]?.color;
+                document.body.classList.remove("dark");
+            }
+            else if (setting?.color === 7) {
+                // document.body.classList.add("dark");
+                document.body.style.backgroundColor = "#222222";
+            }
+            else {
+                document.body.classList.remove("dark");
+                document.body.style.backgroundColor = "#EAE4D3";
+            }
+        }
+    }, [setting]);
+    const fontFamilyClass = {
+        'Arial': 'font-sans',
+        'Times': 'font-serif',
+        'Courier': 'font-mono',
+        'Georgia': 'font-display',
+        'Verdana': 'font-handwriting',
+    }[setting?.font] || '';
+    console.log(setting)
     return (
-        <div className='w-full'>
-            <div className={`relative py-10 w-full h-full bg-gray-100`}>
-                <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
-                <IonIcon className='animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
+        <div className={`w-full ${setting?.color === 7 ? "dark" : ""} dark:bg-[#222222]`}>
+            <div className={`relative py-10 w-full ${setting?.color === 7 ? "dark" : ""} dark:bg-[#222222] h-full  bg-gray-100`}>
+                <IonIcon className='dark:bg-[#222222] dark:text-gray-500 animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
+                <IonIcon className='dark:bg-[#222222] dark:text-gray-500 animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
                 <div className={` w-full`}>
-                    <div className='mx-48 border bg-[#EAE4D3] border-white rounded-xl items-center justify-center text-center'>
+                    <div className={`mx-48 ${setting?.color === 7 ? "dark" : ""} dark:bg-[#222222] dark:text-gray-500  border ${setting?.color < 7 ? "bg-[" + colorOptions[setting?.color - 1]?.color + "]" : "bg-[#EAE4D3]"} border-white rounded-xl items-center justify-center text-center`}>
                         {/* header page */}
                         <div className='mt-5 flex mx-20 justify-between'>
                             <div className=''>
-                                <button disabled={Number(pageNo) === 1} onClick={(e) => handlePrePage(e)} className={`rounded-3xl px-8 h-10  ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center1`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
+                                <button disabled={Number(pageNo) === 1} onClick={(e) => handlePrePage(e)} className={`dark:bg-[#222222] dark:text-gray-500 rounded-3xl px-8 h-10  ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center1`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
                             </div>
                             <div className=''>
-                                <button disabled={Number(pageNo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`rounded-3xl px-8 h-10 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
+                                <button disabled={Number(pageNo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`dark:bg-[#222222] dark:text-gray-500 rounded-3xl px-8 h-10 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
                             </div>
                         </div>
                         <div className='mt-5 '>
@@ -458,7 +577,7 @@ const ReadBook = () => {
                             </span>
                             <span className='text-sm flex'>
                                 <div className='flex justify-center items-center'>
-                                    <img src={icon?.icon?.author} className='w-5 h-5' alt="" />
+                                    <img src={icon?.icon?.author} className='dark:block text-gray-300 w-5 h-5' alt="" />
                                     {page?.book?.authors?.map((i, index) =>
                                         <div className='flex ml-2' key={index}>
                                             <p className=''>{i?.name}</p>
@@ -481,10 +600,10 @@ const ReadBook = () => {
                             </span>
                         </div>
                         {/* content page */}
-                        <div className='mt-10 mx-16 text-2xl  text-start justify-start items-star'>
+                        <div className={`mt-10 mx-16 ${setting?.textSize ? "text-[" + setting?.textSize + "px]" : "text-2xl"}  text-start justify-start items-star`}>
                             {page?.name && <span className='mt-1 text-3xl font-semibold'>Trang {pageNo}: {page?.name}</span>}
                             <br /><br />
-                            <span className='' style={{ lineHeight: "1" }} >
+                            <span className={` ${fontFamilyClass} `} style={{ lineHeight: `${setting?.lineHeight ? setting?.lineHeight : "1"}` }} >
                                 {processedContent}
                             </span>
                         </div>
@@ -504,23 +623,23 @@ const ReadBook = () => {
                         </div>
                     </div>
                     {/* footer page */}
-                    <div className='mt-4 mx-48 border bg-[#EAE4D3] border-white h-25 rounded-md'>
+                    <div className='mt-4 mx-48 border dark:bg-[#222222] dark:text-gray-500 bg-[#EAE4D3] border-white h-25 rounded-md'>
                         <div className='mx-16 flex gap-10  py-10'>
                             <div className='w-[45%] h-full'>
-                                <button disabled={Number(pageNo) === 1} onClick={(e) => handlePrePage(e)} className={`w-full px-8 h-10 ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} justify-center items-center`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
+                                <button disabled={Number(pageNo) === 1} onClick={(e) => handlePrePage(e)} className={`w-full px-8 h-10 ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} dark:bg-[#222222] dark:text-gray-500 justify-center items-center`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
                             </div>
                             <div className='justify-center text-center h-full items-center w-[10%]'>
-                                <button className='px-8 h-10 bg-[#F0ECDF] justify-center items-center'>
+                                <button className='px-8 h-10 dark:bg-[#222222] dark:text-gray-500 bg-[#F0ECDF] justify-center items-center'>
                                     <IonIcon className="min-w-6 h-full pb-4" icon={alertCircleOutline}></IonIcon>
                                 </button>
                             </div>
                             <div className='w-[45%] h-full justify-end flex'>
-                                <button disabled={Number(pageNo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`ml-auto w-full px-8 h-10 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"}`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
+                                <button disabled={Number(pageNo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`ml-auto w-full px-8 h-10 dark:bg-[#222222] dark:text-gray-500 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"}`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
                             </div>
                         </div>
                     </div>
                     {/* comment */}
-                    <div className='mt-4 mx-48 border bg-[#EAE4D3] border-white h-25 rounded-md'>
+                    <div className='mt-4 mx-48 border dark:bg-[#222222] dark:text-gray-500 bg-[#EAE4D3] border-white h-25 rounded-md'>
                         <div className='mx-16 grid gap-10 py-10'>
                             <div className='grid'>
                                 <div className='justify-between flex'>
@@ -531,14 +650,14 @@ const ReadBook = () => {
                                         <Avatar src="" sx={{ width: 60, height: 60 }} />
                                     </div>
                                     <div className='ml-4 w-full'>
-                                        <input value={content} onKeyPress={(e) => handleKey(e)} onChange={(e) => setContent(e.target.value)} placeholder='Nhập bình luận của bạn ...' className='w-full h-16 rounded-xl bg-gray-200 focus:outline-none focus:ring focus:ring-indigo-500 px-4 py-2' />
+                                        <input value={content} onKeyPress={(e) => handleKey(e)} onChange={(e) => setContent(e.target.value)} placeholder='Nhập bình luận của bạn ...' className='w-full h-16 rounded-xl dark:bg-[#222222] dark:text-gray-500 bg-gray-200 focus:outline-none focus:ring focus:ring-indigo-500 px-4 py-2' />
                                     </div>
                                 </div>
-                                {comments?.length > 0 && <div className='grid border-b-1 border border-gray-200 border-x-0 border-t-0'>
+                                {comments?.length > 0 && <div className='grid border-b-1 border border-gray-300 border-x-0 border-t-0'>
                                     <div className=' w-full'>
                                         {comments?.map((i, index) => (
                                             <>
-                                                {!i?.parent?.id ? <div key={index} className='flex mt-5 border-b-2 border-gray-50'>
+                                                {!i?.parent?.id ? <div key={index} className='flex mt-5 border-b-2 border-gray-300'>
                                                     <div>
                                                         <Avatar src="" sx={{ width: 60, height: 60 }} />
                                                     </div>
@@ -623,15 +742,15 @@ const ReadBook = () => {
                             </div>
                         </div>
                     </div>
-                    {show === "setting" && <Setting handleClose={handleClose} handleVoice={handleVoice} setShowAudio={setShowAudio} showAudio={showAudio} audio={audio} />}
-                    {show === "listpage" && <ListPage handleClose={handleClose} />}
+                    {show === "setting" && <Setting setting={setting} setSetting={setSetting} handleClose={handleClose} handleVoice={handleVoice} setShowAudio={setShowAudio} showAudio={showAudio} audio={audio} />}
+                    {show === "listpage" && <ListPage pages={pages} setPages={setPages} handleClose={handleClose} />}
                     {/* side bar */}
                     <div className='fixed ml-4 top-4 mt-24 right-[6.5rem] rounded-xl'>
                         <div className={`rounded-xl w-20`}>
                             <div
                                 onMouseEnter={() => setIsHover("pages")}
                                 onMouseLeave={handleMouseLeave}
-                                className={`flex relative border-white border ${show === "listpage" ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid border-b-1 justify-center text-center h-14 items-center cursor-pointer`}
+                                className={`flex dark:bg-[#222222] dark:text-gray-500 relative dark:border-0 border-white border ${show === "listpage" ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid border-b-1 justify-center text-center h-14 items-center cursor-pointer`}
                                 onClick={() => handleShow("listpage")}
                             >
                                 <IonIcon className='w-7 h-7' icon={menuSharp} />
@@ -649,7 +768,7 @@ const ReadBook = () => {
                                 onMouseEnter={() => setIsHover("setting")}
                                 onMouseLeave={handleMouseLeave}
                                 onClick={() => handleShow("setting")}
-                                className={`border relative border-white ${show === "setting" ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid  border-b-1 flex items-center justify-center text-center h-14 cursor-pointer`}>
+                                className={`border dark:bg-[#222222] dark:text-gray-500 relative dark:border-0 border-white ${show === "setting" ? 'bg-white ' : 'bg-[#EAE4D3] '} border-solid  border-b-1 flex items-center justify-center text-center h-14 cursor-pointer`}>
                                 <IonIcon className='w-6 h-6' icon={settingsOutline} />
                                 {isHover === "setting" && (
                                     <div
@@ -665,7 +784,7 @@ const ReadBook = () => {
                                 onMouseEnter={() => setIsHover("back")}
                                 onMouseLeave={handleMouseLeave}
                                 onClick={() => handleBack()}
-                                className='border relative border-white border-solid bg-[#EAE4D3] border-b-1 justify-center items-center text-center h-14 flex cursor-pointer'>
+                                className='border dark:bg-[#222222] dark:text-gray-500 relative dark:border-0 border-white border-solid bg-[#EAE4D3] border-b-1 justify-center items-center text-center h-14 flex cursor-pointer'>
                                 <IonIcon className='w-6 h-6' icon={arrowBack} />
                                 {isHover === "back" && (
                                     <div
@@ -680,8 +799,8 @@ const ReadBook = () => {
                         </div>
                     </div>
                     {/*side bar emotion */}
-                    <div className='fixed bottom-10 right-[6.5rem] rounded-xl flex-row justify-center items-center gap-5 '>
-                        {show === "emotion" && <div className='rounded-3xl bg-white py-2'>
+                    <div className='fixed  bottom-10 right-[6.5rem] rounded-xl flex-row justify-center items-center gap-5 '>
+                        {show === "emotion" && <div className='rounded-3xl dark:bg-[#222222] dark:text-gray-500 bg-white py-2'>
                             <div onClick={() => handleEmotion("LOVE")} className='flex justify-center items-center'>
                                 <img src="love.png" alt="" className='w-10 h-10 hover:w-12 hover:h-12 cursor-pointer' />
                             </div>
@@ -700,12 +819,12 @@ const ReadBook = () => {
                         </div>
                         }
                         <div className='mt-2'>
-                            <div className='bg-[#EAE4D3] w-20 rounded-xl'>
+                            <div className='bg-[#EAE4D3] dark:bg-[#222222] dark:text-gray-500 w-20 rounded-xl'>
                                 <div
                                     onMouseEnter={() => setIsHover("emotion")}
                                     onMouseLeave={handleMouseLeave}
                                     onClick={() => handleShow("emotion")}
-                                    className='border relative border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
+                                    className='border relative border-gray-300 dark:border-0 border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
                                     {
                                         interactionPage?.type ? <div>
                                             <img src={interactionPage?.type === "LIKE" ? "like.png" :
@@ -729,9 +848,9 @@ const ReadBook = () => {
                                 <div
                                     onMouseEnter={() => setIsHover("save")}
                                     onMouseLeave={handleMouseLeave}
-                                    onClick={() => handleShow("save")}
-                                    className='border border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
-                                    {show === "save" ? <FontAwesomeIcon className='w-7 h-7' icon={faCheck} /> : <IonIcon className='w-7 h-7' icon={bookmarkOutline} />}
+                                    onClick={() => handleFollow(follow ? 'followCancel' : 'follow')}
+                                    className='border dark:border-0 border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
+                                    {follow ? <FontAwesomeIcon className='w-7 h-7' icon={faCheck} /> : <IonIcon className='w-7 h-7' icon={bookmarkOutline} />}
                                     {isHover === "save" && (
                                         <div
                                             className="absolute right-full top-1/2 z-20 mr-3 -translate-y-1/2  whitespace-nowrap rounded-md bg-tblack py-3 border border-gray-300 px-4 text-xs text-white font-medium transition-opacity duration-300 shadow-[12px_0px_30px_-4px_rgba(16,24,40,0.08)]"
@@ -745,7 +864,7 @@ const ReadBook = () => {
                                 <div
                                     onMouseEnter={() => setIsHover("comment")}
                                     onMouseLeave={handleMouseLeave}
-                                    className='border relative border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
+                                    className='border relative dark:border-0 border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
                                     <IonIcon className='w-7 h-7' icon={chatbubblesOutline} />
                                     {isHover === "comment" && (
                                         <div

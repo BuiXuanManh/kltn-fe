@@ -8,6 +8,13 @@ export default withMT({
   ],
   darkMode: "class",
   theme: {
+    fontFamily: {
+      'sans': ['Helvetica', 'Arial', 'sans-serif'],      // Sans-serif hiện đại
+      'serif': ['Garamond', 'Times New Roman', 'serif'], // Serif cổ điển
+      'mono': ['Menlo', 'Courier New', 'monospace'],    // Monospace
+      'display': ['Impact', 'Haettenschweiler', 'sans-serif'], // Display (tạo điểm nhấn)
+      'handwriting': ['Brush Script MT', 'cursive'], 
+    },
     extend: {
       width: {
         "1p": "1%",

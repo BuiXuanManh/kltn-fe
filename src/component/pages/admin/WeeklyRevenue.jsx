@@ -17,7 +17,6 @@ const WeeklyRevenue = () => {
     queryKey: ["emoList"],
     queryFn: () => service.getEmo().then((res) => {
       if (res.data) {
-        console.log(res.data);
         setEmoList(res.data);
         return res.data;
       }
@@ -25,10 +24,12 @@ const WeeklyRevenue = () => {
       console.error(err);
     })
   })
+
   const getRate = useQuery({
     queryKey: ["rateList"],
     queryFn: () => service.getRate().then((res) => {
       if (res.data) {
+        setRateList(res.data);
         return res.data;
       }
     }).catch((err) => {
@@ -58,7 +59,7 @@ const WeeklyRevenue = () => {
         <div className="h-[250px] w-full xl:h-[350px]">
           <Chart
             options={barChartOptionsWeeklyRevenue}
-            series={barChartDataWeeklyRevenue(emoList, commentList, rateList)}
+            series={barChartDataWeeklyRevenue(getEmo?.data, commentList, rateList)}
             type="bar"
             width="100%"
             height="100%"

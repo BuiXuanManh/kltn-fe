@@ -78,7 +78,9 @@ const NewBook = ({ data, rates }) => {
                                                 <img className='w-14 h-20 cursor-pointer object-cover' src={item?.comment?.book?.image ? item?.comment?.book?.image : "avatarBook.jpg"} width="2.5rem" height="3rem" alt='img book' />
                                             </div>
                                             <div className="ml-2 ">
-                                                <h3 className="cursor-pointer font-semibold hover:text-blue-500">{item?.comment?.book?.title}</h3>
+                                                <Link to={`/details/${item?.comment?.book?.id}`}>
+                                                    <h3 className="cursor-pointer font-semibold hover:text-blue-500">{item?.comment?.book?.title}</h3>
+                                                </Link>
                                                 <div className="line-clamp-3 text-sm mt-2 text-gray-600">
                                                     {item?.comment?.book?.shortDescription}
                                                 </div>

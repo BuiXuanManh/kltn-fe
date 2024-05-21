@@ -176,9 +176,9 @@ const SignIn = () => {
                                 </div>
                             </div> */}
                             <div className="text-sm">
-                                <a className="font-medium text-indigo-400 hover:text-blue-300" href="">
+                                {/* <a className="font-medium text-indigo-400 hover:text-blue-300" href="">
                                     Quên mật khẩu?
-                                </a>
+                                </a> */}
                             </div>
                             <div>
                                 <button onClick={(e) => login(e)}
