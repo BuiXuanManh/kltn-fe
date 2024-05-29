@@ -2,6 +2,9 @@ import api from "../api/api";
 import AuthService from "./AuthService";
 
 export default class AccountService {
+    changPass(data) {
+        return api.post('/auth/password/reset', data);
+    }
     validAdmin(token) {
         return api.get('/auth/valid', AuthService(token));
     }
@@ -14,5 +17,7 @@ export default class AccountService {
     getProfile(token) {
         return api.get("/users/profile", AuthService(token));
     }
-
+    saveProfile(data, token) {
+        return api.post("/users/profile/save", data, AuthService(token));
+    }
 }

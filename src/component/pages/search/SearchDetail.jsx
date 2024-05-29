@@ -69,7 +69,7 @@ const SearchDetail = () => {
     //         console.error(err);
     //     })
     // })
-
+    console.log(data)
     let icon = new IconGlobal()
 
     const [genres, setGenres] = useState([]);
@@ -392,7 +392,7 @@ const SearchDetail = () => {
                                     <div key={item.id} className='flex text-start w-full mt-3 max-h-52 p-3 shadow-md'>
                                         <div className='w-24 h-28 ml-2 cursor-pointer'>
                                             <Link to={`/details/${item?.id}`}>
-                                                <img width="5rem" height="6rem" className='min-w-24 min-h-28 object-cover' src={item.image} alt='img book' />
+                                                <img width="5rem" height="6rem" className='min-w-24 min-h-28 object-cover' src={item.image ? item?.image : "avatarBook.jpg"} alt='img book' />
                                             </Link>
                                         </div>
                                         <div className='ml-2 w-full'>
@@ -438,11 +438,11 @@ const SearchDetail = () => {
                                                     <img src={icon?.icon?.author} className='w-5 h-5 mt-1' alt="" />
 
                                                     <div className='flex truncate justify-center items-center'>
-                                                        <p className='ml-1 max-w-24 truncate'>{item?.authors[0]?.name}</p>
+                                                        <p className='ml-1 max-w-24 truncate'>{item?.authors ? item?.authors[0]?.name : ""}</p>
 
                                                     </div>
                                                 </div>
-                                                <div className='p-1 border border-yellow-500 text-orange-600 cursor-pointer'>{item.genres[0]?.name}</div>
+                                                <div className='p-1 border border-yellow-500 text-orange-600 cursor-pointer'>{item?.genres ? item?.genres[0]?.name : ""}</div>
                                             </div>
                                         </div>
                                     </div>

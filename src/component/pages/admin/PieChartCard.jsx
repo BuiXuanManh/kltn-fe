@@ -27,7 +27,7 @@ const PieChartCard = () => {
       console.error(err);
     })
   })
-  const colors = ["#4318FF", "#6AD2FF", "#FFED8A", "#EAE4D3"]
+  const colors = ["bg-[#4318FF]", "bg-[#6AD2FF]", "bg-[#FFED8A]", "bg-[#EAE4D3]"]
   return (
     <Card extra="rounded-[20px] p-3">
       <div className="flex flex-row justify-between px-3 pt-2">
@@ -60,7 +60,7 @@ const PieChartCard = () => {
         genresName.map((name, index) => (
           <div className="flex items-center !justify-between" key={index}>
             <div className="flex items-center">
-              <div className={`h-2 w-2 rounded-full bg-[${colors[index]}]`} />
+              <div className={`h-2 w-2 rounded-full ${colors[index]}`} />
               <div className="ml-1 text-sm font-normal text-gray-600">{name}</div>
             </div>
             <p className="mt-px text-xl font-bold text-navy-700 dark:text-white">

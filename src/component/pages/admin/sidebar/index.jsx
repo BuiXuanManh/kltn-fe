@@ -117,7 +117,7 @@ const Sidebar = ({ activeRoute, setActiveRoute }) => {
                       : "font-medium text-gray-600"
                       }`}
                   >
-                    Phân quyền
+                    Danh sách tài khoản
                   </p>
                 </li>
                 {activeRoute === "access" ? (

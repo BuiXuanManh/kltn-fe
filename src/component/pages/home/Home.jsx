@@ -7,7 +7,7 @@ import HotBook from './hotbook/HotBook';
 import { IonIcon } from '@ionic/react';
 import { arrowDownCircleOutline, arrowUpCircleOutline } from 'ionicons/icons';
 import BookService from '../../service/BookService';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // import Cookies from 'js-cookie';
 import { Link, useNavigate } from 'react-router-dom';
 import NominatedBookService from '../../service/NominatedBookService';
@@ -89,7 +89,15 @@ const Home = ({ data }) => {
             console.error(err);
         })
     })
-    return (<div className='bg-gray-100 border' >
+    const top = useRef(null);
+    const bottom = useRef(null);
+    const handleNavigateToTop = () => {
+        top.current.scrollIntoView({ behavior: 'smooth' });
+    };
+    const handleNavigateToBottom = () => {
+        bottom.current.scrollIntoView({ behavior: 'smooth' });
+    };
+    return (<div ref={top} className='bg-gray-100 border' >
         <Carousel interval={3000} navButtonsAlwaysVisible={true} >
             {nominatedBooks?.map((bg) => {
                 return (
@@ -104,13 +112,13 @@ const Home = ({ data }) => {
             })
             }
         </Carousel>
-        <IonIcon className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
-        <IonIcon className='animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
+        <IonIcon onClick={() => handleNavigateToTop()} className='animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
+        <IonIcon onClick={() => handleNavigateToBottom()} className='animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
         {data?.length > 0 && HotBook(hotBooks)}
         {/* Nominated book */}
         <NominatedBook data={nominateTotal} />
         {/* New update book */}
-        <NewBook data={newBooks} rates={rates} />
+        <NewBook bottom={bottom} data={newBooks} rates={rates} />
     </div >
     );
 };

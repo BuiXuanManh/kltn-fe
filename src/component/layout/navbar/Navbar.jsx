@@ -11,6 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Skeleton } from "@mui/material";
 import { AppContext } from "../../../context/AppContext";
 import BookService from "../../service/BookService";
+import ChangePassModal from "./changPass/ChangePassModal";
 export default function Navbar() {
   const { token, setToken, mssv, profile, setProfile, setInteractions } = useContext(AppContext);
   const [showMenu, setShowMenu] = useState(false);
@@ -25,6 +26,14 @@ export default function Navbar() {
   const [showSetting, setShowSetting] = useState(false);
   const showSettingHandle = () => {
     setShowSetting(!showSetting);
+  }
+  const [showChangePass, setShowChangePass] = useState(false)
+  const changePass = () => {
+    setShowChangePass(true)
+    setShowSetting(!showSetting);
+  }
+  const handleCloseChange = () => {
+    setShowChangePass(false)
   }
   const handleLogout = (e) => {
     e.preventDefault();
@@ -206,9 +215,9 @@ export default function Navbar() {
                             <Link onClick={() => showSettingHandle()} to={"/profile/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                               Profile
                             </Link>
-                            <Link onClick={() => showSettingHandle()} to={"/changPass/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
+                            <a onClick={() => changePass()} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                               Đổi mật khẩu
-                            </Link>
+                            </a>
                             <Link onClick={() => showSettingHandle()} to={"/history/" + mssv} className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white">
                               Lịch sử đọc
                             </Link>
@@ -219,6 +228,7 @@ export default function Navbar() {
 
                         </>
                       )}
+                      {showChangePass && <ChangePassModal handleClose={handleCloseChange} />}
                     </div>
                   </>
                 )}

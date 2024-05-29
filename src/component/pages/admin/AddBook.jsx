@@ -7,6 +7,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import GenreService from '../../service/GenreService';
 import { Link } from 'react-router-dom';
 import BookService from '../../service/BookService';
+import { toast } from 'react-toastify';
 const AddBook = () => {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
@@ -97,15 +98,24 @@ const AddBook = () => {
         if (title !== "" && title) {
             setLoading(true);
             const regex = /#|\*/;
-            const result1 = await RunChat("tác giả của cuốn sách " + title);
-            setAuthor(result1.replace(regex, ""))
-            const result2 = await RunChat("viết đoạn mô tả ngắn về cuốn sách " + title);
-            setShortDescription(result2.replace(regex, ""))
-            const result3 = await RunChat("viết đoạn mô tả dài về cuốn sách " + title);
-            setLongDescription(result3.replace(regex, ""))
-            setLoading(false);
-        } else message.error("Vui lòng nhập tiêu đề sách", 2)
-    }
+            try {
+                const result1 = await RunChat("tác giả của cuốn sách " + title);
+                setAuthor(result1.replace(regex, ""));
+                const result2 = await RunChat("viết đoạn mô tả ngắn về cuốn sách " + title);
+                setShortDescription(result2.replace(regex, ""));
+                const result3 = await RunChat("viết đoạn mô tả dài về cuốn sách " + title);
+                setLongDescription(result3.replace(regex, ""));
+            } catch (error) {
+                console.error("Lỗi khi gọi RunChat:", error);
+                toast.error("Đã xảy ra lỗi khi tạo nội dung. Vui lòng thử lại sau.");
+            } finally {
+                setLoading(false);
+            }
+        } else {
+            message.error("Vui lòng nhập tiêu đề sách", 2);
+        }
+    };
+
     const handleReset = () => {
         setTitle('');
         setAuthor('');
@@ -175,6 +185,18 @@ const AddBook = () => {
         reader.readAsDataURL(file);
 
     }
+    const [isInputFocused, setIsInputFocused] = useState(false);
+    const [showFind, setShowFind] = useState(false);
+    const handleInputFocus = () => {
+        setIsInputFocused(true);
+        setShowFind(true)
+    };
+
+    const handleInputBlur = () => {
+        // setFindBooks([])
+        setIsInputFocused(false);
+        setShowFind(false);
+    };
     return (
         <div className=' md:mr-10 -ml-20' >
             {!showPage ?
@@ -227,11 +249,11 @@ const AddBook = () => {
                                 <div className='col-span-3 flex mt-4'>
                                     <input className='w-full mr-4 h-14 px-4 border-2 rounded-lg dark:border-brand-600 dark:bg-navy-700'
                                         value={title} onChange={(e) => setTitle(e.target.value)}
-                                        // onFocus={handleInputFocus}
-                                        // onBlur={handleInputBlur}
+                                        onFocus={handleInputFocus}
+                                        onBlur={handleInputBlur}
                                         placeholder='Nhập tiêu đề sách'
                                         type="text" />
-                                    {findBooks?.length > 0 && <div className="absolute w-96 mt-16 z-50">
+                                    {showFind && findBooks?.length > 0 && <div className="absolute w-96 mt-16 z-50">
                                         <div className="bg-white border border-gray-300 text-black rounded-lg shadow-lg">
                                             {findBooks?.map((book, index) => (
                                                 <div onClick={() => handleGetBook(book)} key={index}>

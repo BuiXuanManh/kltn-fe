@@ -115,27 +115,36 @@ const AddPage = ({ book, author, setShowPage, handleReset }) => {
         await saveFunction();
     }
     const handleGenerate = async () => {
-        if (book?.title !== "" && book?.title) {
-            setLoading(true);
-            const regex = /#|\*/;
-            const promises = []; // Khai báo một list (mảng) rỗng
-            for (const page of pages) {
-                const result1 = await RunChat("viết trang " + page.pageNo + " của cuôn sách " + book?.title);
-                const updatePageContent = { ...page, content: result1.replace(regex, "") };
-                promises.push(updatePageContent);
-            }
-            await Promise.all(promises);
-            setPages(promises);
-            setLoading(false);
-        } else message.error("Không có tiêu đề sách", 2)
-    }
+        if (!book?.title) { // Kiểm tra xem book.title có rỗng hoặc undefined không
+            message.error("Không có tiêu đề sách", 2); // Hiển thị thông báo lỗi
+            return; // Dừng hàm nếu không có tiêu đề sách
+        }
+        setLoading(true);
+        const regex = /#|\*/;
+        const newPages = await Promise.all(
+            pages.map(async (page) => {
+                try {
+                    const result1 = await RunChat("viết trang " + page.pageNo + " của cuôn sách " + book.title);
+                    return { ...page, content: result1.replace(regex, "") };
+                } catch (error) {
+                    console.error("Lỗi khi tạo nội dung trang:", error);
+                    toast.error(`Lỗi khi tạo nội dung trang ${page.pageNo}`);
+                    setLoading(false);
+                    return page; // Giữ nguyên nội dung trang hiện tại nếu có lỗi
+                }
+            })
+        );
+        setPages(newPages); // Cập nhật lại toàn bộ state pages một lần
+        setLoading(false);
+    };
+
     return (
         <div>
             <div className=' pt-5s mt-5 pt-5 rounded-lg w-full dark:!bg-navy-800 dark:text-white'>
                 <div className='justify-between items-center flex'>
                     <div className='h-14 flex items-center '>
                         <h2 className='text-2xl ml-4 pb-2 font-semibold border-b-4  !border-brand-600 dark:!border-brand-400'>
-                            Danh sách trang</h2>
+                            Thêm các trang tóm tắt</h2>
                     </div>
                     <div className='flex p-2  items-center justify-center'>
                         {loading && <div role="status" className='mr-2'>

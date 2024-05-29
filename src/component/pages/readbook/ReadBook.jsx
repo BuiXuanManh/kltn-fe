@@ -1,6 +1,6 @@
 
 import { IonIcon } from '@ionic/react';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
     heartOutline, documentTextOutline, bookmarkOutline, arrowBack, arrowForward,
     alertCircleOutline, menuSharp, settingsOutline, chatbubblesOutline,
@@ -150,6 +150,8 @@ const ReadBook = () => {
     const queryClient = useQueryClient();
     const handlePrePage = (e) => {
         e.preventDefault();
+        getInteraction.refetch()
+        setRate(1);
         if (pageNo > 1) {
             const no = Number(pageNo) - 1;
             navigate(`/details/read/${id}/${Number(no)}`);
@@ -157,9 +159,12 @@ const ReadBook = () => {
     }
     const handleNextPage = (e) => {
         e.preventDefault();
+        getInteraction.refetch()
+        setRate(1);
         if (pageNo < page?.book?.pageCount) {
             const no = Number(pageNo) + 1;
             navigate(`/details/read/${id}/${Number(no)}`);
+            handleNavigateToTop()
         }
     }
     const updateBookInteraction = useMutation({
@@ -306,11 +311,10 @@ const ReadBook = () => {
     const getInteraction = useQuery({
         queryKey: ["interactionPage", profile?.id, page?.id],
         queryFn: () => {
-            if (page.id !== "" && profile.id !== undefined && !isPage && token !== undefined && token !== "" && pageNo > 0 && page?.id !== undefined)
+            if (page.id !== "" && profile.id !== undefined && token !== undefined && token !== "" && pageNo > 0 && page?.id !== undefined)
                 pageService.getInteractionPage(token, page?.id).then((res) => {
                     if (res?.data) {
                         console.log(res.data);
-                        setIsPage(true);
                         setInteractionPage(res.data);
                         return res.data;
                     }
@@ -548,12 +552,23 @@ const ReadBook = () => {
         'Georgia': 'font-display',
         'Verdana': 'font-handwriting',
     }[setting?.font] || '';
-    console.log(setting)
+    const top = useRef(null);
+    const bottom = useRef(null);
+    const comment = useRef(null);
+    const handleNavigateToTop = () => {
+        top.current.scrollIntoView({ behavior: 'smooth' });
+    };
+    const handleNavigateToBottom = () => {
+        bottom.current.scrollIntoView({ behavior: 'smooth' });
+    };
+    const handleNavigateToComment = () => {
+        comment.current.scrollIntoView({ behavior: 'smooth' });
+    };
     return (
-        <div className={`w-full ${setting?.color === 7 ? "dark" : ""} dark:bg-[#222222]`}>
+        <div ref={top} className={`w-full ${setting?.color === 7 ? "dark" : ""} dark:bg-[#222222]`}>
             <div className={`relative py-10 w-full ${setting?.color === 7 ? "dark" : ""} dark:bg-[#222222] h-full  bg-gray-100`}>
-                <IonIcon className='dark:bg-[#222222] dark:text-gray-500 animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
-                <IonIcon className='dark:bg-[#222222] dark:text-gray-500 animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
+                <IonIcon onClick={() => handleNavigateToTop()} className='dark:bg-[#222222] dark:text-gray-500 animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
+                <IonIcon onClick={() => handleNavigateToBottom()} className='dark:bg-[#222222] dark:text-gray-500 animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
                 <div className={` w-full`}>
                     <div className={`mx-48 ${setting?.color === 7 ? "dark" : ""} dark:bg-[#222222] dark:text-gray-500  border ${setting?.color < 7 ? "bg-[" + colorOptions[setting?.color - 1]?.color + "]" : "bg-[#EAE4D3]"} border-white rounded-xl items-center justify-center text-center`}>
                         {/* header page */}
@@ -625,21 +640,21 @@ const ReadBook = () => {
                     {/* footer page */}
                     <div className='mt-4 mx-48 border dark:bg-[#222222] dark:text-gray-500 bg-[#EAE4D3] border-white h-25 rounded-md'>
                         <div className='mx-16 flex gap-10  py-10'>
-                            <div className='w-[45%] h-full'>
+                            <div className='w-[50%] h-full'>
                                 <button disabled={Number(pageNo) === 1} onClick={(e) => handlePrePage(e)} className={`w-full px-8 h-10 ${Number(pageNo) === 1 ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"} dark:bg-[#222222] dark:text-gray-500 justify-center items-center`}><div className='text-center justify-center'><IonIcon className='' icon={arrowBack}></IonIcon><span className='ml-3 mb-3'>Trang trước</span></div></button>
                             </div>
-                            <div className='justify-center text-center h-full items-center w-[10%]'>
+                            {/* <div className='justify-center text-center h-full items-center w-[10%]'>
                                 <button className='px-8 h-10 dark:bg-[#222222] dark:text-gray-500 bg-[#F0ECDF] justify-center items-center'>
                                     <IonIcon className="min-w-6 h-full pb-4" icon={alertCircleOutline}></IonIcon>
                                 </button>
-                            </div>
-                            <div className='w-[45%] h-full justify-end flex'>
+                            </div> */}
+                            <div className='w-[50%] h-full justify-end flex'>
                                 <button disabled={Number(pageNo) === page?.book?.pageCount} onClick={(e) => handleNextPage(e)} className={`ml-auto w-full px-8 h-10 dark:bg-[#222222] dark:text-gray-500 ${Number(pageNo) === page?.book?.pageCount ? "bg-gray-200 text-gray-400" : "bg-[#F0ECDF]"}`}><div className='justify-center text-center'><span className='mr-3 mb-3'>Trang sau</span> <IonIcon className='' icon={arrowForward}></IonIcon></div></button>
                             </div>
                         </div>
                     </div>
                     {/* comment */}
-                    <div className='mt-4 mx-48 border dark:bg-[#222222] dark:text-gray-500 bg-[#EAE4D3] border-white h-25 rounded-md'>
+                    <div ref={comment} className='mt-4 mx-48 border dark:bg-[#222222] dark:text-gray-500 bg-[#EAE4D3] border-white h-25 rounded-md'>
                         <div className='mx-16 grid gap-10 py-10'>
                             <div className='grid'>
                                 <div className='justify-between flex'>
@@ -864,6 +879,7 @@ const ReadBook = () => {
                                 <div
                                     onMouseEnter={() => setIsHover("comment")}
                                     onMouseLeave={handleMouseLeave}
+                                    onClick={() => handleNavigateToComment()}
                                     className='border relative dark:border-0 border-white border-solid  border-b-1 justify-center text-center h-14 items-center flex cursor-pointer'>
                                     <IonIcon className='w-7 h-7' icon={chatbubblesOutline} />
                                     {isHover === "comment" && (
@@ -881,6 +897,7 @@ const ReadBook = () => {
                     </div>
                 </div>
             </div>
+            <div ref={bottom}></div>
             <>
                 {show === "review" && <Review id={page?.book?.id} rate={rate} setRate={setRate} pageId={page?.id} handleClose={handleClose} />}</>
         </div >

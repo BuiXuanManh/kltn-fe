@@ -2,21 +2,69 @@
 /* eslint-disable no-unused-vars */
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Paper } from '@mui/material';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import Carousel from 'react-material-ui-carousel';
 import { faUser, faPenToSquare } from '@fortawesome/free-regular-svg-icons';
 import { faUserTie, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Avatar, Skeleton } from "@mui/material";
 import { AppContext } from '../../../context/AppContext';
+import { useMutation } from '@tanstack/react-query';
+import AccountService from '../../service/AccountService';
+import Cookies from 'js-cookie';
 // import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 const Profile = ({ data }) => {
     const [showSetting, setShowSetting] = useState(false);
     const showSettingHandle = () => {
         setShowSetting(!showSetting);
     }
-    const { token, user, profile } = useContext(AppContext);
-    console.log(token)
-    console.log(profile);
+    const { token, user, profile, setProfile } = useContext(AppContext);
+    const [avatar, setAvatar] = useState('');
+    const [background, setBackground] = useState('');
+    const avatarRef = useRef();
+    const handleChangeAvatar = () => {
+        avatarRef.current.click();
+    }
+    const uploadImageAvatar = () => {
+        const file = avatarRef.current.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            console.log('called: ', reader.result)
+            setAvatar(reader.result);
+            save.mutate({ image: reader.result, coverImage: background })
+        };
+        reader.readAsDataURL(file);
+    }
+    const bgRef = useRef();
+    const handleChangeBg = () => {
+        bgRef.current.click();
+    }
+    const uploadImageBg = () => {
+        const file = bgRef.current.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setBackground(reader.result);
+            save.mutate({ image: avatar, coverImage: reader.result })
+        };
+        reader.readAsDataURL(file);
+
+    }
+    let service = new AccountService();
+    const save = useMutation({
+        mutationFn: (data) => {
+            if (token !== "" && token !== undefined) {
+                service.saveProfile(data, token).then(res => {
+                    if (res.data) {
+                        setAvatar(res.data.image)
+                        setBackground(res.data.coverImage)
+
+                        setProfile(res.data)
+                        Cookies.setProfile(JSON.stringify(res.data));
+                        return res.data;
+                    }
+                })
+            }
+        }
+    })
     return (
         <div>
             <div className="h-full bg-gray-200 p-8">
@@ -38,11 +86,11 @@ const Profile = ({ data }) => {
                                     </div>
                                 </div>
 
-                                <button className="w-full flex items-center px-6 py-1.5 space-x-2 hover:bg-gray-200">
+                                <button onClick={() => handleChangeAvatar()} className="w-full flex items-center px-6 py-1.5 space-x-2 hover:bg-gray-200">
                                     <FontAwesomeIcon icon={faUserTie} className='h-4 w-6 text-gray-400' />
                                     <span className="text-sm text-gray-700">Đổi avatar</span>
                                 </button>
-                                <button className="w-full flex items-center py-1.5 px-6 space-x-2 hover:bg-gray-200">
+                                <button onClick={() => handleChangeBg()} className="w-full flex items-center py-1.5 px-6 space-x-2 hover:bg-gray-200">
                                     <FontAwesomeIcon className='h-4 w-6 text-gray-400' icon={faPenToSquare} />
                                     <span className="ml-4 text-sm text-gray-700">Đổi hình nền</span>
                                 </button>
@@ -50,11 +98,13 @@ const Profile = ({ data }) => {
                         </div>}
                     </div>
                     <div className="w-full h-[250px]">
-                        <img src="https://vojislavd.com/ta-template-demo/assets/img/profile-background.jpg" className="w-full h-full rounded-tl-lg rounded-tr-lg" />
+                        <img src={profile?.coverImage ? profile?.coverImage : "https://vojislavd.com/ta-template-demo/assets/img/profile-background.jpg"} className="w-full h-full rounded-tl-lg rounded-tr-lg" />
+                        <input accept='image/*' ref={bgRef} onChange={() => uploadImageBg()} type="file" className='hidden' />
                     </div>
                     <div className="flex flex-col items-center -mt-20">
                         {/* <img src="avatar.jpg" className="w-40 border-4 border-white rounded-full" /> */}
-                        <Avatar src={profile?.image} sx={{ width: "10rem", height: "10rem" }} />
+                        <Avatar onClick={() => handleChangeAvatar()} src={avatar ? avatar : profile?.image} sx={{ width: "10rem", height: "10rem" }} />
+                        <input accept='image/*' ref={avatarRef} onChange={() => uploadImageAvatar()} type="file" className='hidden' />
                         <div className="flex items-center space-x-2 mt-2">
                             <p className="text-2xl">{profile?.firstName} {profile?.lastName}</p>
                             <span className="bg-blue-500 rounded-full p-1" title="Verified">
@@ -93,11 +143,11 @@ const Profile = ({ data }) => {
                                     <span className="font-bold w-28">Email:</span>
                                     <span className="text-gray-700">{user?.email}</span>
                                 </li>
-                                <li className="flex items-center py-2 space-x-2 mt-4">
+                                {/* <li className="flex items-center py-2 space-x-2 mt-4">
                                     <button className='bg-tblue text-white rounded-md px-6 h-10'>Edit</button>
                                     <button className='bg-green-600 text-white rounded-md px-6 h-10'>Save</button>
                                     <button className='bg-red-500 text-white rounded-md px-6 h-10'>Cancel</button>
-                                </li>
+                                </li> */}
                             </ul>
                         </div>
                         <div className="flex-1 bg-white rounded-lg shadow-xl mt-4 p-8">
