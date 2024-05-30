@@ -9,7 +9,7 @@ class AxiosSingleton {
         }
 
         this.api = axios.create({
-            baseURL: 'https://ec2-54-254-52-63.ap-southeast-1.compute.amazonaws.com:8080',
+            baseURL: 'http://ec2-13-215-218-209.ap-southeast-1.compute.amazonaws.com:8080',
             headers: {
                 'Content-Type': 'application/json',
             },
