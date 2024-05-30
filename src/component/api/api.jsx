@@ -9,10 +9,11 @@ class AxiosSingleton {
         }
 
         this.api = axios.create({
-            baseURL: 'http://ec2-13-215-218-209.ap-southeast-1.compute.amazonaws.com:8080',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            baseURL: 'https://192.168.43.71:8080',
+            // baseURL: 'https://ec2-13-215-218-209.ap-southeast-1.compute.amazonaws.com:8080',
+            // headers: {
+            //     'Content-Type': 'application/json',
+            // },
         });
 
         AxiosSingleton.instance = this; // Lưu trữ instance
