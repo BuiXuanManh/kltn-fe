@@ -564,9 +564,22 @@ const ReadBook = () => {
     const handleNavigateToComment = () => {
         comment.current.scrollIntoView({ behavior: 'smooth' });
     };
+    const changPage = (e) => {
+        e.stopPropagation();
+        if (e.key === "ArrowRight") {
+            handleNextPage(e)
+        }
+        if (e.key === "ArrowLeft") {
+            handlePrePage(e)
+        }
+    }
+    const change = useRef(null);
+    useEffect(() => {
+        change.current.focus();
+    }, []);
     return (
         <div ref={top} className={`w-full ${setting?.color === 7 ? "dark" : ""} dark:bg-[#222222]`}>
-            <div className={`relative py-10 w-full ${setting?.color === 7 ? "dark" : ""} dark:bg-[#222222] h-full  bg-gray-100`}>
+            <div ref={change} tabIndex="0" onKeyDown={e => changPage(e)} className={`relative py-10 w-full ${setting?.color === 7 ? "dark" : ""} dark:bg-[#222222] h-full  bg-gray-100`}>
                 <IonIcon onClick={() => handleNavigateToTop()} className='dark:bg-[#222222] dark:text-gray-500 animate-bounce w-10 h-10 fixed right-4 bottom-96 cursor-pointer' icon={arrowUpCircleOutline}></IonIcon>
                 <IonIcon onClick={() => handleNavigateToBottom()} className='dark:bg-[#222222] dark:text-gray-500 animate-bounce w-10 h-10 fixed right-4 top-96 cursor-pointer' icon={arrowDownCircleOutline}></IonIcon>
                 <div className={` w-full`}>
