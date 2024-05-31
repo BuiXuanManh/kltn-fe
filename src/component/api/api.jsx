@@ -9,11 +9,12 @@ class AxiosSingleton {
         }
 
         this.api = axios.create({
-            baseURL: 'https://45aa-113-185-77-11.ngrok-free.app',
+            // baseURL: 'http://localhost:8080',
+            baseURL: 'https://9aca-113-185-77-11.ngrok-free.app',
             // baseURL: 'https://ec2-13-215-218-209.ap-southeast-1.compute.amazonaws.com:8080',
             headers: {
                 'Content-Type': 'application/json',
-                "X-My-Custom-Header": "anything"
+                "ngrok-skip-browser-warning": "anything"
             },
         });
 
