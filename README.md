@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/c32c9f76-e139-4241-bb53-adcd60502893)# Recommendation book app use ReactJS + ViteJS + taiwindcss 
+# Recommendation book app use ReactJS + ViteJS + taiwindcss 
 State management tool: React Query
 # Overview project: app allows searching for books, handling user activities such as: rating, commenting, saving, reading book summaries, adding new books, managing accounts, viewing statistics,...
 - Home page:
